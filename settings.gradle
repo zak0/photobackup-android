@@ -1,0 +1,2 @@
+rootProject.name='photosapp-android'
+include ':app'
