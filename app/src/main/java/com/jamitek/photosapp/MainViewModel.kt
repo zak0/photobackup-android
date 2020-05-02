@@ -25,6 +25,9 @@ class MainViewModel : ViewModel() {
     private val mutableSelectedPhoto = MutableLiveData<Photo>().apply { value = null }
     val selectedPhoto: LiveData<Photo> = mutableSelectedPhoto
 
+    private val mutablePhotosPerDate = MutableLiveData<ArrayList<Pair<String, ArrayList<Photo>>>>().apply { value = ArrayList() }
+    val photosPerDate: LiveData<ArrayList<Pair<String, ArrayList<Photo>>>> = mutablePhotosPerDate
+
     /**
      * Callback for when a thumbnail is clicked on library screen. Marks the clicked image as
      * selected.
@@ -62,6 +65,42 @@ class MainViewModel : ViewModel() {
         } else {
             mutablePhotos.value = mutablePhotos.value
         }
+
+        // Arrange photos into date buckets
+        arrangeIntoDateBuckets()
+    }
+
+    private fun arrangeIntoDateBuckets() {
+        val newPhotosPerDate = ArrayList<Pair<String, ArrayList<Photo>>>()
+
+        var currentDate = ""
+        var photosForCurrentDate = ArrayList<Photo>()
+
+        mutablePhotos.value?.forEach { photo ->
+            val date = DateUtil.exifDateToNiceDate(photo.dateTimeOriginal)
+
+            // If date differs from the date currently being processed, then add these photos to the
+            // list and init the list for the next date.
+            if (currentDate != date) {
+                // Eliminate adding the first one by only adding the pair if there are photos for
+                // this date. (Which should be the case for all other than the initialized first
+                // date (empty string).
+                if (photosForCurrentDate.size > 0) {
+                    val pair = Pair(currentDate, photosForCurrentDate)
+                    newPhotosPerDate.add(pair)
+                }
+                currentDate = date
+                photosForCurrentDate = ArrayList()
+            }
+
+            photosForCurrentDate.add(photo)
+        }
+
+        // Add the last pair
+        val pair = Pair(currentDate, photosForCurrentDate)
+        newPhotosPerDate.add(pair)
+
+        mutablePhotosPerDate.value = newPhotosPerDate
     }
 
 }
