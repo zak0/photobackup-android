@@ -1,6 +1,7 @@
 package com.jamitek.photosapp.networking
 
 import android.util.Log
+import com.jamitek.photosapp.model.Photo
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -22,35 +23,29 @@ object ApiClient {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.1.105:3000/")
+        .baseUrl(UrlRepo.baseUrl)
         .client(okHttpClient)
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
 
     private val retrofitService = retrofit.create(PhotosRetrofitService::class.java)
 
-    fun getAllPhotos(callback: (List<Int>) -> Unit) {
-        val callback = object : Callback<String> {
+    fun getAllPhotos(callback: (List<Photo>) -> Unit) {
+        val retroFitCallback = object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
-                    val photosJson = response.body()?.let { ResponseParser.parsePhotosJson(it) }
-                    photosJson?.getJSONArray("files")?.let {
-                        val photoIds = ArrayList<Int>()
-                        for (i in 0 until it.length()) {
-                            photoIds.add(it.getJSONObject(i).getInt("id"))
-                        }
-                        callback(photoIds)
-                    }
-                    val foo = "bar"
+                    val photos =
+                        response.body()?.let { ResponseParser.parsePhotosJson(it) } ?: emptyList()
+                    callback(photos)
                     Log.d(TAG, "getAllPhotos() - response: 200")
                 }
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                val foo = "bar"
+                Log.e(TAG, "Retrieving photos failed: ", t)
             }
         }
 
-        retrofitService.getAllMedia().enqueue(callback)
+        retrofitService.getAllMedia().enqueue(retroFitCallback)
     }
 }

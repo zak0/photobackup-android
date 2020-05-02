@@ -26,11 +26,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        get_all_button.setOnClickListener {
-            ApiClient.getAllPhotos() { photoIds ->
-                adapter.dataSet = ArrayList(photoIds)
-                adapter.notifyDataSetChanged()
-            }
+        ApiClient.getAllPhotos() { photos ->
+            adapter.dataSet = ArrayList(photos)
+            adapter.notifyDataSetChanged()
         }
 
         observe()
@@ -38,7 +36,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private fun observe() {
         viewModel.selectedPhoto.observe(viewLifecycleOwner, Observer {
-            it?.let { photoId ->
+            it?.let { photo ->
                 findNavController().navigate(R.id.action_mainFragment_to_viewerFragment)
             }
         })
