@@ -1,9 +1,10 @@
 package com.jamitek.photosapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.jamitek.photosapp.networking.ApiClient
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -12,15 +13,15 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     companion object {
         private const val TAG = "MainFragment"
-        fun newInstance() = MainFragment()
     }
 
-    private val adapter: ThumbnailsAdapter by lazy { ThumbnailsAdapter() }
-    private lateinit var viewModel: MainViewModel
+    private val adapter: ThumbnailsAdapter by lazy { ThumbnailsAdapter(viewModel) }
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(requireContext(), 3)
@@ -32,5 +33,14 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
         }
 
+        observe()
+    }
+
+    private fun observe() {
+        viewModel.selectedPhoto.observe(viewLifecycleOwner, Observer {
+            it?.let { photoId ->
+                findNavController().navigate(R.id.action_mainFragment_to_viewerFragment)
+            }
+        })
     }
 }

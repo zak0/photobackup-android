@@ -9,7 +9,7 @@ import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import kotlinx.android.synthetic.main.list_item_thumbnail.view.*
 
-class ThumbnailsAdapter : RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailsViewHolder>() {
+class ThumbnailsAdapter(private val viewModel: MainViewModel) : RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailsViewHolder>() {
 
     var dataSet = ArrayList<Int>()
 
@@ -27,6 +27,10 @@ class ThumbnailsAdapter : RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailsViewH
             .load(glideUrl)
             .centerCrop()
             .into(holder.itemView.image)
+
+        holder.itemView.setOnClickListener {
+            viewModel.onThumbnailClicked(dataSet[position])
+        }
     }
 
     class ThumbnailsViewHolder(view: View) : RecyclerView.ViewHolder(view)
