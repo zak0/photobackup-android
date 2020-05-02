@@ -30,7 +30,9 @@ object ApiClient {
 
     private val retrofitService = retrofit.create(PhotosRetrofitService::class.java)
 
-    fun getAllPhotos(callback: (List<Photo>) -> Unit) {
+    fun getAllPhotos(callback: (List<Photo>) -> Unit) = getAllPhotos(0, callback)
+
+    fun getAllPhotos(offset: Int, callback: (List<Photo>) -> Unit) {
         val retroFitCallback = object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
@@ -46,6 +48,6 @@ object ApiClient {
             }
         }
 
-        retrofitService.getAllMedia().enqueue(retroFitCallback)
+        retrofitService.getAllMedia(100000, offset).enqueue(retroFitCallback)
     }
 }

@@ -25,13 +25,13 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(requireContext(), 3)
-
-        ApiClient.getAllPhotos() { photos ->
-            adapter.dataSet = ArrayList(photos)
-            adapter.notifyDataSetChanged()
-        }
+        //recycler.addOnScrollListener(ThumbnailsOnScrollListener(viewModel)) // TODO Uncomment when lazy loading is really built
 
         observe()
+
+        ApiClient.getAllPhotos() { photos ->
+            viewModel.onPhotosLoaded(photos)
+        }
     }
 
     private fun observe() {
@@ -40,5 +40,18 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 findNavController().navigate(R.id.action_mainFragment_to_viewerFragment)
             }
         })
+
+        viewModel.photos.observe(viewLifecycleOwner, Observer {
+            adapter.notifyDataSetChanged()
+        })
+
+        // TODO Uncomment when lazy loading is added
+//        viewModel.nextGetOffset.observe(viewLifecycleOwner, Observer {
+//            it?.let { offset ->
+//                ApiClient.getAllPhotos(offset) { photos ->
+//                    viewModel.onPhotosLoaded(photos)
+//                }
+//            }
+//        })
     }
 }
