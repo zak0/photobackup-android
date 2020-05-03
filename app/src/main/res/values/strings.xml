@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Photos App</string>
+    <string name="appName">Photos App</string>
+    <string name="navLibrary">Library</string>
+    <string name="navFolders">Local Folders</string>
+    <string name="navSettings">Settings</string>
+
 </resources>
