@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/viewerFragment"
-        android:name="com.jamitek.photosapp.ViewerFragment"
+        android:name="com.jamitek.photosapp.viewer.ViewerFragment"
         android:label="ViewerFragment" />
 
 </navigation>
