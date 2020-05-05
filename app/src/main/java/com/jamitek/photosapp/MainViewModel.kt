@@ -3,8 +3,10 @@ package com.jamitek.photosapp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jamitek.photosapp.model.Photo
 import com.jamitek.photosapp.model.RemotePhoto
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
@@ -17,8 +19,7 @@ class MainViewModel : ViewModel() {
     /**
      * List of currently loaded photos.
      */
-    private val mutablePhotos = MutableLiveData<ArrayList<Photo>>().apply { value = ArrayList() }
-    val photos: LiveData<ArrayList<Photo>> = mutablePhotos
+    val photos = Repository.allPhotos
 
     /**
      * Currently selected photo for detailed viewing and inspection.
@@ -26,8 +27,7 @@ class MainViewModel : ViewModel() {
     private val mutableSelectedPhoto = MutableLiveData<Photo>().apply { value = null }
     val selectedPhoto: LiveData<Photo> = mutableSelectedPhoto
 
-    private val mutablePhotosPerDate = MutableLiveData<ArrayList<Pair<String, ArrayList<Photo>>>>().apply { value = ArrayList() }
-    val photosPerDate: LiveData<ArrayList<Pair<String, ArrayList<Photo>>>> = mutablePhotosPerDate
+    val photosPerDate = Repository.photosPerDate
 
     /**
      * Callback for when a thumbnail is clicked on library screen. Marks the clicked image as
@@ -55,55 +55,11 @@ class MainViewModel : ViewModel() {
 
     /**
      * Callback for when a GET for photos finishes.
-     *
-     * TODO When infinite scrolling is built, add photos to the list, but only add new ones
-     *  to avoid duplicates. There should not be duplicates to begin with, so keep an eye on
-     *  this when check for duplicates is built.
      */
     fun onRemotePhotosLoaded(newPhotos: List<RemotePhoto>) {
-        if (newPhotos.size != mutablePhotos.value?.size ?: 0) {
-            mutablePhotos.value = ArrayList(newPhotos.map { Photo(null, it) })
-        } else {
-            mutablePhotos.value = mutablePhotos.value
-        }
-
-        // Arrange photos into date buckets
-        arrangeIntoDateBuckets()
+        viewModelScope.launch { Repository.onRemotePhotosLoaded(newPhotos) }
     }
 
-    private fun arrangeIntoDateBuckets() {
-        val newPhotosPerDate = ArrayList<Pair<String, ArrayList<Photo>>>()
 
-        var currentDate = ""
-        var photosForCurrentDate = ArrayList<Photo>()
-
-        mutablePhotos.value?.forEach { photo ->
-            photo.remotePhoto?.also { remotePhoto ->
-                val date = DateUtil.exifDateToNiceDate(remotePhoto.dateTimeOriginal)
-
-                // If date differs from the date currently being processed, then add these photos to the
-                // list and init the list for the next date.
-                if (currentDate != date) {
-                    // Eliminate adding the first one by only adding the pair if there are photos for
-                    // this date. (Which should be the case for all other than the initialized first
-                    // date (empty string).
-                    if (photosForCurrentDate.size > 0) {
-                        val pair = Pair(currentDate, photosForCurrentDate)
-                        newPhotosPerDate.add(pair)
-                    }
-                    currentDate = date
-                    photosForCurrentDate = ArrayList()
-                }
-
-                photosForCurrentDate.add(photo)
-            }
-        }
-
-        // Add the last pair
-        val pair = Pair(currentDate, photosForCurrentDate)
-        newPhotosPerDate.add(pair)
-
-        mutablePhotosPerDate.value = newPhotosPerDate
-    }
 
 }

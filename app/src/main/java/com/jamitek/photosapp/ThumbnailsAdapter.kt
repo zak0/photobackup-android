@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jamitek.photosapp.model.Photo
-import com.jamitek.photosapp.networking.UrlRepo
+import com.jamitek.photosapp.networking.UrlHelper
 import kotlinx.android.synthetic.main.list_item_thumbnail.view.*
 
 class ThumbnailsAdapter(
@@ -26,8 +26,8 @@ class ThumbnailsAdapter(
     override fun onBindViewHolder(holder: ThumbnailsViewHolder, position: Int) {
         val photo = dataSet[position]
         photo.remotePhoto?.also { remotePhoto ->
-            val url = UrlRepo.thumbnailUrl(remotePhoto.id)
-            val glideUrl = UrlRepo.authorizedGlideUrl(url)
+            val url = UrlHelper.thumbnailUrl(remotePhoto.id)
+            val glideUrl = UrlHelper.authorizedGlideUrl(url)
             Glide
                 .with(holder.itemView)
                 .load(glideUrl)

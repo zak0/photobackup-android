@@ -2,9 +2,8 @@ package com.jamitek.photosapp.networking
 
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
-import retrofit2.http.Url
 
-object UrlRepo {
+object UrlHelper {
     val baseUrl = "http://192.168.1.105:3000/"
     fun thumbnailUrl(photoId: Int) = "${baseUrl}media/$photoId/thumbnail"
     fun photoUrl(photoId: Int) = "${baseUrl}media/$photoId/file"

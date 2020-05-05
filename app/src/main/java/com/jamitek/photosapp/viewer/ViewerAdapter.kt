@@ -8,7 +8,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import com.jamitek.photosapp.MainViewModel
 import com.jamitek.photosapp.R
-import com.jamitek.photosapp.networking.UrlRepo
+import com.jamitek.photosapp.networking.UrlHelper
 import kotlinx.android.synthetic.main.view_viewer_image.view.*
 
 class ViewerAdapter(private val viewModel: MainViewModel) : RecyclerView.Adapter<ViewerAdapter.ViewerViewHolder>() {
@@ -22,8 +22,8 @@ class ViewerAdapter(private val viewModel: MainViewModel) : RecyclerView.Adapter
 
     override fun onBindViewHolder(holder: ViewerViewHolder, position: Int) {
         viewModel.photos.value?.get(position)?.remotePhoto?.also { remotePhoto ->
-            val url = UrlRepo.photoUrl(remotePhoto.id)
-            val glideUrl = UrlRepo.authorizedGlideUrl(url)
+            val url = UrlHelper.photoUrl(remotePhoto.id)
+            val glideUrl = UrlHelper.authorizedGlideUrl(url)
             Glide
                 .with(holder.itemView.context)
                 .load(glideUrl)

@@ -23,7 +23,7 @@ object ApiClient {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(UrlRepo.baseUrl)
+        .baseUrl(UrlHelper.baseUrl)
         .client(okHttpClient)
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
