@@ -27,8 +27,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         observe()
 
-        ApiClient.getAllPhotos() { photos ->
-            viewModel.onPhotosLoaded(photos)
+        ApiClient.getAllPhotos() { remotePhotos ->
+            viewModel.onRemotePhotosLoaded(remotePhotos)
         }
     }
 

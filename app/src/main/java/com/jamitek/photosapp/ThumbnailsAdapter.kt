@@ -25,16 +25,18 @@ class ThumbnailsAdapter(
 
     override fun onBindViewHolder(holder: ThumbnailsViewHolder, position: Int) {
         val photo = dataSet[position]
-        val url = UrlRepo.thumbnailUrl(photo.id)
-        val glideUrl = UrlRepo.authorizedGlideUrl(url)
-        Glide
-            .with(holder.itemView)
-            .load(glideUrl)
-            .centerCrop()
-            .into(holder.itemView.image)
+        photo.remotePhoto?.also { remotePhoto ->
+            val url = UrlRepo.thumbnailUrl(remotePhoto.id)
+            val glideUrl = UrlRepo.authorizedGlideUrl(url)
+            Glide
+                .with(holder.itemView)
+                .load(glideUrl)
+                .centerCrop()
+                .into(holder.itemView.image)
 
-        holder.itemView.setOnClickListener {
-            viewModel.onThumbnailClicked(photo)
+            holder.itemView.setOnClickListener {
+                viewModel.onThumbnailClicked(photo)
+            }
         }
     }
 

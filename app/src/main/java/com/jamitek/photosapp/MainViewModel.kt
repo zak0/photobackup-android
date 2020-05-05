@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.model.RemotePhoto
 
 class MainViewModel : ViewModel() {
 
@@ -59,9 +60,9 @@ class MainViewModel : ViewModel() {
      *  to avoid duplicates. There should not be duplicates to begin with, so keep an eye on
      *  this when check for duplicates is built.
      */
-    fun onPhotosLoaded(newPhotos: List<Photo>) {
+    fun onRemotePhotosLoaded(newPhotos: List<RemotePhoto>) {
         if (newPhotos.size != mutablePhotos.value?.size ?: 0) {
-            mutablePhotos.value = ArrayList(newPhotos)
+            mutablePhotos.value = ArrayList(newPhotos.map { Photo(null, it) })
         } else {
             mutablePhotos.value = mutablePhotos.value
         }
@@ -77,23 +78,25 @@ class MainViewModel : ViewModel() {
         var photosForCurrentDate = ArrayList<Photo>()
 
         mutablePhotos.value?.forEach { photo ->
-            val date = DateUtil.exifDateToNiceDate(photo.dateTimeOriginal)
+            photo.remotePhoto?.also { remotePhoto ->
+                val date = DateUtil.exifDateToNiceDate(remotePhoto.dateTimeOriginal)
 
-            // If date differs from the date currently being processed, then add these photos to the
-            // list and init the list for the next date.
-            if (currentDate != date) {
-                // Eliminate adding the first one by only adding the pair if there are photos for
-                // this date. (Which should be the case for all other than the initialized first
-                // date (empty string).
-                if (photosForCurrentDate.size > 0) {
-                    val pair = Pair(currentDate, photosForCurrentDate)
-                    newPhotosPerDate.add(pair)
+                // If date differs from the date currently being processed, then add these photos to the
+                // list and init the list for the next date.
+                if (currentDate != date) {
+                    // Eliminate adding the first one by only adding the pair if there are photos for
+                    // this date. (Which should be the case for all other than the initialized first
+                    // date (empty string).
+                    if (photosForCurrentDate.size > 0) {
+                        val pair = Pair(currentDate, photosForCurrentDate)
+                        newPhotosPerDate.add(pair)
+                    }
+                    currentDate = date
+                    photosForCurrentDate = ArrayList()
                 }
-                currentDate = date
-                photosForCurrentDate = ArrayList()
-            }
 
-            photosForCurrentDate.add(photo)
+                photosForCurrentDate.add(photo)
+            }
         }
 
         // Add the last pair

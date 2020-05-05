@@ -1,7 +1,7 @@
 package com.jamitek.photosapp.networking
 
 import android.util.Log
-import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.model.RemotePhoto
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,9 +30,9 @@ object ApiClient {
 
     private val retrofitService = retrofit.create(PhotosRetrofitService::class.java)
 
-    fun getAllPhotos(callback: (List<Photo>) -> Unit) = getAllPhotos(0, callback)
+    fun getAllPhotos(callback: (List<RemotePhoto>) -> Unit) = getAllPhotos(0, callback)
 
-    fun getAllPhotos(offset: Int, callback: (List<Photo>) -> Unit) {
+    fun getAllPhotos(offset: Int, callback: (List<RemotePhoto>) -> Unit) {
         val retroFitCallback = object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {

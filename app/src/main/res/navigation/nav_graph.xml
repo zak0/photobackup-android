@@ -9,7 +9,7 @@
         android:id="@+id/mainFragment"
         android:name="com.jamitek.photosapp.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_viewerFragment"
             app:destination="@id/viewerFragment" />
@@ -19,5 +19,18 @@
         android:id="@+id/viewerFragment"
         android:name="com.jamitek.photosapp.viewer.ViewerFragment"
         android:label="ViewerFragment" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.jamitek.photosapp.SettingsFragment"
+        android:label="SettingsFragment" />
+
+    <action
+        android:id="@+id/action_global_mainFragment"
+        app:destination="@id/mainFragment" />
+
+    <action
+        android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settingsFragment" />
 
 </navigation>
