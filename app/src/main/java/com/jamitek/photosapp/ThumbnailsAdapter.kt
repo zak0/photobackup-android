@@ -1,5 +1,7 @@
 package com.jamitek.photosapp
 
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +17,16 @@ class ThumbnailsAdapter(
 ) :
     RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailsViewHolder>() {
 
+    companion object {
+        var thumbnailPlaceholder: Drawable? = null
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThumbnailsViewHolder {
+        thumbnailPlaceholder ?: run {
+            thumbnailPlaceholder =
+                ColorDrawable(parent.context.resources.getColor(R.color.colorSecondaryText, null))
+        }
+
         return ThumbnailsViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.list_item_thumbnail, parent, false)
         )
@@ -35,6 +46,7 @@ class ThumbnailsAdapter(
                 .with(holder.itemView)
                 .load(glideUrl)
                 .centerCrop()
+                .placeholder(thumbnailPlaceholder)
                 .into(holder.itemView.image)
         }
 

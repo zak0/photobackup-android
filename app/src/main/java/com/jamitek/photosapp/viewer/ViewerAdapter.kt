@@ -29,6 +29,7 @@ class ViewerAdapter(private val viewModel: MainViewModel) : RecyclerView.Adapter
                 .load(glideUrl)
                 //.format(DecodeFormat.PREFER_ARGB_8888) // TODO Test if this has an effect
                 .override(Target.SIZE_ORIGINAL) // Without this, Glide downsamples the images
+                .placeholder(R.drawable.ic_broken_image_24dp)
                 .into(holder.itemView.image)
         }
     }
