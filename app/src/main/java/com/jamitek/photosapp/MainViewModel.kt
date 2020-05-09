@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jamitek.photosapp.model.Photo
-import com.jamitek.photosapp.model.RemotePhoto
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -56,10 +55,9 @@ class MainViewModel : ViewModel() {
     /**
      * Callback for when a GET for photos finishes.
      */
-    fun onRemotePhotosLoaded(newPhotos: List<RemotePhoto>) {
+    fun onRemotePhotosLoaded(newPhotos: List<Photo>) {
         viewModelScope.launch { Repository.onRemotePhotosLoaded(newPhotos) }
     }
-
 
 
 }

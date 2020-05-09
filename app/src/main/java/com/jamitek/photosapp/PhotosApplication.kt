@@ -9,6 +9,7 @@ class PhotosApplication : Application() {
 
     override fun onCreate() {
         INSTANCE = this
+        Repository.init(this)
         super.onCreate()
     }
 }

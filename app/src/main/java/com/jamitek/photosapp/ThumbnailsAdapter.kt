@@ -25,18 +25,21 @@ class ThumbnailsAdapter(
 
     override fun onBindViewHolder(holder: ThumbnailsViewHolder, position: Int) {
         val photo = dataSet[position]
-        photo.remotePhoto?.also { remotePhoto ->
-            val url = UrlHelper.thumbnailUrl(remotePhoto.id)
+
+        // TODO Use local thumbnail for local photos, now only tries to fetch a remote
+        //  thumbnail, which for local-only photos doesn't even exist.
+        photo.serverId?.also { serverId ->
+            val url = UrlHelper.thumbnailUrl(serverId)
             val glideUrl = UrlHelper.authorizedGlideUrl(url)
             Glide
                 .with(holder.itemView)
                 .load(glideUrl)
                 .centerCrop()
                 .into(holder.itemView.image)
+        }
 
-            holder.itemView.setOnClickListener {
-                viewModel.onThumbnailClicked(photo)
-            }
+        holder.itemView.setOnClickListener {
+            viewModel.onThumbnailClicked(photo)
         }
     }
 

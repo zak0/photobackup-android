@@ -21,8 +21,8 @@ class ViewerAdapter(private val viewModel: MainViewModel) : RecyclerView.Adapter
     override fun getItemCount(): Int = viewModel.photos.value?.size ?: 0
 
     override fun onBindViewHolder(holder: ViewerViewHolder, position: Int) {
-        viewModel.photos.value?.get(position)?.remotePhoto?.also { remotePhoto ->
-            val url = UrlHelper.photoUrl(remotePhoto.id)
+        viewModel.photos.value?.get(position)?.serverId?.also { serverId ->
+            val url = UrlHelper.photoUrl(serverId)
             val glideUrl = UrlHelper.authorizedGlideUrl(url)
             Glide
                 .with(holder.itemView.context)
