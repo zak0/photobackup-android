@@ -6,9 +6,13 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
+import com.jamitek.photosapp.DateUtil
+import com.jamitek.photosapp.Repository
+import com.jamitek.photosapp.model.Photo
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.*
+import kotlin.collections.ArrayList
 
 object StorageAccessHelper {
 
@@ -21,11 +25,13 @@ object StorageAccessHelper {
         activity.startActivityForResult(intent, REQUEST_CODE_SET_CAMERA_DIR)
     }
 
-    fun iterateCameraDir(context: Context, uriString: String) {
+    suspend fun iterateCameraDir(context: Context, uriString: String) {
         DocumentFile.fromTreeUri(context, Uri.parse(uriString))?.also { docFile ->
             if (!docFile.isDirectory) {
                 throw IllegalStateException("Selected camera directory is not a directory.")
             }
+
+            val localPhotos = ArrayList<Photo>()
 
             docFile.listFiles().forEach { childDocFile ->
                 val fileName = childDocFile.name ?: ""
@@ -35,18 +41,38 @@ object StorageAccessHelper {
                     val fileSize = childDocFile.length()
                     val digest = calculateMd5ForFile(context, childDocFile)
 
+                    // TODO Check if local photo record already exists for this photo (based on
+                    //  its file size and hash), and only if not, then read necessary info and
+                    //  add it into the metadata database.
+                    val fileUriString = childDocFile.uri.toString()
+
+                    val photo = Photo(
+                        null,
+                        null,
+                        fileName,
+                        fileSize,
+                        null,
+                        fileUriString,
+                        null,
+                        digest,
+                        DateUtil.EPOCH_EXIF, // 1970:01:01 00:00:00
+                        null
+                    )
+
+                    localPhotos.add(photo)
                     Log.d(TAG, "filename: $fileName, filesize: $fileSize, digest: $digest")
                 }
             }
+
+            Repository.onLocalPhotosLoaded(context, localPhotos)
         }
     }
 
-    private fun calculateMd5ForFile(context: Context, file: DocumentFile): String? {
+    private fun calculateMd5ForFile(context: Context, file: DocumentFile): String {
         val digest = MessageDigest.getInstance("MD5")
         val buffer = ByteArray(32768)
-        var output: String? = null
 
-        context.contentResolver.openInputStream(file.uri)?.also { stream ->
+        return context.contentResolver.openInputStream(file.uri)?.let { stream ->
             var readBytes = stream.read(buffer)
             while (readBytes > 0) {
                 digest.update(buffer, 0, readBytes)
@@ -55,11 +81,17 @@ object StorageAccessHelper {
 
             val md5Sum = digest.digest()
             val bigInt = BigInteger(1, md5Sum)
-            output = bigInt.toString(16)
-            output = String.format("%32s", output).replace(" ", "0")
+            val asString = bigInt.toString(16)
+            String.format("%32s", asString).replace(" ", "0")
+        } ?: run {
+            throw IllegalStateException("Failed to calculate MD5 hash for ${file.name}.")
         }
+    }
 
-        return output
+    fun getFileLastModifiedDate(context: Context, uriString: String): Date? {
+        return DocumentFile.fromSingleUri(context, Uri.parse(uriString))?.let {
+            Date(it.lastModified())
+        }
     }
 
 }

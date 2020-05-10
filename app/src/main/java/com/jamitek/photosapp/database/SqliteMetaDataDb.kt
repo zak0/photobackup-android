@@ -79,12 +79,14 @@ class SqliteMetaDataDb(context: Context) :
                 // Localphoto entry already exists, update existing
                 val sql = """
                        UPDATE "photo" SET
-                        "serverid" = ${photo.serverId}
                         "filename" = "${photo.fileName}",
                         "filesize" = ${photo.fileSize},
                         "hash" = "${photo.hash}",
-                        "status = "${photo.status}",
-                        "serverdirpath" = "${photo.serverDirPath}",
+                        "status" = ${photo.status?.let { "\"$it\"" } ?: "null"},
+                        "serverid" = ${photo.serverId ?: "null"},
+                        "serverdirpath" = ${photo.serverDirPath?.let { "\"$it\"" } ?: "null"},
+                        "localimageuri" = ${photo.localUriString?.let { "\"$it\"" } ?: "null"},
+                        "localthumbnailuri" = ${photo.localThumbnailUriString?.let { "\"$it\"" } ?: "null"},
                         "datetimeoriginal" = "${photo.dateTimeOriginal}"
                         WHERE "id" = ${photo.id}
                     """.trimIndent()
@@ -94,19 +96,23 @@ class SqliteMetaDataDb(context: Context) :
                 // It doesn't exist in the database yet, let's insert
                 val sql = """
                 INSERT INTO "photo" (
-                "serverid",
                 "filename",
                 "filesize",
                 "hash",
                 "status",
+                "serverid",
                 "serverdirpath",
+                "localimageuri",
+                "localthumbnailuri",
                 "datetimeoriginal") VALUES (
-                ${photo.serverId},
                 "${photo.fileName}",
                 ${photo.fileSize},
                 "${photo.hash}",
-                "${photo.status}",
-                "${photo.serverDirPath}",
+                ${photo.status?.let { "\"$it\"" } ?: "null" },
+                ${photo.serverId ?: "null"},
+                ${photo.serverDirPath?.let { "\"$it\"" } ?: "null"},
+                ${photo.localUriString?.let { "\"$it\"" } ?: "null"},
+                ${photo.localThumbnailUriString?.let { "\"$it\"" } ?: "null"},
                 "${photo.dateTimeOriginal}"
                 )
                 """.trimIndent()

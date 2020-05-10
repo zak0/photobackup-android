@@ -2,6 +2,7 @@ package com.jamitek.photosapp
 
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,18 +38,20 @@ class ThumbnailsAdapter(
     override fun onBindViewHolder(holder: ThumbnailsViewHolder, position: Int) {
         val photo = dataSet[position]
 
-        // TODO Use local thumbnail for local photos, now only tries to fetch a remote
-        //  thumbnail, which for local-only photos doesn't even exist.
-        photo.serverId?.also { serverId ->
-            val url = UrlHelper.thumbnailUrl(serverId)
-            val glideUrl = UrlHelper.authorizedGlideUrl(url)
-            Glide
-                .with(holder.itemView)
-                .load(glideUrl)
-                .centerCrop()
-                .placeholder(thumbnailPlaceholder)
-                .into(holder.itemView.image)
-        }
+        // Primarily try to use local thumbnails to prevent having to load anything over the
+        // network.
+        val thumbnailAddress =
+            photo.localThumbnailUriString?.let { Uri.parse(it) } ?: photo.serverId?.let {
+                val url = UrlHelper.thumbnailUrl(it)
+                UrlHelper.authorizedGlideUrl(url)
+            }
+
+        Glide
+            .with(holder.itemView)
+            .load(thumbnailAddress)
+            .centerCrop()
+            .placeholder(thumbnailPlaceholder)
+            .into(holder.itemView.image)
 
         holder.itemView.setOnClickListener {
             viewModel.onThumbnailClicked(photo)

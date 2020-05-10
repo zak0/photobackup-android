@@ -13,6 +13,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jamitek.photosapp.database.SharedPrefsPersistence
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -51,7 +53,9 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 StorageAccessHelper.REQUEST_CODE_SET_CAMERA_DIR -> {
                     data?.data?.let { uri ->
                         SharedPrefsPersistence.cameraDirUriString = uri.toString()
-                        StorageAccessHelper.iterateCameraDir(this, uri.toString())
+                        GlobalScope.launch {
+                            StorageAccessHelper.iterateCameraDir(this@MainActivity, uri.toString())
+                        }
                     }
                 }
                 else -> super.onActivityResult(requestCode, resultCode, data)

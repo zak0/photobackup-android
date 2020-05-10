@@ -29,5 +29,5 @@ data class Photo(
     var dateTimeOriginal: String,
 
     /** Status of the photo */
-    var status: String
+    var status: String?
 )
