@@ -40,6 +40,13 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
                 .override(Target.SIZE_ORIGINAL) // Without this, Glide downsamples the images
                 .placeholder(R.drawable.ic_broken_image_24dp)
                 .into(holder.itemView.image)
+
+            holder.itemView.filenameLabel.text = photo.fileName
+
+            holder.itemView.localFileIcon.visibility =
+                photo.localUriString?.let { View.VISIBLE } ?: View.GONE
+            holder.itemView.remoteFileIcon.visibility =
+                photo.serverId?.let { View.VISIBLE } ?: View.GONE
         }
     }
 
