@@ -94,4 +94,10 @@ object StorageAccessHelper {
         }
     }
 
+    fun getPhotoAsByteArray(context: Context, photo: Photo): ByteArray? {
+        return photo.localUriString?.let { uriString ->
+            context.contentResolver.openInputStream(Uri.parse(uriString))?.readBytes()
+        }
+    }
+
 }

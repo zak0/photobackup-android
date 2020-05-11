@@ -16,18 +16,7 @@ object ResponseParser {
             val files = root.getJSONArray("files")
             for (i in 0 until files.length()) {
                 val file = files.getJSONObject(i)
-                val photo = Photo(
-                    null, // local id
-                    file.getInt("id"),
-                    file.getString("fileName"),
-                    file.getLong("fileSize"),
-                    "dirpath goes here",
-                    null,
-                    null,
-                    file.getString("hash"),
-                    file.getString("dateTimeOriginal"),
-                    file.getString("status")
-                )
+                val photo = parsePhotoJson(file)
                 photos.add(photo)
             }
         } catch (e: JSONException) {
@@ -35,5 +24,24 @@ object ResponseParser {
         }
 
         return photos
+    }
+
+    fun parsePhotoJson(jsonString: String): Photo {
+        return parsePhotoJson(JSONObject(jsonString))
+    }
+
+    fun parsePhotoJson(json: JSONObject): Photo {
+        return Photo(
+            null, // local id
+            json.getInt("id"),
+            json.getString("fileName"),
+            json.getLong("fileSize"),
+            "dirpath goes here",
+            null,
+            null,
+            json.getString("hash"),
+            json.getString("dateTimeOriginal"),
+            json.getString("status")
+        )
     }
 }

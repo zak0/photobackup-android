@@ -12,6 +12,7 @@
         tools:ignore="ContentDescription" />
 
     <View
+        android:id="@+id/toolbarBackground"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#44000000"
@@ -39,6 +40,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/uploadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/toolbarBackground"
+        app:layout_constraintEnd_toStartOf="@id/locationIconBarrier"
+        app:layout_constraintTop_toTopOf="@id/toolbarBackground"
         tools:visibility="visible" />
 
     <ImageView

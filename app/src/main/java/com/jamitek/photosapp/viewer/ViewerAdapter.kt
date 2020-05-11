@@ -4,11 +4,14 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import com.jamitek.photosapp.MainViewModel
 import com.jamitek.photosapp.R
+import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.networking.UrlHelper
 import kotlinx.android.synthetic.main.view_viewer_image.view.*
 
@@ -43,10 +46,53 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
 
             holder.itemView.filenameLabel.text = photo.fileName
 
-            holder.itemView.localFileIcon.visibility =
-                photo.localUriString?.let { View.VISIBLE } ?: View.GONE
-            holder.itemView.remoteFileIcon.visibility =
-                photo.serverId?.let { View.VISIBLE } ?: View.GONE
+            val isLocal = photo.localUriString != null
+            val isRemote = photo.serverId != null
+
+            holder.itemView.localFileIcon.visibility = if (isLocal) View.VISIBLE else View.GONE
+            holder.itemView.remoteFileIcon.visibility = if (isRemote) View.VISIBLE else View.GONE
+            holder.itemView.uploadButton.visibility =
+                if (isLocal && !isRemote) View.VISIBLE else View.GONE
+
+            setupUploadButton(holder, photo)
+        }
+    }
+
+    /**
+     * Just a dummy to test upload implementation...
+     */
+    private fun setupUploadButton(viewHolder: ViewerViewHolder, photo: Photo) {
+        val context = viewHolder.itemView.context
+
+        viewHolder.itemView.uploadButton.setOnClickListener {
+            Toast.makeText(
+                context,
+                "Sending metadata for ${photo.fileName}...",
+                Toast.LENGTH_LONG
+            ).show()
+
+            ApiClient.postPhotoMetaData(photo) { serverId ->
+                serverId?.also {
+                    photo.serverId = serverId
+                    Toast.makeText(
+                        context,
+                        "Received server ID ${serverId}. Starting upload...",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    ApiClient.uploadPhoto(context, photo) { success ->
+                        Toast.makeText(
+                            context,
+                            "Upload successful: $success",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    photo.serverId = null // This is a hack to get around duplicate photos. REMOVE THIS!!
+
+                } ?: run {
+                    Toast.makeText(context, "Something went wrong...", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 

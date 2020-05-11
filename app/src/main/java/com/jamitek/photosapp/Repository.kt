@@ -85,6 +85,12 @@ object Repository {
             processRemotePhotosTask = async(Dispatchers.Default) {
                 mutableAllPhotos.value?.also { photos ->
                     remotePhotos.forEach { remotePhoto ->
+                        // We only care about photos that are in "ready" state on server side
+                        if (remotePhoto.status != "ready") {
+                            Log.d(TAG, "Remote photo '${remotePhoto.fileName}' is not at state 'ready'. Skipping.")
+                            return@forEach
+                        }
+
                         // Check for already existing ones (by fileSize and hash) and do nothing if found.
                         // NOTE!! Meta data must be loaded from the database before this in order
                         // for this to work...
