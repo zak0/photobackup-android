@@ -41,7 +41,6 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
                 .load(imageAddress)
                 //.format(DecodeFormat.PREFER_ARGB_8888) // TODO Test if this has an effect
                 .override(Target.SIZE_ORIGINAL) // Without this, Glide downsamples the images
-                .placeholder(R.drawable.ic_broken_image_24dp)
                 .into(holder.itemView.image)
 
             holder.itemView.filenameLabel.text = photo.fileName
@@ -65,20 +64,9 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
         val context = viewHolder.itemView.context
 
         viewHolder.itemView.uploadButton.setOnClickListener {
-            Toast.makeText(
-                context,
-                "Sending metadata for ${photo.fileName}...",
-                Toast.LENGTH_LONG
-            ).show()
-
             ApiClient.postPhotoMetaData(photo) { serverId ->
                 serverId?.also {
                     photo.serverId = serverId
-                    Toast.makeText(
-                        context,
-                        "Received server ID ${serverId}. Starting upload...",
-                        Toast.LENGTH_LONG
-                    ).show()
 
                     ApiClient.uploadPhoto(context, photo) { success ->
                         Toast.makeText(
@@ -90,7 +78,7 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
                     photo.serverId = null // This is a hack to get around duplicate photos. REMOVE THIS!!
 
                 } ?: run {
-                    Toast.makeText(context, "Something went wrong...", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Metadata POST failed...", Toast.LENGTH_LONG).show()
                 }
             }
         }
