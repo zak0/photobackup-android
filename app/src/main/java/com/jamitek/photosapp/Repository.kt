@@ -149,6 +149,9 @@ object Repository {
                     }
                 }
 
+                // Sort the photos by date
+                mutableAllPhotos.value?.sortByDescending { it.dateTimeOriginal }
+
                 // Done. Notify observers.
                 withContext(Dispatchers.Main) {
                     mutableAllPhotos.value = mutableAllPhotos.value
@@ -254,7 +257,13 @@ object Repository {
                             )
                         }
                     }
+
+                    // Sort the photos by date
+                    photos.sortByDescending { it.dateTimeOriginal }
                 }
+
+                // Notify observers
+                withContext(Dispatchers.Main) { mutableAllPhotos.value = mutableAllPhotos.value }
 
                 // TODO Do this only if local photos processing is not ongoing.
                 //  in which case this would now be done multiple times.
@@ -299,6 +308,8 @@ object Repository {
         // Add the last pair
         val pair = Pair(currentDate, photosForCurrentDate)
         newPhotosPerDate.add(pair)
+
+        newPhotosPerDate.sortByDescending { it.second.firstOrNull()?.dateTimeOriginal }
 
         withContext(Dispatchers.Main) { mutablePhotosPerDate.value = newPhotosPerDate }
     }
