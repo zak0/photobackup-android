@@ -40,4 +40,7 @@ data class Photo(
 
     val isLocal: Boolean
         get() = localUriString != null
+
+    val isRemote: Boolean
+        get() = serverId != null
 }

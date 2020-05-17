@@ -45,13 +45,12 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
 
             holder.itemView.filenameLabel.text = photo.fileName
 
-            val isLocal = photo.localUriString != null
-            val isRemote = photo.serverId != null
-
-            holder.itemView.localFileIcon.visibility = if (isLocal) View.VISIBLE else View.GONE
-            holder.itemView.remoteFileIcon.visibility = if (isRemote) View.VISIBLE else View.GONE
+            holder.itemView.localFileIcon.visibility =
+                if (photo.isLocal) View.VISIBLE else View.GONE
+            holder.itemView.remoteFileIcon.visibility =
+                if (photo.isRemote) View.VISIBLE else View.GONE
             holder.itemView.uploadButton.visibility =
-                if (isLocal && !isRemote) View.VISIBLE else View.GONE
+                if (photo.isLocal && photo.status != Photo.Status.READY) View.VISIBLE else View.GONE
 
             setupUploadButton(holder, photo)
         }
@@ -64,23 +63,31 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
         val context = viewHolder.itemView.context
 
         viewHolder.itemView.uploadButton.setOnClickListener {
-            ApiClient.postPhotoMetaData(photo) { serverId ->
-                serverId?.also {
-//                    photo.serverId = serverId
-//
-//                    ApiClient.uploadPhoto(context, photo) { success ->
-//                        Toast.makeText(
-//                            context,
-//                            "Upload successful: $success",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    }
-//                    photo.serverId = null // This is a hack to get around duplicate photos. REMOVE THIS!!
-
-                } ?: run {
-                    Toast.makeText(context, "Metadata POST failed...", Toast.LENGTH_LONG).show()
+            val uploadLambda = { serverId: Int ->
+                photo.serverId = serverId
+                ApiClient.uploadPhoto(context, photo) { success ->
+                    Toast.makeText(
+                        context,
+                        "Upload successful: $success",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
+
+            // POST metadata only if needed
+            if (photo.isRemote) {
+                // Metadata is already at the server
+                photo.serverId?.also(uploadLambda)
+            } else
+                // Server does not know of this photo yet
+                ApiClient.postPhotoMetaData(photo) { serverId ->
+                    serverId?.also {
+                        Toast.makeText(context, "Metadata POST successful, serverId: $serverId", Toast.LENGTH_LONG).show()
+                        uploadLambda(it)
+                    } ?: run {
+                        Toast.makeText(context, "Metadata POST failed...", Toast.LENGTH_LONG).show()
+                    }
+                }
         }
     }
 

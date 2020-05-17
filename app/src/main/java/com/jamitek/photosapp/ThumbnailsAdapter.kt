@@ -41,7 +41,7 @@ class ThumbnailsAdapter(
         // Primarily try to use local thumbnails to prevent having to load anything over the
         // network.
         val thumbnailAddress =
-            photo.localThumbnailUriString?.let { Uri.parse(it) } ?: photo.serverId?.let {
+            photo.localUriString?.let { Uri.parse(it) } ?: photo.serverId?.let {
                 val url = UrlHelper.thumbnailUrl(it)
                 UrlHelper.authorizedGlideUrl(url)
             }
