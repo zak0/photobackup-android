@@ -66,16 +66,16 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
         viewHolder.itemView.uploadButton.setOnClickListener {
             ApiClient.postPhotoMetaData(photo) { serverId ->
                 serverId?.also {
-                    photo.serverId = serverId
-
-                    ApiClient.uploadPhoto(context, photo) { success ->
-                        Toast.makeText(
-                            context,
-                            "Upload successful: $success",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    photo.serverId = null // This is a hack to get around duplicate photos. REMOVE THIS!!
+//                    photo.serverId = serverId
+//
+//                    ApiClient.uploadPhoto(context, photo) { success ->
+//                        Toast.makeText(
+//                            context,
+//                            "Upload successful: $success",
+//                            Toast.LENGTH_LONG
+//                        ).show()
+//                    }
+//                    photo.serverId = null // This is a hack to get around duplicate photos. REMOVE THIS!!
 
                 } ?: run {
                     Toast.makeText(context, "Metadata POST failed...", Toast.LENGTH_LONG).show()

@@ -30,4 +30,14 @@ data class Photo(
 
     /** Status of the photo */
     var status: String?
-)
+) {
+    object Status {
+        const val READY = "ready"
+        const val UNKNOWN = "unknown"
+        const val UPLOAD_PENDING = "upload_pending"
+        const val PROCESSING = "processing"
+    }
+
+    val isLocal: Boolean
+        get() = localUriString != null
+}

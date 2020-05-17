@@ -85,67 +85,46 @@ object Repository {
             processRemotePhotosTask = async(Dispatchers.Default) {
                 mutableAllPhotos.value?.also { photos ->
                     remotePhotos.forEach { remotePhoto ->
-                        // We only care about photos that are in "ready" state on server side
-                        if (remotePhoto.status != "ready") {
-                            Log.d(TAG, "Remote photo '${remotePhoto.fileName}' is not at state 'ready'. Skipping.")
-                            return@forEach
-                        }
-
-                        // Check for already existing ones (by fileSize and hash) and do nothing if found.
-                        // NOTE!! Meta data must be loaded from the database before this in order
-                        // for this to work...
-                        if (photos.count {
-                                it.serverId != null && it.serverDirPath != null && photosAreEqual(remotePhoto, it)
-                            } > 0) {
-                            Log.d(
-                                TAG,
-                                "Remote photo '${remotePhoto.fileName}' already exists. Skipping."
-                            )
-                            return@forEach
-                        }
-
-                        // Map to potentially existing LocalPhotos (by fileSize and hash)
-                        // The following filter takes photos that don't have a server ID assigned
-                        // to ghem (and thus there probably is no remote photo) and that do have
-                        // an URI pointing to a photo in local mass storage.
-                        photos
-                            .filter { it.serverId == null && it.localUriString != null }
-                            .find { existingLocalPhoto ->
-                                photosAreEqual(remotePhoto, existingLocalPhoto)
-                            }
-                            ?.also { photoWithMatchingLocal ->
-                                // We're here if there was a local photo, that didn't yet have a
-                                // matching remote photo attached to it.
-                                // Update the record with data of the remote photo.
-                                photoWithMatchingLocal.serverId = remotePhoto.serverId
-                                photoWithMatchingLocal.serverDirPath = remotePhoto.serverDirPath
+                        // Check if a record for this photo already exists in meta data DB.
+                        // If it does, then update the existing local file record with remote
+                        // information.
+                        photos.firstOrNull { existingPhoto ->
+                            photosAreEqual(existingPhoto, remotePhoto)
+                        }?.also { existingPhoto ->
+                            // If remote info differs, update and persist.
+                            if (existingPhoto.serverId != remotePhoto.serverId
+                                || existingPhoto.serverDirPath != remotePhoto.serverDirPath
+                                || existingPhoto.status != remotePhoto.status
+                            ) {
+                                existingPhoto.serverId = remotePhoto.serverId
+                                existingPhoto.serverDirPath = remotePhoto.serverDirPath
+                                existingPhoto.status = remotePhoto.status
                                 Log.d(
                                     TAG,
-                                    "Remote photo '${remotePhoto.fileName}' existed locally. Linking."
+                                    "Remote - Updating existing record for `${remotePhoto.fileName}`."
                                 )
-                                metaDataDb.persistPhoto(photoWithMatchingLocal)
-                                return@forEach
+                                metaDataDb.persistPhoto(existingPhoto)
+                            } else {
+                                Log.d(TAG, "Remote - Photo `${remotePhoto.fileName}` is already up to date.")
                             }
-
-                        // We're here if the remote photo didn't already exist, nor was there a
-                        // matching already existing local photo where it was mapped to.
-                        // This is a new photo, so let's create a new Photo object with just
-                        // data for the remote photo.
-                        Log.d(TAG, "Remote photo '${remotePhoto.fileName}' is new one. Adding.")
-                        val newPhoto = Photo(
-                            null,
-                            remotePhoto.serverId,
-                            remotePhoto.fileName,
-                            remotePhoto.fileSize,
-                            remotePhoto.serverDirPath,
-                            null,
-                            null,
-                            remotePhoto.hash,
-                            remotePhoto.dateTimeOriginal,
-                            remotePhoto.status
-                        )
-                        photos.add(newPhoto)
-                        metaDataDb.persistPhoto(newPhoto)
+                        } ?: run {
+                            // Insert a new photo, if it didn't already exist.
+                            Log.d(TAG, "Remote - '${remotePhoto.fileName}' is new one. Adding.")
+                            val newPhoto = Photo(
+                                null,
+                                remotePhoto.serverId,
+                                remotePhoto.fileName,
+                                remotePhoto.fileSize,
+                                remotePhoto.serverDirPath,
+                                null,
+                                null,
+                                remotePhoto.hash,
+                                remotePhoto.dateTimeOriginal,
+                                remotePhoto.status
+                            )
+                            photos.add(newPhoto)
+                            metaDataDb.persistPhoto(newPhoto)
+                        }
                     }
                 }
 
@@ -177,84 +156,69 @@ object Repository {
             processLocalPhotosTask = async(Dispatchers.Default) {
                 mutableAllPhotos.value?.also { photos ->
                     localPhotos.forEach { localPhoto ->
-                        // Check for already existing ones (by fileSize and hash) and do nothing if found.
-                        // NOTE!! Meta data must be loaded from the database before this in order
-                        // for this to work...
-                        if (photos.count {
-                                it.localUriString != null && it.localThumbnailUriString != null && photosAreEqual(localPhoto, it)
-                            } > 0) {
-                            Log.d(
-                                TAG,
-                                "Local photo '${localPhoto.fileName}' already exists. Skipping."
-                            )
-                            return@forEach
-                        }
+                        // Check if a record for this photo already exists in meta data DB.
+                        // If it does, then update the existing local file record with remote
+                        // information.
+                        photos.firstOrNull { existingPhoto ->
+                            photosAreEqual(existingPhoto, localPhoto)
+                        }?.also { existingPhoto ->
+                            if (existingPhoto.fileName != localPhoto.fileName
+                                || existingPhoto.localUriString != localPhoto.localUriString
+                                || existingPhoto.localThumbnailUriString != localPhoto.localThumbnailUriString
+                            ) {
+                                // NOTE!! Datetimeoriginal is disregarded in this comparison, and
+                                // setting, because it is currently only calculated when inserting
+                                // the photo into the meta data db for the first time!
+                                // I.e. the localPhoto above does not have datetimeoriginal in it.
+                                existingPhoto.fileName = localPhoto.fileName
+                                existingPhoto.localUriString = localPhoto.localUriString
+                                existingPhoto.localThumbnailUriString =
+                                    localPhoto.localThumbnailUriString
 
-                        // Map to potentially existing remote photos (by fileSize and hash).
-                        // The following filter only takes photos that don't have a local URI
-                        // set, but do have a server ID (to have sort of validation in place).
-                        photos
-                            .filter { it.localUriString == null && it.serverId != null }
-                            .find { existingRemotePhoto ->
-                                photosAreEqual(localPhoto, existingRemotePhoto)
+                                Log.d(TAG, "Local - Updating existing record for '${localPhoto.fileName}'.")
+                                metaDataDb.persistPhoto(existingPhoto)
+                            } else {
+                                Log.d(TAG, "Local - Existing record for '${localPhoto.fileName}' was already up to date.")
                             }
-                            ?.also { photoWithMatchingRemote ->
-                                // We're here if there was a remote photo, that didn't yet have a
-                                // matching local photo attached to it.
-                                // Update the record with data of the local photo.
-
-                                // TODO Generate thumbnail
-
-                                photoWithMatchingRemote.localUriString = localPhoto.localUriString
-                                photoWithMatchingRemote.localThumbnailUriString = localPhoto.localUriString
-                                Log.d(
-                                    TAG,
-                                    "Local photo '${localPhoto.fileName}' existed remotely. Linking."
-                                )
-                                metaDataDb.persistPhoto(photoWithMatchingRemote)
-                                return@forEach
-                            }
-
-                        // We're here if the local photo didn't already exist, nor was there a
-                        // matching already existing remote photo where it was mapped to.
-                        // This is a new photo, so let's create a new Photo object with just
-                        // data for the local photo.
-                        localPhoto.localUriString?.also { localUriString ->
-                            Log.d(TAG, "Local photo '${localPhoto.fileName}' is new one. Adding.")
-
-                            // TODO Generate thumbnail
-
-                            // Attempt to read EXIF time, fall back to file modification date, and
-                            // finally fall back to epoch time.
-                            val dateTimeOriginal =
-                                ExifHelper.getDateTimeOriginal(context, localUriString)
-                                    ?: StorageAccessHelper.getFileLastModifiedDate(
-                                        context,
-                                        localUriString
-                                    )?.let { DateUtil.dateToExifDate(it) } ?: let {
-                                        Log.e(TAG, "Unable to get timestamp for '${localPhoto.fileName}'")
-                                        DateUtil.EPOCH_EXIF
-                                    }
-
-                            val newPhoto = Photo(
-                                null,
-                                null,
-                                localPhoto.fileName,
-                                localPhoto.fileSize,
-                                null,
-                                localUriString,
-                                localUriString,
-                                localPhoto.hash,
-                                dateTimeOriginal,
-                                localPhoto.status
-                            )
-                            photos.add(newPhoto)
-                            metaDataDb.persistPhoto(newPhoto)
                         } ?: run {
-                            Log.e(
-                                TAG,
-                                "Local photo '${localPhoto.fileName}' is new one, but didn't have an URI!?"
-                            )
+                            localPhoto.localUriString?.also { localUriString ->
+                                // Attempt to read EXIF time, fall back to file modification date, and
+                                // finally fall back to epoch time.
+                                val dateTimeOriginal =
+                                    ExifHelper.getDateTimeOriginal(context, localUriString)
+                                        ?: StorageAccessHelper.getFileLastModifiedDate(
+                                            context,
+                                            localUriString
+                                        )?.let { DateUtil.dateToExifDate(it) } ?: let {
+                                            Log.e(
+                                                TAG,
+                                                "Local - Unable to get timestamp for '${localPhoto.fileName}'"
+                                            )
+                                            DateUtil.EPOCH_EXIF
+                                        }
+
+                                val newPhoto = Photo(
+                                    null,
+                                    null,
+                                    localPhoto.fileName,
+                                    localPhoto.fileSize,
+                                    null,
+                                    localUriString,
+                                    localUriString,
+                                    localPhoto.hash,
+                                    dateTimeOriginal,
+                                    localPhoto.status
+                                )
+                                photos.add(newPhoto)
+
+                                Log.d(TAG, "Local - Inserting a new record for '${localPhoto.fileName}'.")
+                                metaDataDb.persistPhoto(newPhoto)
+                            } ?: run {
+                                Log.e(
+                                    TAG,
+                                    "Local - '${localPhoto.fileName}' is new one, but didn't have an URI!?"
+                                )
+                            }
                         }
                     }
 
@@ -279,13 +243,28 @@ object Repository {
         return leftPhoto.fileSize == rightPhoto.fileSize && leftPhoto.hash == rightPhoto.hash
     }
 
+    /**
+     * Arranges photos into "buckets" based on their date. This allows for nice grouping of photos
+     * and displaying then on a timeline.
+     *
+     * Only local photos and remote photos on state [Photo.Status.READY] are included in the
+     * buckets.
+     *
+     * The resulting grouping is stored in observable [photosPerDate] [ArrayList].
+     */
     private suspend fun arrangeIntoDateBuckets() {
         val newPhotosPerDate = ArrayList<Pair<String, ArrayList<Photo>>>()
 
         var currentDate = ""
         var photosForCurrentDate = ArrayList<Photo>()
 
-        mutableAllPhotos.value?.sortedByDescending{ it.dateTimeOriginal }?.forEach { photo ->
+        mutableAllPhotos.value?.sortedByDescending { it.dateTimeOriginal }?.forEach { photo ->
+            // Skip if this is a remote-only photo, that is not on state READY.
+            if (!photo.isLocal && photo.status != Photo.Status.READY) {
+                Log.d(TAG, "Arrange by date - skipping unready ${photo.fileName}")
+                return@forEach
+            }
+
             val date = DateUtil.exifDateToNiceDate(photo.dateTimeOriginal)
 
             // If date differs from the date currently being processed, then add these photos to the
@@ -311,6 +290,7 @@ object Repository {
 
         newPhotosPerDate.sortByDescending { it.second.firstOrNull()?.dateTimeOriginal }
 
+        Log.d(TAG, "Arrange by date - Done. Notifying observers...")
         withContext(Dispatchers.Main) { mutablePhotosPerDate.value = newPhotosPerDate }
     }
 }
