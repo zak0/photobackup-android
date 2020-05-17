@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.jamitek.photosapp.database.SharedPrefsPersistence
 import com.jamitek.photosapp.storage.StorageAccessHelper
+import com.jamitek.photosapp.worker.WorkerService
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,6 +25,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     StorageAccessHelper.iterateCameraDir(requireActivity(), it)
                 }
             }
+        }
+
+        manualSyncButton.setOnClickListener {
+            WorkerService.start(requireContext())
         }
 
         cameraDirLabel.text = "Camera dir: ${SharedPrefsPersistence.cameraDirUriString}"

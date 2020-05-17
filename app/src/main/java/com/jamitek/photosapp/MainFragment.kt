@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.jamitek.photosapp.networking.ApiClient
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -26,10 +25,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         //recycler.addOnScrollListener(ThumbnailsOnScrollListener(viewModel)) // TODO Uncomment when lazy loading is really built
 
         observe()
-
-        ApiClient.getAllPhotos() { remotePhotos ->
-            viewModel.onRemotePhotosLoaded(remotePhotos)
-        }
     }
 
     private fun observe() {

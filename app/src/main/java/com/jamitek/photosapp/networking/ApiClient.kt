@@ -34,22 +34,25 @@ object ApiClient {
 
     private val retrofitService = retrofit.create(PhotosRetrofitService::class.java)
 
-    fun getAllPhotos(callback: (List<Photo>) -> Unit) = getAllPhotos(0, callback)
+    fun getAllPhotos(callback: (Boolean, List<Photo>) -> Unit) = getAllPhotos(0, callback)
 
-    fun getAllPhotos(offset: Int, callback: (List<Photo>) -> Unit) {
+    fun getAllPhotos(offset: Int, callback: (Boolean, List<Photo>) -> Unit) {
         val retroFitCallback = object : Callback<ResponseBody> {
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.code() == 200) {
                     val photos =
                         response.body()?.let { ResponseParser.parsePhotosJson(it.string()) } ?: emptyList()
-                    callback(photos)
+                    callback(true, photos)
                     Log.d(TAG, "getAllPhotos() - response: 200")
+                } else {
+                    callback(false, emptyList())
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Log.e(TAG, "Retrieving photos failed: ", t)
+                callback(false, emptyList())
             }
         }
 
