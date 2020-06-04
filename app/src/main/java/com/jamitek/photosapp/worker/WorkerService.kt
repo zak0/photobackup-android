@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.Repository
 import com.jamitek.photosapp.database.SharedPrefsPersistence
+import com.jamitek.photosapp.model.Photo
 import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.coroutines.GlobalScope
@@ -90,7 +91,10 @@ class WorkerService : Service() {
                     }
                     Log.d(TAG, "Requesting photos from server... 4")
 
-                    // TODO Upload local photos that don't exist on server
+                    // Upload photos that are pending to be uploaded
+                    if (success) {
+                        uploadPhotosPendingBackup()
+                    }
 
                     // Stop the service when done
                     stop(applicationContext)
@@ -126,6 +130,44 @@ class WorkerService : Service() {
             .append(if (uploadDone) "✔ " else "")
             .append("Backup new photos")
             .toString()
+    }
+
+    private fun uploadPhotosPendingBackup() {
+        updateNotificationText("Uploading new photos...")
+
+        val uploadLambda = { photo: Photo ->
+            ApiClient.uploadPhoto(applicationContext, photo) { success ->
+                if (success) {
+                    Log.d(
+                        TAG,
+                        "Upload successful: serverId: ${photo.serverId}, '${photo.fileName}'"
+                    )
+                } else {
+                    Log.e(TAG, "Upload failed: serverId: ${photo.serverId}, '${photo.fileName}'")
+                }
+            }
+        }
+
+        // Get all photos that are only local
+        Repository.allPhotos.value?.filter {
+            it.isLocal || (it.isLocal && it.isPendingUpload)
+        }?.forEach { photo ->
+            // If meta data is already uploaded, then just upload the file
+            if (photo.isPendingUpload) {
+                uploadLambda(photo)
+            } else {
+                // First upload meta data, then the file itself
+                ApiClient.postPhotoMetaData(photo) { serverId ->
+                    serverId?.also {
+                        photo.serverId = serverId
+                        Log.d(TAG, "Metadata POST successful, serverId: $serverId, '${photo.fileName}'")
+                        uploadLambda(photo)
+                    } ?: run {
+                        Log.d(TAG, "Metadata POST failed, '${photo.fileName}'")
+                    }
+                }
+            }
+        }
     }
 
     private fun updateNotificationText(newText: String) {

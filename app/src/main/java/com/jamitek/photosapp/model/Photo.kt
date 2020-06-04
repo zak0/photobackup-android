@@ -43,4 +43,7 @@ data class Photo(
 
     val isRemote: Boolean
         get() = serverId != null
+
+    val isPendingUpload: Boolean
+        get() = isRemote && status == Status.UPLOAD_PENDING
 }
