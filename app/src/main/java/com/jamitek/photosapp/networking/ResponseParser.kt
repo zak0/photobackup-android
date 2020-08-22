@@ -2,6 +2,7 @@ package com.jamitek.photosapp.networking
 
 import android.util.Log
 import com.jamitek.photosapp.model.Photo
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -12,8 +13,7 @@ object ResponseParser {
         val photos = ArrayList<Photo>()
 
         try {
-            val root = JSONObject(json)
-            val files = root.getJSONArray("files")
+            val files = JSONArray(json)
             for (i in 0 until files.length()) {
                 val file = files.getJSONObject(i)
                 val photo = parsePhotoJson(file)
@@ -39,7 +39,7 @@ object ResponseParser {
             "dirpath goes here",
             null,
             null,
-            json.getString("hash"),
+            json.getString("checksum"),
             json.getString("dateTimeOriginal"),
             json.getString("status")
         )
