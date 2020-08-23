@@ -34,17 +34,17 @@ object Repository {
      * Task that loads and processes metadata already persisted in the database. This is only
      * necessary during a cold start of the app.
      */
-    var processPersistedPhotosMetaTask: Deferred<Unit>? = null
+    var processPersistedPhotosMetaTask: Job? = null
 
     /**
      * Task that processes and persists received metadata from the server.
      */
-    var processRemotePhotosTask: Deferred<Unit>? = null
+    var processRemotePhotosTask: Job? = null
 
     /**
      * Task that processes and persists metadata for photos in local mass storage.
      */
-    var processLocalPhotosTask: Deferred<Unit>? = null
+    var processLocalPhotosTask: Job? = null
 
     fun init(context: Context) {
         metaDataDb = SqliteMetaDataDb(context)
@@ -60,7 +60,7 @@ object Repository {
     private suspend fun initPhotosFromDatabase() {
         val startTime = System.currentTimeMillis()
         coroutineScope {
-            processPersistedPhotosMetaTask = async(Dispatchers.Default) {
+            processPersistedPhotosMetaTask = launch(Dispatchers.Default) {
                 val metaFromDb = metaDataDb.getAllPhotos()
                 withContext(Dispatchers.Main) {
                     mutableAllPhotos.value = metaFromDb
@@ -79,10 +79,10 @@ object Repository {
     suspend fun onRemotePhotosLoaded(remotePhotos: List<Photo>) {
         coroutineScope {
             // Wait for processing of local files and DB initialization to finish before continuing.
-            processPersistedPhotosMetaTask?.await()
-            processLocalPhotosTask?.await()
+            processPersistedPhotosMetaTask?.join()
+            processLocalPhotosTask?.join()
 
-            processRemotePhotosTask = async(Dispatchers.Default) {
+            processRemotePhotosTask = launch(Dispatchers.Default) {
                 mutableAllPhotos.value?.also { photos ->
                     remotePhotos.forEach { remotePhoto ->
                         // Check if a record for this photo already exists in meta data DB.
@@ -150,10 +150,10 @@ object Repository {
     suspend fun onLocalPhotosLoaded(context: Context, localPhotos: List<Photo>) {
         coroutineScope {
             // Wait for processing of remote files to finish before continuing.
-            processPersistedPhotosMetaTask?.await()
-            processRemotePhotosTask?.await()
+            processPersistedPhotosMetaTask?.join()
+            processRemotePhotosTask?.join()
 
-            processLocalPhotosTask = async(Dispatchers.Default) {
+            processLocalPhotosTask = launch(Dispatchers.Default) {
                 mutableAllPhotos.value?.also { photos ->
                     localPhotos.forEach { localPhoto ->
                         // Check if a record for this photo already exists in meta data DB.
