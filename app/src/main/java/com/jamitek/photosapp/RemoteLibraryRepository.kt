@@ -16,8 +16,8 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
         private const val TAG = "RemoteLibraryRepository"
     }
 
-    // TODO Implement this somehow. Now photos are never added to this list.
-    val allPhotos: LiveData<List<Photo>> = MutableLiveData<List<Photo>>().apply { value = emptyList() }
+    private val mutableAllPhotos = MutableLiveData<List<Photo>>().apply { value = emptyList() }
+    val allPhotos: LiveData<List<Photo>> = mutableAllPhotos
 
     /**
      * Photos for "timeline" neatly organized into per-date buckets.
@@ -82,7 +82,19 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
 
         newPhotosPerDate.sortByDescending { it.second.firstOrNull()?.dateTimeOriginal }
 
+        // Put the photos in the same order into the "all photos" array. This array is used for
+        // swiping through photos.
+        val newAllPhotos = ArrayList<Photo>()
+        newPhotosPerDate.forEach { datePhotosPair ->
+            datePhotosPair.second.forEach { photo ->
+                newAllPhotos.add(photo)
+            }
+        }
+
         Log.d(TAG, "Arrange by date - Done. Notifying observers...")
-        withContext(Dispatchers.Main) { mutablePhotosPerDate.value = newPhotosPerDate }
+        withContext(Dispatchers.Main) {
+            mutablePhotosPerDate.value = newPhotosPerDate
+            mutableAllPhotos.value = newAllPhotos
+        }
     }
 }

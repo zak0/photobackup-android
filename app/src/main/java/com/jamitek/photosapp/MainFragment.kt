@@ -21,8 +21,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         recycler.adapter = adapter
         //recycler.addOnScrollListener(ThumbnailsOnScrollListener(viewModel)) // TODO Uncomment when lazy loading is really built
-
         observe()
+        viewModel.refreshRemotePhotos()
     }
 
     private fun observe() {

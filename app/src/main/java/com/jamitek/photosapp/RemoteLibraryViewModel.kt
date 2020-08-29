@@ -41,5 +41,9 @@ class RemoteLibraryViewModel(
         mutableSelectedPhoto.value = null
     }
 
+    fun refreshRemotePhotos() {
+        repository.fetchRemotePhotos()
+    }
+
 
 }
