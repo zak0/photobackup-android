@@ -1,5 +1,6 @@
 package com.jamitek.photosapp.locallibrary
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jamitek.photosapp.database.KeyValueStore
@@ -14,7 +15,12 @@ class LocalLibraryRepository(
     private val scanner: LocalLibraryScanner
 ) {
 
+    companion object {
+        private const val TAG = "LocalLibRepo"
+    }
+
     private var initJob: Job? = null
+    private var scanJob: Job? = null
     private val cache = HashSet<LocalMedia>()
     private val cacheByCheckSum = HashMap<String, LocalMedia>()
 
@@ -47,33 +53,37 @@ class LocalLibraryRepository(
             return
         }
 
+        // Only allow one scan to be running at any given time
+        if (scanJob?.isActive == true) {
+            Log.d(TAG, "Scan already running. Not starting a new one...")
+            return
+        }
+
         requireNotNull(mutableStatus.value) { "Status should have been initialized by now" }
 
         cameraDirUriString?.also { uriString ->
             updateStatus(true)
-            CoroutineScope(Dispatchers.IO).launch {
+            scanJob = CoroutineScope(Dispatchers.IO).launch {
                 scanner.iterateCameraDir(uriString) { localMedia ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        cacheByCheckSum[localMedia.checksum]?.also { existingMedia ->
-                            // We're here if this file was already known. It could be that the URI
-                            // has changed, so let's check for that, and update the DB if that's the
-                            // case.
-                            if (cacheByCheckSum[localMedia.checksum]!!.uri != localMedia.uri) {
-                                // Update the uri of existing media, because it contains the DB ID.
-                                // This way the existing DB entry is updated.
-                                existingMedia.checksum = localMedia.checksum
-                                db.persist(existingMedia)
-                            }
-                        } ?: run {
-                            // We're here if this file is so-far unknown. It didn't exist in the database.
-                            db.persist(localMedia)
-                            cacheLocalMedia(localMedia)
+                    cacheByCheckSum[localMedia.checksum]?.also { existingMedia ->
+                        // We're here if this file was already known. It could be that the URI
+                        // has changed, so let's check for that, and update the DB if that's the
+                        // case.
+                        if (cacheByCheckSum[localMedia.checksum]!!.uri != localMedia.uri) {
+                            // Update the uri of existing media, because it contains the DB ID.
+                            // This way the existing DB entry is updated.
+                            existingMedia.checksum = localMedia.checksum
+                            db.persist(existingMedia)
                         }
+                    } ?: run {
+                        // We're here if this file is so-far unknown. It didn't exist in the database.
+                        db.persist(localMedia)
+                        cacheLocalMedia(localMedia)
                     }
-
-                    // Update
-                    updateStatus(false)
                 }
+
+                // Update library status once scan is complete
+                updateStatus(false)
             }
         }
     }

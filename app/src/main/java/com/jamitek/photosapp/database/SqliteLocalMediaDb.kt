@@ -50,7 +50,7 @@ class SqliteLocalMediaDb(context: Context) :
         // TODO Build something for DB upgrades
     }
 
-    override suspend fun getAll(): ArrayList<LocalMedia> {
+    override fun getAll(): ArrayList<LocalMedia> {
         val sql = QueryBuilder(QueryBuilder.QueryType.SELECT_ALL, LocalMediaSchema.TABLE).build()
         val ret = ArrayList<LocalMedia>()
         val cursor = db.rawQuery(sql, null)
@@ -63,7 +63,7 @@ class SqliteLocalMediaDb(context: Context) :
         return ret
     }
 
-    override suspend fun persist(localMedia: LocalMedia) {
+    override fun persist(localMedia: LocalMedia) {
         // If the media already exists, UPDATE existing record.
         // If the media doesn't already exist in the DB, INSERT it.
         if (localMedia.id > 0) {
@@ -71,7 +71,10 @@ class SqliteLocalMediaDb(context: Context) :
                 .addTextValue(LocalMediaSchema.Column.URI, localMedia.uri)
                 .addTextValue(LocalMediaSchema.Column.CHECKSUM, localMedia.checksum)
                 .addLongValue(LocalMediaSchema.Column.FILESIZE, localMedia.fileSize)
-                .addIntegerValue(LocalMediaSchema.Column.IS_UPLOADED, if (localMedia.uploaded) 1 else 0)
+                .addIntegerValue(
+                    LocalMediaSchema.Column.IS_UPLOADED,
+                    if (localMedia.uploaded) 1 else 0
+                )
                 .addIntegerCondition(LocalMediaSchema.Column.ID, localMedia.id)
                 .build()
             safeTransaction { db.execSQL(sql) }
@@ -89,7 +92,7 @@ class SqliteLocalMediaDb(context: Context) :
 
     }
 
-    override suspend fun delete(localMedia: LocalMedia) {
+    override fun delete(localMedia: LocalMedia) {
         val sql = QueryBuilder(QueryBuilder.QueryType.DELETE, LocalMediaSchema.TABLE)
             .addIntegerCondition(LocalMediaSchema.Column.ID, localMedia.id)
             .build()
