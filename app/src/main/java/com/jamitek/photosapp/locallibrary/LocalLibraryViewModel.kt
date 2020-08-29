@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 
 class LocalLibraryViewModel(private val repository: LocalLibraryRepository) : ViewModel() {
 
+    val libraryStatus = repository.status
+
     fun scan() {
         repository.scan()
     }

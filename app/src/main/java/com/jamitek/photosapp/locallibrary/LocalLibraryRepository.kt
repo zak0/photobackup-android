@@ -65,7 +65,7 @@ class LocalLibraryRepository(
                                 db.persist(existingMedia)
                             }
                         } ?: run {
-                            // We're here if this is so-far unknown. It didn't exist in the database.
+                            // We're here if this file is so-far unknown. It didn't exist in the database.
                             db.persist(localMedia)
                             cacheLocalMedia(localMedia)
                         }
