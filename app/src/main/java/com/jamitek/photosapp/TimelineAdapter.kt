@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.list_item_timeline.view.*
 
-class TimelineAdapter(private val viewModel: MainViewModel) : RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder>() {
+class TimelineAdapter(private val viewModel: RemoteLibraryViewModel) : RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimelineViewHolder {
         val view = LayoutInflater

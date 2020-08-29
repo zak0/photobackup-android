@@ -11,14 +11,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.jamitek.photosapp.PhotosApplication
 import com.jamitek.photosapp.R
-import com.jamitek.photosapp.Repository
-import com.jamitek.photosapp.database.SharedPrefsPersistence
-import com.jamitek.photosapp.model.Photo
-import com.jamitek.photosapp.networking.ApiClient
-import com.jamitek.photosapp.storage.StorageAccessHelper
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class WorkerService : Service() {
 
@@ -69,38 +63,43 @@ class WorkerService : Service() {
         Log.d(TAG, "onCreate()")
         startForeground(NOTIFICATION_ID, notification)
 
-        GlobalScope.launch {
-            updateNotificationText("Scanning local photos...")
+        val dependencyRoot = (application as PhotosApplication).dependencyRoot
 
-            // Scan local camera directory
-            SharedPrefsPersistence.cameraDirUriString?.also { cameraDirUriString ->
-                Log.d(TAG, "Processing camera dir... 1")
-                StorageAccessHelper.iterateCameraDir(applicationContext, cameraDirUriString)
-                Log.d(TAG, "Processing camera dir... 2")
-            }
+        // Scan local folders
+        // Upload photos that are not yet backed up
 
-            // Get changes from the server
-            Log.d(TAG, "Requesting photos from server... 1")
-            updateNotificationText("Fetching changes from the server...")
-            ApiClient.getAllPhotos { success, photos ->
-                Log.d(TAG, "Requesting photos from server... 2")
-                GlobalScope.launch {
-                    Log.d(TAG, "Requesting photos from server... 3")
-                    if (success) {
-                        Repository.onRemotePhotosLoaded(photos)
-                    }
-                    Log.d(TAG, "Requesting photos from server... 4")
-
-                    // Upload photos that are pending to be uploaded
-                    if (success) {
-                        uploadPhotosPendingBackup()
-                    }
-
-                    // Stop the service when done
-                    stop(applicationContext)
-                }
-            }
-        }
+//        GlobalScope.launch {
+//            updateNotificationText("Scanning local photos...")
+//
+//            // Scan local camera directory
+//            SharedPrefsPersistence.cameraDirUriString?.also { cameraDirUriString ->
+//                Log.d(TAG, "Processing camera dir... 1")
+//                StorageAccessHelper.iterateCameraDir(applicationContext, cameraDirUriString)
+//                Log.d(TAG, "Processing camera dir... 2")
+//            }
+//
+//            // Get changes from the server
+//            Log.d(TAG, "Requesting photos from server... 1")
+//            updateNotificationText("Fetching changes from the server...")
+//            ApiClient.getAllPhotos { success, photos ->
+//                Log.d(TAG, "Requesting photos from server... 2")
+//                GlobalScope.launch {
+//                    Log.d(TAG, "Requesting photos from server... 3")
+//                    if (success) {
+//                        RemoteLibraryRepository.onRemotePhotosLoaded(photos)
+//                    }
+//                    Log.d(TAG, "Requesting photos from server... 4")
+//
+//                    // Upload photos that are pending to be uploaded
+//                    if (success) {
+//                        uploadPhotosPendingBackup()
+//                    }
+//
+//                    // Stop the service when done
+//                    stop(applicationContext)
+//                }
+//            }
+//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -115,59 +114,42 @@ class WorkerService : Service() {
         }
     }
 
-    private fun getSyncServiceStatusString(
-        localPhotosDone: Boolean,
-        remotePhotosDone: Boolean,
-        uploadDone: Boolean
-    ): String {
-        return StringBuilder()
-            .append(if (localPhotosDone) "✔ " else "")
-            .append("Scan local photos")
-            .append("\n")
-            .append(if (remotePhotosDone) "✔ " else "")
-            .append("Fetch photos from server")
-            .append("\n")
-            .append(if (uploadDone) "✔ " else "")
-            .append("Backup new photos")
-            .toString()
-    }
-
     private fun uploadPhotosPendingBackup() {
-        updateNotificationText("Uploading new photos...")
-
-        val uploadLambda = { photo: Photo ->
-            ApiClient.uploadPhoto(applicationContext, photo) { success ->
-                if (success) {
-                    Log.d(
-                        TAG,
-                        "Upload successful: serverId: ${photo.serverId}, '${photo.fileName}'"
-                    )
-                } else {
-                    Log.e(TAG, "Upload failed: serverId: ${photo.serverId}, '${photo.fileName}'")
-                }
-            }
-        }
-
-        // Get all photos that are only local
-        Repository.allPhotos.value?.filter {
-            it.isLocal || (it.isLocal && it.isPendingUpload)
-        }?.forEach { photo ->
-            // If meta data is already uploaded, then just upload the file
-            if (photo.isPendingUpload) {
-                uploadLambda(photo)
-            } else {
-                // First upload meta data, then the file itself
-                ApiClient.postPhotoMetaData(photo) { serverId ->
-                    serverId?.also {
-                        photo.serverId = serverId
-                        Log.d(TAG, "Metadata POST successful, serverId: $serverId, '${photo.fileName}'")
-                        uploadLambda(photo)
-                    } ?: run {
-                        Log.d(TAG, "Metadata POST failed, '${photo.fileName}'")
-                    }
-                }
-            }
-        }
+//        updateNotificationText("Uploading new photos...")
+//
+//        val uploadLambda = { photo: Photo ->
+//            ApiClient.uploadPhoto(applicationContext, photo) { success ->
+//                if (success) {
+//                    Log.d(
+//                        TAG,
+//                        "Upload successful: serverId: ${photo.serverId}, '${photo.fileName}'"
+//                    )
+//                } else {
+//                    Log.e(TAG, "Upload failed: serverId: ${photo.serverId}, '${photo.fileName}'")
+//                }
+//            }
+//        }
+//
+//        // Get all photos that are only local
+//        RemoteLibraryRepository.allPhotos.value?.filter {
+//            it.isLocal || (it.isLocal && it.isPendingUpload)
+//        }?.forEach { photo ->
+//            // If meta data is already uploaded, then just upload the file
+//            if (photo.isPendingUpload) {
+//                uploadLambda(photo)
+//            } else {
+//                // First upload meta data, then the file itself
+//                ApiClient.postPhotoMetaData(photo) { serverId ->
+//                    serverId?.also {
+//                        photo.serverId = serverId
+//                        Log.d(TAG, "Metadata POST successful, serverId: $serverId, '${photo.fileName}'")
+//                        uploadLambda(photo)
+//                    } ?: run {
+//                        Log.d(TAG, "Metadata POST failed, '${photo.fileName}'")
+//                    }
+//                }
+//            }
+//        }
     }
 
     private fun updateNotificationText(newText: String) {

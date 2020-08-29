@@ -3,8 +3,8 @@ package com.jamitek.photosapp
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.jamitek.photosapp.extension.getActivityViewModel
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -14,9 +14,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private val adapter: TimelineAdapter by lazy { TimelineAdapter(viewModel) }
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-    }
+    private val viewModel: RemoteLibraryViewModel by lazy { getActivityViewModel(RemoteLibraryViewModel::class.java) }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

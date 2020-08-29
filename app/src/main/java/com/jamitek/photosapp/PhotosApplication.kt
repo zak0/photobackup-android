@@ -4,15 +4,11 @@ import android.app.Application
 import com.jamitek.photosapp.worker.WorkerService
 
 class PhotosApplication : Application() {
-    companion object {
-        lateinit var INSTANCE: PhotosApplication
-    }
+
+    lateinit var dependencyRoot: DependencyRoot
 
     override fun onCreate() {
-        INSTANCE = this
-        Repository.init(this)
         super.onCreate()
-
-        WorkerService.start(this)
+        dependencyRoot = DependencyRoot(this)
     }
 }

@@ -6,8 +6,11 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-object ResponseParser {
-    private const val TAG = "ResponseParser"
+class ResponseParser {
+
+    companion object {
+        private const val TAG = "ResponseParser"
+    }
 
     fun parsePhotosJson(json: String): List<Photo> {
         val photos = ArrayList<Photo>()

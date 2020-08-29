@@ -6,19 +6,20 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.jamitek.photosapp.database.SharedPrefsPersistence
+import com.jamitek.photosapp.extension.dependencyRoot
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
-    private val navController: NavController by lazy { findNavController(R.id.navHostFragment) }
+    private val navController by lazy { findNavController(R.id.navHostFragment) }
+    private val viewModelFactory by lazy { ViewModelFactory(dependencyRoot) }
+    private val localLibraryViewModel by lazy { ViewModelProvider(this, viewModelFactory).get(LocalLibraryViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +53,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             when (requestCode) {
                 StorageAccessHelper.REQUEST_CODE_SET_CAMERA_DIR -> {
                     data?.data?.let { uri ->
-                        SharedPrefsPersistence.cameraDirUriString = uri.toString()
-                        GlobalScope.launch {
-                            StorageAccessHelper.iterateCameraDir(this@MainActivity, uri.toString())
-                        }
-                    }
+                        localLibraryViewModel.onCameraDirChanged(uri)
+                    } ?: Unit
                 }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }

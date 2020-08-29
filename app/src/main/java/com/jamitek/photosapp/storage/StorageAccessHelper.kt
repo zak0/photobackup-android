@@ -7,18 +7,20 @@ import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.jamitek.photosapp.DateUtil
-import com.jamitek.photosapp.Repository
+import com.jamitek.photosapp.RemoteLibraryRepository
 import com.jamitek.photosapp.model.Photo
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.*
 import kotlin.collections.ArrayList
 
-object StorageAccessHelper {
+class StorageAccessHelper {
 
-    const val TAG = "StorageAccessHelper"
-    const val REQUEST_CODE_SET_CAMERA_DIR = 100
-    val SUPPORTED_EXTENSIONS = listOf("png", "jpg")
+    companion object {
+        const val TAG = "StorageAccessHelper"
+        const val REQUEST_CODE_SET_CAMERA_DIR = 100
+        val SUPPORTED_EXTENSIONS = listOf("png", "jpg")
+    }
 
     fun promptRootDirSelection(activity: Activity) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
@@ -64,7 +66,7 @@ object StorageAccessHelper {
                 }
             }
 
-            Repository.onLocalPhotosLoaded(context, localPhotos)
+            //RemoteLibraryRepository.onLocalPhotosLoaded(context, localPhotos)
         }
     }
 

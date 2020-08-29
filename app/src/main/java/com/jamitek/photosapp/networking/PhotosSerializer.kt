@@ -3,7 +3,7 @@ package com.jamitek.photosapp.networking
 import com.jamitek.photosapp.model.Photo
 import org.json.JSONObject
 
-object PhotosSerializer {
+class PhotosSerializer {
     fun getPhotoMetaRequest(photo: Photo): String {
         return JSONObject()
             .put("id", -1)

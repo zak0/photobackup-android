@@ -1,5 +1,6 @@
 package com.jamitek.photosapp
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,18 +8,14 @@ import androidx.lifecycle.viewModelScope
 import com.jamitek.photosapp.model.Photo
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
-
-    /**
-     * Offset for next GET to fetch more photos. Used for infinite scrolling/lazy loading.
-     */
-    private val mutableNextGetOffset = MutableLiveData<Int>().apply { value = 0 }
-    val nextGetOffset: LiveData<Int> = mutableNextGetOffset
+class RemoteLibraryViewModel(
+    private val repository: RemoteLibraryRepository
+) : ViewModel() {
 
     /**
      * List of currently loaded photos.
      */
-    val photos = Repository.allPhotos
+    val photos = repository.allPhotos
 
     /**
      * Currently selected photo for detailed viewing and inspection.
@@ -26,7 +23,7 @@ class MainViewModel : ViewModel() {
     private val mutableSelectedPhoto = MutableLiveData<Photo>().apply { value = null }
     val selectedPhoto: LiveData<Photo> = mutableSelectedPhoto
 
-    val photosPerDate = Repository.photosPerDate
+    val photosPerDate = repository.photosPerDate
 
     /**
      * Callback for when a thumbnail is clicked on library screen. Marks the clicked image as
@@ -42,21 +39,6 @@ class MainViewModel : ViewModel() {
      */
     fun onImageViewerOpened() {
         mutableSelectedPhoto.value = null
-    }
-
-    /**
-     * Callback for library scroll listener indicating that user is approaching the end of
-     * currently loaded photos and more should be loaded.
-     */
-    fun onShouldLoadMorePhotos() {
-        mutableNextGetOffset.value = (photos.value?.size ?: -1) + 1
-    }
-
-    /**
-     * Callback for when a GET for photos finishes.
-     */
-    fun onRemotePhotosLoaded(newPhotos: List<Photo>) {
-        viewModelScope.launch { Repository.onRemotePhotosLoaded(newPhotos) }
     }
 
 

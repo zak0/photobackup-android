@@ -12,10 +12,14 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
+class ApiClient(
+    private val serializer: PhotosSerializer,
+    private val responseParser: ResponseParser
+) {
 
-object ApiClient {
-
-    private const val TAG = "ApiClient"
+    companion object {
+        private const val TAG = "ApiClient"
+    }
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
@@ -42,7 +46,7 @@ object ApiClient {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.code() == 200) {
                     val photos =
-                        response.body()?.let { ResponseParser.parsePhotosJson(it.string()) } ?: emptyList()
+                        response.body()?.let { responseParser.parsePhotosJson(it.string()) } ?: emptyList()
                     callback(true, photos)
                     Log.d(TAG, "getAllPhotos() - response: 200")
                 } else {
@@ -74,7 +78,7 @@ object ApiClient {
             }
         }
 
-        val body = PhotosSerializer.getPhotoMetaRequest(photo)
+        val body = serializer.getPhotoMetaRequest(photo)
         retrofitService.postPhotoMetaData(RequestBody.create(MediaType.parse("application/json"), body)).enqueue(retrofitCallback)
     }
 
@@ -89,7 +93,7 @@ object ApiClient {
             }
         }
 
-        val file = StorageAccessHelper.getPhotoAsByteArray(context, photo)
+        val file = StorageAccessHelper().getPhotoAsByteArray(context, photo)
         val requestFile: RequestBody =
             RequestBody.create(MediaType.parse("multipart/form-data"), file)
 

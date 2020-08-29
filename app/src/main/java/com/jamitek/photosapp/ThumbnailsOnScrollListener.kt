@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class ThumbnailsOnScrollListener(private val viewModel: MainViewModel) : RecyclerView.OnScrollListener() {
+class ThumbnailsOnScrollListener(private val viewModel: RemoteLibraryViewModel) : RecyclerView.OnScrollListener() {
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
 

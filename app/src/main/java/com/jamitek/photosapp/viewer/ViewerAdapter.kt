@@ -4,18 +4,16 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
-import com.jamitek.photosapp.MainViewModel
 import com.jamitek.photosapp.R
+import com.jamitek.photosapp.RemoteLibraryViewModel
 import com.jamitek.photosapp.model.Photo
-import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.networking.UrlHelper
 import kotlinx.android.synthetic.main.view_viewer_image.view.*
 
-class ViewerAdapter(private val viewModel: MainViewModel) :
+class ViewerAdapter(private val viewModel: RemoteLibraryViewModel) :
     RecyclerView.Adapter<ViewerAdapter.ViewerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewerViewHolder {
@@ -62,32 +60,34 @@ class ViewerAdapter(private val viewModel: MainViewModel) :
     private fun setupUploadButton(viewHolder: ViewerViewHolder, photo: Photo) {
         val context = viewHolder.itemView.context
 
+        // TODO Upload a photo? (Probably not needed here in this class at all, at least for v1)
         viewHolder.itemView.uploadButton.setOnClickListener {
             val uploadLambda = { serverId: Int ->
                 photo.serverId = serverId
-                ApiClient.uploadPhoto(context, photo) { success ->
-                    Toast.makeText(
-                        context,
-                        "Upload successful: $success",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+//                ApiClient.uploadPhoto(context, photo) { success ->
+//                    Toast.makeText(
+//                        context,
+//                        "Upload successful: $success",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+//                }
             }
 
             // POST metadata only if needed
             if (photo.isRemote) {
                 // Metadata is already at the server
                 photo.serverId?.also(uploadLambda)
-            } else
+            } else {
                 // Server does not know of this photo yet
-                ApiClient.postPhotoMetaData(photo) { serverId ->
-                    serverId?.also {
-                        Toast.makeText(context, "Metadata POST successful, serverId: $serverId", Toast.LENGTH_LONG).show()
-                        uploadLambda(it)
-                    } ?: run {
-                        Toast.makeText(context, "Metadata POST failed...", Toast.LENGTH_LONG).show()
-                    }
-                }
+//                ApiClient.postPhotoMetaData(photo) { serverId ->
+//                    serverId?.also {
+//                        Toast.makeText(context, "Metadata POST successful, serverId: $serverId", Toast.LENGTH_LONG).show()
+//                        uploadLambda(it)
+//                    } ?: run {
+//                        Toast.makeText(context, "Metadata POST failed...", Toast.LENGTH_LONG).show()
+//                    }
+//                }
+            }
         }
     }
 

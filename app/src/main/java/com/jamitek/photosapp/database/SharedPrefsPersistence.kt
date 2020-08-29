@@ -1,25 +1,29 @@
 package com.jamitek.photosapp.database
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.jamitek.photosapp.PhotosApplication
 
-object SharedPrefsPersistence {
+class KeyValueStore(context: Context) {
 
-    private const val PREFS_NAME = "sharedprefspersistence"
-    private const val KEY_CAMERA_DIR_URI = "camera_dir_uri"
-
-    private val sharedPrefs: SharedPreferences by lazy {
-        PhotosApplication.INSTANCE.getSharedPreferences(
-            PREFS_NAME, Context.MODE_PRIVATE
-        )
+    companion object {
+        private const val PREFS_NAME = "photosapp.prefs"
+        const val KEY_CAMERA_DIR_URI = "camera.dir.uri"
     }
 
-    var cameraDirUriString: String?
-        get() {
-            return sharedPrefs.getString(KEY_CAMERA_DIR_URI, null)
-        }
-        set(value) {
-            sharedPrefs.edit().putString(KEY_CAMERA_DIR_URI, value).apply()
-        }
+    private val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    fun getString(key: String, defaultValue: String? = null): String? {
+        return sharedPrefs.getString(key, defaultValue)
+    }
+
+    fun putString(key: String, value: String?) {
+        sharedPrefs.edit().putString(key, value).apply()
+    }
+
+    fun clear(key: String) {
+        sharedPrefs.edit().clear().apply()
+    }
+
+    fun remove(key: String) {
+        sharedPrefs.edit().remove(key).apply()
+    }
 }

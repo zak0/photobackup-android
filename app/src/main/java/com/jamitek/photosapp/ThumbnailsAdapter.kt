@@ -13,7 +13,7 @@ import com.jamitek.photosapp.networking.UrlHelper
 import kotlinx.android.synthetic.main.list_item_thumbnail.view.*
 
 class ThumbnailsAdapter(
-    private val viewModel: MainViewModel,
+    private val viewModel: RemoteLibraryViewModel,
     private val dataSet: ArrayList<Photo>
 ) :
     RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailsViewHolder>() {
