@@ -14,7 +14,7 @@ import kotlin.collections.ArrayList
 
 class LocalLibraryScanner(private val context: Context) {
 
-    suspend fun iterateCameraDir(cameraDirUri: String, onMediaFile: (LocalMedia) -> Unit) {
+    fun iterateCameraDir(cameraDirUri: String, onMediaFile: (LocalMedia) -> Unit) {
         DocumentFile.fromTreeUri(context, Uri.parse(cameraDirUri))?.also { docFile ->
             if (!docFile.isDirectory) {
                 throw IllegalStateException("Selected camera directory is not a directory.")

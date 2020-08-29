@@ -93,7 +93,7 @@ class ApiClient(
             }
         }
 
-        val file = StorageAccessHelper().getPhotoAsByteArray(context, photo)
+        val file = StorageAccessHelper.getPhotoAsByteArray(context, photo)
         val requestFile: RequestBody =
             RequestBody.create(MediaType.parse("multipart/form-data"), file)
 

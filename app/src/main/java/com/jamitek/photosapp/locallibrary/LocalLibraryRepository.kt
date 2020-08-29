@@ -36,7 +36,7 @@ class LocalLibraryRepository(
     var cameraDirUriString: String?
         get() = keyValueStore.getString(KEY_CAMERA_DIR_URI)
         set(value) {
-            keyValueStore.getString(KEY_CAMERA_DIR_URI, value)
+            keyValueStore.putString(KEY_CAMERA_DIR_URI, value)
         }
 
     fun scan() {

@@ -57,6 +57,7 @@ class SqliteLocalMediaDb(context: Context) :
         cursor.moveToFirst()
         while (!cursor.isAfterLast) {
             ret.add(cursorToLocalMedia(cursor))
+            cursor.moveToNext()
         }
         cursor.close()
         return ret
