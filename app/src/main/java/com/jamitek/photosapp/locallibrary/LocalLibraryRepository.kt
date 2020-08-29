@@ -7,12 +7,16 @@ import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.KeyValueStore.Companion.KEY_CAMERA_DIR_URI
 import com.jamitek.photosapp.database.LocalMedia
 import com.jamitek.photosapp.database.LocalMediaDb
+import com.jamitek.photosapp.networking.ApiClient
+import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.coroutines.*
 
 class LocalLibraryRepository(
     private val keyValueStore: KeyValueStore,
     private val db: LocalMediaDb,
-    private val scanner: LocalLibraryScanner
+    private val scanner: LocalLibraryScanner,
+    private val storageHelper: StorageAccessHelper,
+    private val api: ApiClient
 ) {
 
     companion object {
@@ -45,6 +49,9 @@ class LocalLibraryRepository(
             keyValueStore.putString(KEY_CAMERA_DIR_URI, value)
         }
 
+    /**
+     * Scans camera directory for media files and maintains an index of them in a database.
+     */
     fun scan() {
         // Only allow starting the scan if initialization is complete.
         // Scan relies on being able to check if given file already is known, and whether it's
@@ -84,6 +91,47 @@ class LocalLibraryRepository(
 
                 // Update library status once scan is complete
                 updateStatus(false)
+            }
+        }
+    }
+
+    /**
+     * Backs up local media files to the server. Only backs up files that do not yet exist on the
+     * server (that the app knows of).
+     *
+     * If an API request times out, server is assumed to be out of reach and backup is stopped.
+     *
+     * Backup will not be initiated if a scan is in progress.
+     */
+    fun backup() {
+        if (scanJob?.isActive == true) {
+            Log.d(TAG, "Backup cannot be started while scan is in progress...")
+            return
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            // Get all files that don't appear to be backed up yet
+            cache.filter { !it.uploaded }.forEach { localMedia ->
+                // First POST meta data. If the POST succeeds, the API responds with ID of the
+                // meta data on the server
+                api.postPhotoMetaData(localMedia)?.also { serverId ->
+                    // Reaching here means that meta data POST was successful.
+                    // We can use the received ID to POST the actual file.
+                    Log.d(TAG, "Media meta POST success for `${localMedia.fileName}`")
+                    storageHelper.getFileAsByteArray(localMedia.uri)?.also { bytes ->
+                        val success = api.uploadPhoto(serverId, localMedia, bytes)
+                        Log.d(
+                            TAG,
+                            "Media upload ${if (success) "success" else "failed"} for `${localMedia.fileName}`"
+                        )
+
+                        // If upload was a success, let's mark the file as uploaded into the DB
+                        if (success) {
+                            localMedia.uploaded = true
+                            db.persist(localMedia)
+                        }
+                    }
+                }
             }
         }
     }

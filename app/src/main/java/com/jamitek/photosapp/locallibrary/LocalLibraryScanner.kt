@@ -32,7 +32,7 @@ class LocalLibraryScanner(private val context: Context) {
                     val fileSize = childDocFile.length()
                     val digest = calculateMd5ForFile(context, childDocFile)
                     val fileUriString = childDocFile.uri.toString()
-                    onMediaFile(LocalMedia(-1, fileUriString, fileSize, digest, false))
+                    onMediaFile(LocalMedia(-1, fileName, fileUriString, fileSize, digest, false))
                     Log.d(
                         StorageAccessHelper.TAG,
                         "filename: $fileName, filesize: $fileSize, digest: $digest"

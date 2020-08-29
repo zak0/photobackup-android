@@ -7,7 +7,6 @@ import androidx.lifecycle.Observer
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.locallibrary.LocalLibraryViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
-import com.jamitek.photosapp.worker.WorkerService
 import kotlinx.android.synthetic.main.fragment_settings.*
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
@@ -27,8 +26,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         manualSyncButton.setOnClickListener {
-            localLibraryViewModel.scan()
-            WorkerService.start(requireContext())
+            localLibraryViewModel.backup()
         }
 
         cameraDirLabel.text = "Camera dir: ${settingsViewModel.cameraDirUriString}"

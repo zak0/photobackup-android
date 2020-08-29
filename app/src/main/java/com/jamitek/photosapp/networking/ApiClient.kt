@@ -1,10 +1,10 @@
 package com.jamitek.photosapp.networking
 
-import android.content.Context
 import android.util.Log
+import com.jamitek.photosapp.database.LocalMedia
 import com.jamitek.photosapp.model.Photo
-import com.jamitek.photosapp.storage.StorageAccessHelper
 import okhttp3.*
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,7 +46,8 @@ class ApiClient(
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.code() == 200) {
                     val photos =
-                        response.body()?.let { responseParser.parsePhotosJson(it.string()) } ?: emptyList()
+                        response.body()?.let { responseParser.parsePhotosJson(it.string()) }
+                            ?: emptyList()
                     callback(true, photos)
                     Log.d(TAG, "getAllPhotos() - response: 200")
                 } else {
@@ -63,47 +64,44 @@ class ApiClient(
         retrofitService.getAllMedia(100000, offset).enqueue(retroFitCallback)
     }
 
-    fun postPhotoMetaData(photo: Photo, callback: (Int?) -> Unit) {
-        val retrofitCallback = object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                val responseString = response.body()?.string()
-                val responsePhotoServerId = responseString?.let {
-                    JSONObject(it).getInt("id")
-                }
-                callback(responsePhotoServerId)
-            }
+    fun postPhotoMetaData(localMedia: LocalMedia): Int? {
+        val body = serializer.getPhotoMetaRequest(localMedia)
+        val response = retrofitService.postPhotoMetaData(
+            RequestBody.create(
+                MediaType.parse("application/json"),
+                body
+            )
+        ).execute()
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e(TAG, "Posting upload initialization failed: ", t)
+        var serverId: Int? = null
+        if (response.isSuccessful) {
+            serverId = response.body()?.string()?.let {
+                try {
+                    JSONObject(it).getInt("id")
+                } catch (e: JSONException) {
+                    null
+                }
             }
+        } else {
+            Log.e(TAG, "Posting upload initialization failed")
         }
 
-        val body = serializer.getPhotoMetaRequest(photo)
-        retrofitService.postPhotoMetaData(RequestBody.create(MediaType.parse("application/json"), body)).enqueue(retrofitCallback)
+        return serverId
     }
 
-    fun uploadPhoto(context: Context, photo: Photo, callback: (Boolean) -> Unit) {
-        val retrofitCallback = object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                callback(response.code() == 201)
-            }
-
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e(TAG, "Photo upload failed: ", t)
-            }
-        }
-
-        val file = StorageAccessHelper.getPhotoAsByteArray(context, photo)
+    fun uploadPhoto(
+        serverId: Int,
+        localMedia: LocalMedia,
+        file: ByteArray
+    ): Boolean {
         val requestFile: RequestBody =
             RequestBody.create(MediaType.parse("multipart/form-data"), file)
 
         val body =
-            MultipartBody.Part.createFormData("newFile", photo.fileName, requestFile)
+            MultipartBody.Part.createFormData("newFile", localMedia.fileName, requestFile)
 
-        photo.serverId?.also { serverId ->
-            retrofitService.uploadPhoto(serverId, body).enqueue(retrofitCallback)
-        } ?: run {
-            callback(false)
-        }
+        val response = retrofitService.uploadPhoto(serverId, body).execute()
+
+        return (response.isSuccessful && response.code() == 201)
     }
 }

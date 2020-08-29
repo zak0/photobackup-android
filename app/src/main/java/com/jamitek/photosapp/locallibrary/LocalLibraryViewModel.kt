@@ -11,6 +11,10 @@ class LocalLibraryViewModel(private val repository: LocalLibraryRepository) : Vi
         repository.scan()
     }
 
+    fun backup() {
+        repository.backup()
+    }
+
     fun onCameraDirChanged(newCameraDir: Uri) {
         repository.cameraDirUriString = newCameraDir.toString()
     }

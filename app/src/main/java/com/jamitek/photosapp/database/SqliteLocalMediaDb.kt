@@ -20,6 +20,7 @@ class SqliteLocalMediaDb(context: Context) :
 
         object Column {
             const val ID = "id"
+            const val FILENAME = "filename"
             const val URI = "uri"
             const val FILESIZE = "filesize"
             const val CHECKSUM = "checksum"
@@ -36,6 +37,11 @@ class SqliteLocalMediaDb(context: Context) :
                 QueryBuilder.FieldType.INTEGER,
                 nullable = false,
                 primaryKey = true
+            )
+            .addField(
+                LocalMediaSchema.Column.FILENAME,
+                QueryBuilder.FieldType.TEXT,
+                nullable = false
             )
             .addField(LocalMediaSchema.Column.URI, QueryBuilder.FieldType.TEXT, nullable = false)
             .addField(LocalMediaSchema.Column.FILESIZE, QueryBuilder.FieldType.INTEGER, nullable = false)
@@ -68,6 +74,7 @@ class SqliteLocalMediaDb(context: Context) :
         // If the media doesn't already exist in the DB, INSERT it.
         if (localMedia.id > 0) {
             val sql = QueryBuilder(QueryBuilder.QueryType.UPDATE, LocalMediaSchema.TABLE)
+                .addTextValue(LocalMediaSchema.Column.FILENAME, localMedia.fileName)
                 .addTextValue(LocalMediaSchema.Column.URI, localMedia.uri)
                 .addTextValue(LocalMediaSchema.Column.CHECKSUM, localMedia.checksum)
                 .addLongValue(LocalMediaSchema.Column.FILESIZE, localMedia.fileSize)
@@ -80,6 +87,7 @@ class SqliteLocalMediaDb(context: Context) :
             safeTransaction { db.execSQL(sql) }
         } else {
             val sql = QueryBuilder(QueryBuilder.QueryType.INSERT, LocalMediaSchema.TABLE)
+                .addTextValue(LocalMediaSchema.Column.FILENAME, localMedia.fileName)
                 .addTextValue(LocalMediaSchema.Column.URI, localMedia.uri)
                 .addTextValue(LocalMediaSchema.Column.CHECKSUM, localMedia.checksum)
                 .addLongValue(LocalMediaSchema.Column.FILESIZE, localMedia.fileSize)
@@ -101,12 +109,13 @@ class SqliteLocalMediaDb(context: Context) :
 
     private fun cursorToLocalMedia(cursor: Cursor): LocalMedia {
         val id = cursor.getInt(cursor.getColumnIndex(LocalMediaSchema.Column.ID))
+        val fileName = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.FILENAME))
         val uri = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.URI))
         val fileSize = cursor.getLong(cursor.getColumnIndex(LocalMediaSchema.Column.FILESIZE))
         val checksum = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.CHECKSUM))
         val isUploaded = cursor.getInt(cursor.getColumnIndex(LocalMediaSchema.Column.IS_UPLOADED)) == 1
 
-        return LocalMedia(id, uri, fileSize, checksum, isUploaded)
+        return LocalMedia(id, fileName, uri, fileSize, checksum, isUploaded)
     }
 
     private fun safeTransaction(block: () -> Unit): Boolean {
