@@ -12,6 +12,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jamitek.photosapp.extension.dependencyRoot
+import com.jamitek.photosapp.locallibrary.LocalLibraryViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -19,7 +20,11 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
 
     private val navController by lazy { findNavController(R.id.navHostFragment) }
     private val viewModelFactory by lazy { ViewModelFactory(dependencyRoot) }
-    private val localLibraryViewModel by lazy { ViewModelProvider(this, viewModelFactory).get(LocalLibraryViewModel::class.java) }
+    private val localLibraryViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(
+            LocalLibraryViewModel::class.java
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
