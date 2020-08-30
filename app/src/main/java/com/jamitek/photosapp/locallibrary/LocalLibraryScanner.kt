@@ -5,22 +5,22 @@ import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.jamitek.photosapp.database.LocalMedia
-import com.jamitek.photosapp.model.Photo
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.*
-import kotlin.collections.ArrayList
 
 class LocalLibraryScanner(private val context: Context) {
+
+    companion object {
+        private const val TAG = "LocalLibScanner"
+    }
 
     fun iterateCameraDir(cameraDirUri: String, onMediaFile: (LocalMedia) -> Unit) {
         DocumentFile.fromTreeUri(context, Uri.parse(cameraDirUri))?.also { docFile ->
             if (!docFile.isDirectory) {
                 throw IllegalStateException("Selected camera directory is not a directory.")
             }
-
-            val localPhotos = ArrayList<Photo>()
 
             docFile.listFiles().forEach { childDocFile ->
                 val fileName = childDocFile.name ?: ""
@@ -48,9 +48,15 @@ class LocalLibraryScanner(private val context: Context) {
 
         return context.contentResolver.openInputStream(file.uri)?.let { stream ->
             var readBytes = stream.read(buffer)
-            while (readBytes > 0) {
-                digest.update(buffer, 0, readBytes)
-                readBytes = stream.read(buffer)
+            try {
+                while (readBytes > 0) {
+                    digest.update(buffer, 0, readBytes)
+                    readBytes = stream.read(buffer)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to calculate MD5 hash for ${file.name}.", e)
+            } finally {
+                stream.close()
             }
 
             val md5Sum = digest.digest()

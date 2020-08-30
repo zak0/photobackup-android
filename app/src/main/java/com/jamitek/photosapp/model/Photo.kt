@@ -5,7 +5,7 @@ data class Photo(
     var id: Int?,
 
     /** Only valid for remote photos! ID of this photo on server */
-    var serverId: Int?,
+    var serverId: Int,
 
     /** Name of the file (without the path) */
     var fileName: String,

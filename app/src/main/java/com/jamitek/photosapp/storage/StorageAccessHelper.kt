@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import java.io.InputStream
 
 class StorageAccessHelper(private val context: Context) {
 
@@ -20,12 +21,18 @@ class StorageAccessHelper(private val context: Context) {
     }
 
     fun getFileAsByteArray(uriString: String): ByteArray? {
-        return try {
-            context.contentResolver.openInputStream(Uri.parse(uriString))?.readBytes()
+        var bytes: ByteArray? = null
+        var stream: InputStream? = null
+        try {
+            stream = context.contentResolver.openInputStream(Uri.parse(uriString))
+            bytes = stream?.readBytes()
         } catch (e: Exception) {
             Log.e(TAG, "Could not read file contents: ", e)
-            null
+        } finally {
+            stream?.close()
         }
+
+        return bytes
     }
 
 }

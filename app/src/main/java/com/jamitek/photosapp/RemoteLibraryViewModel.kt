@@ -1,12 +1,9 @@
 package com.jamitek.photosapp
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.jamitek.photosapp.model.Photo
-import kotlinx.coroutines.launch
 
 class RemoteLibraryViewModel(
     private val repository: RemoteLibraryRepository

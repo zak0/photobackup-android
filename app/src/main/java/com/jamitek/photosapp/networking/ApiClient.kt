@@ -5,7 +5,6 @@ import com.jamitek.photosapp.database.LocalMedia
 import com.jamitek.photosapp.model.Photo
 import okhttp3.*
 import org.json.JSONException
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -64,44 +63,52 @@ class ApiClient(
         retrofitService.getAllMedia(100000, offset).enqueue(retroFitCallback)
     }
 
-    fun postPhotoMetaData(localMedia: LocalMedia): Int? {
+    fun postPhotoMetaData(localMedia: LocalMedia): ApiResponse<Photo> {
         val body = serializer.getPhotoMetaRequest(localMedia)
-        val response = retrofitService.postPhotoMetaData(
-            RequestBody.create(
-                MediaType.parse("application/json"),
-                body
-            )
-        ).execute()
 
-        var serverId: Int? = null
-        if (response.isSuccessful) {
-            serverId = response.body()?.string()?.let {
-                try {
-                    JSONObject(it).getInt("id")
-                } catch (e: JSONException) {
-                    null
+        try {
+            val response = retrofitService.postPhotoMetaData(
+                RequestBody.create(
+                    MediaType.parse("application/json"),
+                    body
+                )
+            ).execute()
+
+
+            var remotePhoto: Photo? = null
+            if (response.isSuccessful) {
+                remotePhoto = response.body()?.string()?.let {
+                    try {
+                        responseParser.parsePhotoJson(it)
+                    } catch (e: JSONException) {
+                        null
+                    }
                 }
+            } else {
+                Log.e(TAG, "POSTing media meta failed")
             }
-        } else {
-            Log.e(TAG, "Posting upload initialization failed")
-        }
 
-        return serverId
+            return ApiResponse(response.code(), remotePhoto)
+        } catch (e: Exception) {
+            Log.e(TAG, "POSTing media meda failed: ", e)
+            return ApiResponse(null, null)
+        }
     }
 
     fun uploadPhoto(
         serverId: Int,
         localMedia: LocalMedia,
         file: ByteArray
-    ): Boolean {
-        val requestFile: RequestBody =
-            RequestBody.create(MediaType.parse("multipart/form-data"), file)
+    ): ApiResponse<Boolean> {
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+        val body = MultipartBody.Part.createFormData("newFile", localMedia.fileName, requestFile)
 
-        val body =
-            MultipartBody.Part.createFormData("newFile", localMedia.fileName, requestFile)
-
-        val response = retrofitService.uploadPhoto(serverId, body).execute()
-
-        return (response.isSuccessful && response.code() == 201)
+        return try {
+            val response = retrofitService.uploadPhoto(serverId, body).execute()
+            ApiResponse(response.code(), response.isSuccessful)
+        } catch (e: Exception) {
+            Log.e(TAG, "POSTing media failed: ", e)
+            ApiResponse(null, false)
+        }
     }
 }

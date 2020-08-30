@@ -7,6 +7,7 @@ import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.KeyValueStore.Companion.KEY_CAMERA_DIR_URI
 import com.jamitek.photosapp.database.LocalMedia
 import com.jamitek.photosapp.database.LocalMediaDb
+import com.jamitek.photosapp.model.Photo
 import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.coroutines.*
@@ -114,22 +115,34 @@ class LocalLibraryRepository(
             cache.filter { !it.uploaded }.forEach { localMedia ->
                 // First POST meta data. If the POST succeeds, the API responds with ID of the
                 // meta data on the server
-                api.postPhotoMetaData(localMedia)?.also { serverId ->
-                    // Reaching here means that meta data POST was successful.
-                    // We can use the received ID to POST the actual file.
-                    Log.d(TAG, "Media meta POST success for `${localMedia.fileName}`")
-                    storageHelper.getFileAsByteArray(localMedia.uri)?.also { bytes ->
-                        val success = api.uploadPhoto(serverId, localMedia, bytes)
-                        Log.d(
-                            TAG,
-                            "Media upload ${if (success) "success" else "failed"} for `${localMedia.fileName}`"
-                        )
+                val metaPostResponse = api.postPhotoMetaData(localMedia)
 
-                        // If upload was a success, let's mark the file as uploaded into the DB
-                        if (success) {
-                            localMedia.uploaded = true
-                            db.persist(localMedia)
+                if (metaPostResponse.statusCode in 200..201) {
+                    // Status code is 200 if the server already knew of this file.
+                    // Status code is 201 if this was a new file that the server didn't have before.
+                    if (metaPostResponse.data?.status == Photo.Status.UPLOAD_PENDING) {
+                        storageHelper.getFileAsByteArray(localMedia.uri)?.also { bytes ->
+                            val success = api.uploadPhoto(
+                                metaPostResponse.data.serverId,
+                                localMedia,
+                                bytes
+                            ).data == true
+                            Log.d(
+                                TAG,
+                                "Media upload ${if (success) "success" else "failed"} for `${localMedia.fileName}`"
+                            )
+
+                            // If upload was a success, let's mark the file as uploaded into the DB
+                            if (success) {
+                                localMedia.uploaded = true
+                                db.persist(localMedia)
+                            }
                         }
+                    } else if (metaPostResponse.data?.status == Photo.Status.READY) {
+                        // Photo is already uploaded. Let's mark it as such in our DB
+                        localMedia.uploaded = true
+                        db.persist(localMedia)
+                        Log.d(TAG, "Media '${localMedia.fileName}' already existed on the server")
                     }
                 }
             }
