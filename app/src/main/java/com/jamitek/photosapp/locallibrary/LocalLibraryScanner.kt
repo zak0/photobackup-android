@@ -16,28 +16,46 @@ class LocalLibraryScanner(private val context: Context) {
         private const val TAG = "LocalLibScanner"
     }
 
+    /**
+     * Iterates the user set camera directory and all its sub-directories for supported media files.
+     * With each detected media file, calls [onMediaFile] callback.
+     */
     fun iterateCameraDir(cameraDirUri: String, onMediaFile: (LocalMedia) -> Unit) {
         DocumentFile.fromTreeUri(context, Uri.parse(cameraDirUri))?.also { docFile ->
             if (!docFile.isDirectory) {
                 throw IllegalStateException("Selected camera directory is not a directory.")
             }
 
-            docFile.listFiles().forEach { childDocFile ->
-                val fileName = childDocFile.name ?: ""
+            iterateDirectory(docFile, onMediaFile)
+        }
+    }
 
-                // Only accept media files
-                if (fileName.split(".").last()
-                        .toLowerCase(Locale.ROOT) in StorageAccessHelper.SUPPORTED_EXTENSIONS
-                ) {
-                    val fileSize = childDocFile.length()
-                    val digest = calculateMd5ForFile(context, childDocFile)
-                    val fileUriString = childDocFile.uri.toString()
-                    onMediaFile(LocalMedia(-1, fileName, fileUriString, fileSize, digest, false))
-                    Log.d(
-                        StorageAccessHelper.TAG,
-                        "filename: $fileName, filesize: $fileSize, digest: $digest"
-                    )
-                }
+    /**
+     * Scans a directory and all subdirectories for supported media files. If a supported file is encountered, calls
+     * [onMediaFile] with it as the parameter. If a directory is encountered, calls this same
+     * method again to scan that directory.
+     */
+    private fun iterateDirectory(directory: DocumentFile, onMediaFile: (LocalMedia) -> Unit) {
+        directory.listFiles().forEach { childDocFile ->
+            val fileName = childDocFile.name ?: ""
+
+            // Iterate subfolders as well
+            if (childDocFile.isDirectory) {
+                iterateDirectory(childDocFile, onMediaFile)
+            }
+
+            // Only accept media files
+            if (fileName.split(".").last()
+                    .toLowerCase(Locale.ROOT) in StorageAccessHelper.SUPPORTED_EXTENSIONS
+            ) {
+                val fileSize = childDocFile.length()
+                val digest = calculateMd5ForFile(context, childDocFile)
+                val fileUriString = childDocFile.uri.toString()
+                onMediaFile(LocalMedia(-1, fileName, fileUriString, fileSize, digest, false))
+                Log.d(
+                    StorageAccessHelper.TAG,
+                    "filename: $fileName, filesize: $fileSize, digest: $digest"
+                )
             }
         }
     }
