@@ -1,7 +1,8 @@
-package com.jamitek.photosapp.locallibrary
+package com.jamitek.photosapp.ui.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import com.jamitek.photosapp.locallibrary.LocalLibraryRepository
 
 class LocalLibraryViewModel(private val repository: LocalLibraryRepository) : ViewModel() {
 

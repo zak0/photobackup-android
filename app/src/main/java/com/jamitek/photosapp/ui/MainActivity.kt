@@ -1,4 +1,4 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -11,9 +11,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.dependencyRoot
-import com.jamitek.photosapp.locallibrary.LocalLibraryViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
+import com.jamitek.photosapp.ui.viewmodel.LocalLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, BottomNavigationView.OnNavigationItemSelectedListener {

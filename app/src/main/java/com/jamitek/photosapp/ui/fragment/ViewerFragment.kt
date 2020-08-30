@@ -1,11 +1,12 @@
-package com.jamitek.photosapp.viewer
+package com.jamitek.photosapp.ui.fragment
 
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.jamitek.photosapp.RemoteLibraryViewModel
 import com.jamitek.photosapp.R
+import com.jamitek.photosapp.ui.adapter.ViewerAdapter
+import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 import kotlinx.android.synthetic.main.fragment_viewer.*
 
 class ViewerFragment : Fragment(R.layout.fragment_viewer) {
@@ -20,7 +21,7 @@ class ViewerFragment : Fragment(R.layout.fragment_viewer) {
 
         viewPager.adapter = viewerAdapter
 
-        viewModel.selectedPhoto.value?.let { photo ->
+        viewModel.selectedRemoteMedia.value?.let { photo ->
             viewPager.setCurrentItem(viewModel.photos.value?.indexOf(photo) ?: 0, false)
         }
 

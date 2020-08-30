@@ -1,12 +1,14 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui.fragment
 
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.getActivityViewModel
-import com.jamitek.photosapp.locallibrary.LocalLibraryViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
+import com.jamitek.photosapp.ui.viewmodel.LocalLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_settings.*
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {

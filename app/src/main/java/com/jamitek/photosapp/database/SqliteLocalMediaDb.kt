@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.jamitek.photosapp.model.LocalMedia
 
 class SqliteLocalMediaDb(context: Context) :
     SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION), LocalMediaDb {

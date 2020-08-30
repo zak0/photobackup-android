@@ -1,8 +1,11 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.util
 
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Collection of methods for dealing with date and time.
+ */
 object DateUtil {
 
     private const val TAG = "DateUtil"

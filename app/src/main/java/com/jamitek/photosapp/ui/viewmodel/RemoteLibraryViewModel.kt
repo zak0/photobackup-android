@@ -1,9 +1,10 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.model.RemoteMedia
+import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 
 class RemoteLibraryViewModel(
     private val repository: RemoteLibraryRepository
@@ -17,8 +18,8 @@ class RemoteLibraryViewModel(
     /**
      * Currently selected photo for detailed viewing and inspection.
      */
-    private val mutableSelectedPhoto = MutableLiveData<Photo>().apply { value = null }
-    val selectedPhoto: LiveData<Photo> = mutableSelectedPhoto
+    private val mutableSelectedPhoto = MutableLiveData<RemoteMedia>().apply { value = null }
+    val selectedRemoteMedia: LiveData<RemoteMedia> = mutableSelectedPhoto
 
     val photosPerDate = repository.photosPerDate
 
@@ -26,8 +27,8 @@ class RemoteLibraryViewModel(
      * Callback for when a thumbnail is clicked on library screen. Marks the clicked image as
      * selected.
      */
-    fun onThumbnailClicked(photo: Photo) {
-        mutableSelectedPhoto.value = photo
+    fun onThumbnailClicked(remoteMedia: RemoteMedia) {
+        mutableSelectedPhoto.value = remoteMedia
     }
 
     /**

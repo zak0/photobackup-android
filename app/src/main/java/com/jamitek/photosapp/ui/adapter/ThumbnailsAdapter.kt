@@ -1,4 +1,4 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui.adapter
 
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -8,13 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.R
+import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.networking.UrlHelper
+import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 import kotlinx.android.synthetic.main.list_item_thumbnail.view.*
 
 class ThumbnailsAdapter(
     private val viewModel: RemoteLibraryViewModel,
-    private val dataSet: ArrayList<Photo>
+    private val dataSet: ArrayList<RemoteMedia>
 ) :
     RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailsViewHolder>() {
 

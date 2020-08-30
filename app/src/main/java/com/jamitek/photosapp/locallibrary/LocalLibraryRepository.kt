@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.KeyValueStore.Companion.KEY_CAMERA_DIR_URI
-import com.jamitek.photosapp.database.LocalMedia
 import com.jamitek.photosapp.database.LocalMediaDb
-import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.model.LocalMedia
+import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.coroutines.*
@@ -120,7 +120,7 @@ class LocalLibraryRepository(
                 if (metaPostResponse.statusCode in 200..201) {
                     // Status code is 200 if the server already knew of this file.
                     // Status code is 201 if this was a new file that the server didn't have before.
-                    if (metaPostResponse.data?.status == Photo.Status.UPLOAD_PENDING) {
+                    if (metaPostResponse.data?.status == RemoteMedia.Status.UPLOAD_PENDING) {
                         storageHelper.getFileAsByteArray(localMedia.uri)?.also { bytes ->
                             val success = api.uploadPhoto(
                                 metaPostResponse.data.serverId,
@@ -138,7 +138,7 @@ class LocalLibraryRepository(
                                 db.persist(localMedia)
                             }
                         }
-                    } else if (metaPostResponse.data?.status == Photo.Status.READY) {
+                    } else if (metaPostResponse.data?.status == RemoteMedia.Status.READY) {
                         // Photo is already uploaded. Let's mark it as such in our DB
                         localMedia.uploaded = true
                         db.persist(localMedia)

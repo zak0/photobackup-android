@@ -1,10 +1,13 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui.fragment
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.getActivityViewModel
+import com.jamitek.photosapp.ui.adapter.TimelineAdapter
+import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -14,7 +17,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private val adapter: TimelineAdapter by lazy { TimelineAdapter(viewModel) }
-    private val viewModel: RemoteLibraryViewModel by lazy { getActivityViewModel(RemoteLibraryViewModel::class.java) }
+    private val viewModel: RemoteLibraryViewModel by lazy {
+        getActivityViewModel(
+            RemoteLibraryViewModel::class.java
+        )
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -26,7 +33,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun observe() {
-        viewModel.selectedPhoto.observe(viewLifecycleOwner, Observer {
+        viewModel.selectedRemoteMedia.observe(viewLifecycleOwner, Observer {
             it?.let { photo ->
                 findNavController().navigate(R.id.action_mainFragment_to_viewerFragment)
             }

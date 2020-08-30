@@ -1,4 +1,4 @@
-package com.jamitek.photosapp.database
+package com.jamitek.photosapp.model
 
 data class LocalMedia(
     var id: Int,

@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
-import com.jamitek.photosapp.database.LocalMedia
+import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import java.math.BigInteger
 import java.security.MessageDigest

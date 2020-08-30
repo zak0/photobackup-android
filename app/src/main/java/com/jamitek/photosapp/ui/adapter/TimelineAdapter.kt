@@ -1,10 +1,12 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.jamitek.photosapp.R
+import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 import kotlinx.android.synthetic.main.list_item_timeline.view.*
 
 class TimelineAdapter(private val viewModel: RemoteLibraryViewModel) : RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder>() {

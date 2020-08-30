@@ -1,8 +1,6 @@
 package com.jamitek.photosapp.model
 
-data class Photo(
-    /** ID of this photo in local database */
-    var id: Int?,
+data class RemoteMedia(
 
     /** Only valid for remote photos! ID of this photo on server */
     var serverId: Int,

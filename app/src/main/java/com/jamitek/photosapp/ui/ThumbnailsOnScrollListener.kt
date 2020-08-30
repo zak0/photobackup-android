@@ -1,8 +1,9 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui
 
 import android.util.Log
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 
 class ThumbnailsOnScrollListener(private val viewModel: RemoteLibraryViewModel) : RecyclerView.OnScrollListener() {
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

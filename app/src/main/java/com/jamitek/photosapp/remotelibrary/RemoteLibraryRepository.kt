@@ -1,10 +1,11 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.remotelibrary
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.networking.ApiClient
+import com.jamitek.photosapp.util.DateUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -16,15 +17,19 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
         private const val TAG = "RemoteLibraryRepository"
     }
 
-    private val mutableAllPhotos = MutableLiveData<List<Photo>>().apply { value = emptyList() }
-    val allPhotos: LiveData<List<Photo>> = mutableAllPhotos
+    private val mutableAllPhotos =
+        MutableLiveData<List<RemoteMedia>>().apply { value = emptyList() }
+    val allPhotos: LiveData<List<RemoteMedia>> = mutableAllPhotos
 
     /**
      * Photos for "timeline" neatly organized into per-date buckets.
      */
     private val mutablePhotosPerDate =
-        MutableLiveData<ArrayList<Pair<String, ArrayList<Photo>>>>().apply { value = ArrayList() }
-    val photosPerDate: LiveData<ArrayList<Pair<String, ArrayList<Photo>>>> = mutablePhotosPerDate
+        MutableLiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>>().apply {
+            value = ArrayList()
+        }
+    val photosPerDate: LiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>> =
+        mutablePhotosPerDate
 
     fun fetchRemotePhotos() {
         libraryApi.getAllPhotos { success, photos ->
@@ -38,20 +43,20 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
      * Arranges photos into "buckets" based on their date. This allows for nice grouping of photos
      * and displaying then on a timeline.
      *
-     * Only local photos and remote photos on state [Photo.Status.READY] are included in the
+     * Only local photos and remote photos on state [RemoteMedia.Status.READY] are included in the
      * buckets.
      *
      * The resulting grouping is stored in observable [photosPerDate] [ArrayList].
      */
-    private suspend fun arrangeIntoDateBuckets(photos: List<Photo>) {
-        val newPhotosPerDate = ArrayList<Pair<String, ArrayList<Photo>>>()
+    private suspend fun arrangeIntoDateBuckets(remoteMedia: List<RemoteMedia>) {
+        val newPhotosPerDate = ArrayList<Pair<String, ArrayList<RemoteMedia>>>()
 
         var currentDate = ""
-        var photosForCurrentDate = ArrayList<Photo>()
+        var photosForCurrentDate = ArrayList<RemoteMedia>()
 
-        photos.sortedByDescending { it.dateTimeOriginal }.forEach { photo ->
+        remoteMedia.sortedByDescending { it.dateTimeOriginal }.forEach { photo ->
             // Skip if this is a remote-only photo, that is not on state READY.
-            if (!photo.isLocal && photo.status != Photo.Status.READY) {
+            if (!photo.isLocal && photo.status != RemoteMedia.Status.READY) {
                 Log.d(TAG, "Arrange by date - skipping unready ${photo.fileName}")
                 return@forEach
             }
@@ -84,7 +89,7 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
 
         // Put the photos in the same order into the "all photos" array. This array is used for
         // swiping through photos.
-        val newAllPhotos = ArrayList<Photo>()
+        val newAllPhotos = ArrayList<RemoteMedia>()
         newPhotosPerDate.forEach { datePhotosPair ->
             datePhotosPair.second.forEach { photo ->
                 newAllPhotos.add(photo)

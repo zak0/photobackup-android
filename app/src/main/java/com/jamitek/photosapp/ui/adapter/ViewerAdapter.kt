@@ -1,4 +1,4 @@
-package com.jamitek.photosapp.viewer
+package com.jamitek.photosapp.ui.adapter
 
 import android.net.Uri
 import android.view.LayoutInflater
@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import com.jamitek.photosapp.R
-import com.jamitek.photosapp.RemoteLibraryViewModel
-import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.networking.UrlHelper
+import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 import kotlinx.android.synthetic.main.view_viewer_image.view.*
 
 class ViewerAdapter(private val viewModel: RemoteLibraryViewModel) :
@@ -48,7 +48,7 @@ class ViewerAdapter(private val viewModel: RemoteLibraryViewModel) :
             holder.itemView.remoteFileIcon.visibility =
                 if (photo.isRemote) View.VISIBLE else View.GONE
             holder.itemView.uploadButton.visibility =
-                if (photo.isLocal && photo.status != Photo.Status.READY) View.VISIBLE else View.GONE
+                if (photo.isLocal && photo.status != RemoteMedia.Status.READY) View.VISIBLE else View.GONE
 
             setupUploadButton(holder, photo)
         }
@@ -57,13 +57,13 @@ class ViewerAdapter(private val viewModel: RemoteLibraryViewModel) :
     /**
      * Just a dummy to test upload implementation...
      */
-    private fun setupUploadButton(viewHolder: ViewerViewHolder, photo: Photo) {
+    private fun setupUploadButton(viewHolder: ViewerViewHolder, remoteMedia: RemoteMedia) {
         val context = viewHolder.itemView.context
 
         // TODO Upload a photo? (Probably not needed here in this class at all, at least for v1)
         viewHolder.itemView.uploadButton.setOnClickListener {
             val uploadLambda = { serverId: Int ->
-                photo.serverId = serverId
+                remoteMedia.serverId = serverId
 //                ApiClient.uploadPhoto(context, photo) { success ->
 //                    Toast.makeText(
 //                        context,
@@ -74,9 +74,9 @@ class ViewerAdapter(private val viewModel: RemoteLibraryViewModel) :
             }
 
             // POST metadata only if needed
-            if (photo.isRemote) {
+            if (remoteMedia.isRemote) {
                 // Metadata is already at the server
-                photo.serverId?.also(uploadLambda)
+                remoteMedia.serverId?.also(uploadLambda)
             } else {
                 // Server does not know of this photo yet
 //                ApiClient.postPhotoMetaData(photo) { serverId ->

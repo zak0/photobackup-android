@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.jamitek.photosapp.MainFragment"
+        android:name="com.jamitek.photosapp.ui.fragment.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main">
         <action
@@ -17,12 +17,12 @@
 
     <fragment
         android:id="@+id/viewerFragment"
-        android:name="com.jamitek.photosapp.viewer.ViewerFragment"
+        android:name="com.jamitek.photosapp.ui.fragment.ViewerFragment"
         android:label="ViewerFragment" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.jamitek.photosapp.SettingsFragment"
+        android:name="com.jamitek.photosapp.ui.fragment.SettingsFragment"
         android:label="SettingsFragment" />
 
     <action

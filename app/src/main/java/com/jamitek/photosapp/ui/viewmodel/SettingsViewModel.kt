@@ -1,4 +1,4 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.jamitek.photosapp.database.KeyValueStore

@@ -1,8 +1,8 @@
 package com.jamitek.photosapp.networking
 
 import android.util.Log
-import com.jamitek.photosapp.database.LocalMedia
-import com.jamitek.photosapp.model.Photo
+import com.jamitek.photosapp.model.LocalMedia
+import com.jamitek.photosapp.model.RemoteMedia
 import okhttp3.*
 import org.json.JSONException
 import retrofit2.Call
@@ -12,8 +12,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ApiClient(
-    private val serializer: PhotosSerializer,
-    private val responseParser: ResponseParser
+    private val serializer: MediaSerializer
 ) {
 
     companion object {
@@ -37,15 +36,15 @@ class ApiClient(
 
     private val retrofitService = retrofit.create(PhotosRetrofitService::class.java)
 
-    fun getAllPhotos(callback: (Boolean, List<Photo>) -> Unit) = getAllPhotos(0, callback)
+    fun getAllPhotos(callback: (Boolean, List<RemoteMedia>) -> Unit) = getAllPhotos(0, callback)
 
-    fun getAllPhotos(offset: Int, callback: (Boolean, List<Photo>) -> Unit) {
+    fun getAllPhotos(offset: Int, callback: (Boolean, List<RemoteMedia>) -> Unit) {
         val retroFitCallback = object : Callback<ResponseBody> {
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.code() == 200) {
                     val photos =
-                        response.body()?.let { responseParser.parsePhotosJson(it.string()) }
+                        response.body()?.let { serializer.parseRemoteMediasJson(it.string()) }
                             ?: emptyList()
                     callback(true, photos)
                     Log.d(TAG, "getAllPhotos() - response: 200")
@@ -63,8 +62,8 @@ class ApiClient(
         retrofitService.getAllMedia(100000, offset).enqueue(retroFitCallback)
     }
 
-    fun postPhotoMetaData(localMedia: LocalMedia): ApiResponse<Photo> {
-        val body = serializer.getPhotoMetaRequest(localMedia)
+    fun postPhotoMetaData(localMedia: LocalMedia): ApiResponse<RemoteMedia> {
+        val body = serializer.localMediaToMetaDataPostBody(localMedia)
 
         try {
             val response = retrofitService.postPhotoMetaData(
@@ -75,11 +74,11 @@ class ApiClient(
             ).execute()
 
 
-            var remotePhoto: Photo? = null
+            var remoteMedia: RemoteMedia? = null
             if (response.isSuccessful) {
-                remotePhoto = response.body()?.string()?.let {
+                remoteMedia = response.body()?.string()?.let {
                     try {
-                        responseParser.parsePhotoJson(it)
+                        serializer.parseRemoteMediaJson(it)
                     } catch (e: JSONException) {
                         null
                     }
@@ -88,7 +87,7 @@ class ApiClient(
                 Log.e(TAG, "POSTing media meta failed")
             }
 
-            return ApiResponse(response.code(), remotePhoto)
+            return ApiResponse(response.code(), remoteMedia)
         } catch (e: Exception) {
             Log.e(TAG, "POSTing media meda failed: ", e)
             return ApiResponse(null, null)

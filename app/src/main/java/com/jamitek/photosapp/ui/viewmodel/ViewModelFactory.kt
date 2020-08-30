@@ -1,8 +1,8 @@
-package com.jamitek.photosapp
+package com.jamitek.photosapp.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.jamitek.photosapp.locallibrary.LocalLibraryViewModel
+import com.jamitek.photosapp.DependencyRoot
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelProvider.Factory {
