@@ -36,9 +36,9 @@ class ApiClient(
 
     private val retrofitService = retrofit.create(PhotosRetrofitService::class.java)
 
-    fun getAllPhotos(callback: (Boolean, List<RemoteMedia>) -> Unit) = getAllPhotos(0, callback)
+    fun getAllMedia(callback: (Boolean, List<RemoteMedia>) -> Unit) = getAllMedia(0, callback)
 
-    fun getAllPhotos(offset: Int, callback: (Boolean, List<RemoteMedia>) -> Unit) {
+    fun getAllMedia(offset: Int, callback: (Boolean, List<RemoteMedia>) -> Unit) {
         val retroFitCallback = object : Callback<ResponseBody> {
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -62,7 +62,7 @@ class ApiClient(
         retrofitService.getAllMedia(100000, offset).enqueue(retroFitCallback)
     }
 
-    fun postPhotoMetaData(localMedia: LocalMedia): ApiResponse<RemoteMedia> {
+    fun postMetaData(localMedia: LocalMedia): ApiResponse<RemoteMedia> {
         val body = serializer.localMediaToMetaDataPostBody(localMedia)
 
         try {
@@ -94,7 +94,7 @@ class ApiClient(
         }
     }
 
-    fun uploadPhoto(
+    fun uploadMedia(
         serverId: Int,
         localMedia: LocalMedia,
         file: ByteArray

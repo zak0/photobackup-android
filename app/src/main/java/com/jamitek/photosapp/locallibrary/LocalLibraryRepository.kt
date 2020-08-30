@@ -115,14 +115,14 @@ class LocalLibraryRepository(
             cache.filter { !it.uploaded }.forEach { localMedia ->
                 // First POST meta data. If the POST succeeds, the API responds with ID of the
                 // meta data on the server
-                val metaPostResponse = api.postPhotoMetaData(localMedia)
+                val metaPostResponse = api.postMetaData(localMedia)
 
                 if (metaPostResponse.statusCode in 200..201) {
                     // Status code is 200 if the server already knew of this file.
                     // Status code is 201 if this was a new file that the server didn't have before.
                     if (metaPostResponse.data?.status == RemoteMedia.Status.UPLOAD_PENDING) {
                         storageHelper.getFileAsByteArray(localMedia.uri)?.also { bytes ->
-                            val success = api.uploadPhoto(
+                            val success = api.uploadMedia(
                                 metaPostResponse.data.serverId,
                                 localMedia,
                                 bytes

@@ -2,7 +2,6 @@ package com.jamitek.photosapp.ui.adapter
 
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,13 +39,9 @@ class ThumbnailsAdapter(
     override fun onBindViewHolder(holder: ThumbnailsViewHolder, position: Int) {
         val photo = dataSet[position]
 
-        // Primarily try to use local thumbnails to prevent having to load anything over the
-        // network.
-        val thumbnailAddress =
-            photo.localUriString?.let { Uri.parse(it) } ?: photo.serverId?.let {
-                val url = UrlHelper.thumbnailUrl(it)
-                UrlHelper.authorizedGlideUrl(url)
-            }
+        // TODO Primarily try to use local thumbnails to prevent having to load anything over the
+        //  network. Check local lib repo for this. FYI: Glide supports URIs as URLs.
+        val thumbnailAddress = UrlHelper.authorizedGlideUrl(UrlHelper.thumbnailUrl(photo.serverId))
 
         Glide
             .with(holder.itemView)

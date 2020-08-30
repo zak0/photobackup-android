@@ -52,8 +52,6 @@ class MediaSerializer {
             json.getString("fileName"),
             json.getLong("fileSize"),
             "dirpath goes here",
-            null,
-            null,
             json.getString("checksum"),
             json.getString("dateTimeOriginal"),
             json.getString("status")

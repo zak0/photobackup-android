@@ -14,12 +14,6 @@ data class RemoteMedia(
     /** Only valid for remote photos! Path to the containing directory in remote server */
     var serverDirPath: String?,
 
-    /** Only valid for local photos! URI as a string pointing to this file in local mass storage */
-    var localUriString: String?,
-
-    /** Only valid for local photos! URI as a string pointing to the thumbnail of this photo in local storage */
-    var localThumbnailUriString: String?,
-
     /** Checksum for the contents of the file */
     var hash: String,
 
@@ -35,13 +29,4 @@ data class RemoteMedia(
         const val UPLOAD_PENDING = "upload_pending"
         const val PROCESSING = "processing"
     }
-
-    val isLocal: Boolean
-        get() = localUriString != null
-
-    val isRemote: Boolean
-        get() = serverId != null
-
-    val isPendingUpload: Boolean
-        get() = isRemote && status == Status.UPLOAD_PENDING
 }

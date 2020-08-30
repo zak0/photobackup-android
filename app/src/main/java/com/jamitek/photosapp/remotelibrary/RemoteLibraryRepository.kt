@@ -32,7 +32,7 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
         mutablePhotosPerDate
 
     fun fetchRemotePhotos() {
-        libraryApi.getAllPhotos { success, photos ->
+        libraryApi.getAllMedia { success, photos ->
             GlobalScope.launch {
                 arrangeIntoDateBuckets(photos)
             }
@@ -55,8 +55,8 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
         var photosForCurrentDate = ArrayList<RemoteMedia>()
 
         remoteMedia.sortedByDescending { it.dateTimeOriginal }.forEach { photo ->
-            // Skip if this is a remote-only photo, that is not on state READY.
-            if (!photo.isLocal && photo.status != RemoteMedia.Status.READY) {
+            // Skip if this is not on state READY.
+            if (photo.status != RemoteMedia.Status.READY) {
                 Log.d(TAG, "Arrange by date - skipping unready ${photo.fileName}")
                 return@forEach
             }
