@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#44000000"
-        app:layout_constraintBottom_toBottomOf="@id/toolbarBottomBarrier"
+        app:layout_constraintBottom_toBottomOf="@id/filenameLabel"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -28,55 +28,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="IMG_19700101_133705.jpg" />
-
-    <ImageView
-        android:id="@+id/localFileIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:src="@drawable/ic_folder_24dp"
-        android:tint="@android:color/white"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"
-        tools:visibility="visible" />
-
-    <Button
-        android:id="@+id/uploadButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Upload"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filenameLabel"
-        tools:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/remoteFileIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:src="@drawable/ic_cloud_24dp"
-        android:tint="@android:color/white"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@id/locationIconBarrier"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"
-        tools:visibility="visible" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/locationIconBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="start"
-        app:constraint_referenced_ids="localFileIcon" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/toolbarBottomBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="localFileIcon, remoteFileIcon, filenameLabel, uploadButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,7 +26,7 @@ class TimelineAdapter(private val viewModel: RemoteLibraryViewModel) : RecyclerV
             holder.itemView.dateLabel.text = timelineItem.first
 
             holder.itemView.recycler.adapter = ThumbnailsAdapter(viewModel, timelineItem.second)
-            holder.itemView.recycler.layoutManager = GridLayoutManager(holder.itemView.context, 3)
+            holder.itemView.recycler.layoutManager = GridLayoutManager(holder.itemView.context, 4)
         }
     }
 
