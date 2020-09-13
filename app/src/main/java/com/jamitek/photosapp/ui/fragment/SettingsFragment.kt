@@ -36,7 +36,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         localLibraryViewModel.libraryStatus.observe(viewLifecycleOwner, Observer {
             it?.also { status ->
                 localLibScanStatus.text =
-                    "scanning: ${status.isScanning}\nlocalFilesCount: ${status.localFilesCount}\nnotSyncedCount: ${status.waitingForBackupCount}"
+                    """
+                        uploading: ${status.isUploading}
+                        scanning: ${status.isScanning}
+                        localFilesCount: ${status.localFilesCount}
+                        notSyncedCount: ${status.waitingForBackupCount}
+                    """.trimIndent()
             }
         })
 

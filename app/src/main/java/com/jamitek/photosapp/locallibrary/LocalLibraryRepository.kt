@@ -22,6 +22,7 @@ class LocalLibraryRepository(
 
     companion object {
         private const val TAG = "LocalLibRepo"
+        private const val UPLOAD_MAX_FAILURES = 2
     }
 
     private var initJob: Job? = null
@@ -38,7 +39,7 @@ class LocalLibraryRepository(
             cacheByCheckSum.clear()
             cacheByCheckSum.putAll(cache.map { it.checksum to it })
 
-            updateStatus(false)
+            updateStatus(false, false)
         }
     }
 
@@ -77,7 +78,7 @@ class LocalLibraryRepository(
         requireNotNull(mutableStatus.value) { "Status should have been initialized by now" }
 
         cameraDirUriString?.also { uriString ->
-            updateStatus(true)
+            updateStatus(true, false)
             scanJob = CoroutineScope(Dispatchers.IO).launch {
                 scanner.iterateCameraDir(uriString) { localMedia ->
                     cacheByCheckSum[localMedia.checksum]?.also { existingMedia ->
@@ -95,11 +96,11 @@ class LocalLibraryRepository(
                         db.persist(localMedia)
                         cacheLocalMedia(localMedia)
                     }
-                    updateStatus(true)
+                    updateStatus(true, false)
                 }
 
                 // Update library status once scan is complete
-                updateStatus(false)
+                updateStatus(false, false)
             }
         }
     }
@@ -108,7 +109,8 @@ class LocalLibraryRepository(
      * Backs up local media files to the server. Only backs up files that do not yet exist on the
      * server (that the app knows of).
      *
-     * If an API request times out, server is assumed to be out of reach and backup is stopped.
+     * If an API request fails [UPLOAD_MAX_FAILURES] consecutive times, server is assumed to be out
+     * of reach and backup is stopped.
      *
      * Backup will not be initiated if a scan is in progress.
      */
@@ -124,6 +126,8 @@ class LocalLibraryRepository(
             return
         }
 
+        var consecutiveFailures = 0
+        updateStatus(false, true)
         backupJob = CoroutineScope(Dispatchers.IO).launch {
             // Get all files that don't appear to be backed up yet
             cache.filter { !it.uploaded }.forEach { localMedia ->
@@ -134,6 +138,8 @@ class LocalLibraryRepository(
                 if (metaPostResponse.statusCode in 200..201) {
                     // Status code is 200 if the server already knew of this file.
                     // Status code is 201 if this was a new file that the server didn't have before.
+                    consecutiveFailures = 0
+
                     if (metaPostResponse.data?.status == RemoteMedia.Status.UPLOAD_PENDING) {
                         storageHelper.getFileAsByteArray(localMedia.uri)?.also { bytes ->
                             val success = api.uploadMedia(
@@ -158,10 +164,23 @@ class LocalLibraryRepository(
                         db.persist(localMedia)
                         Log.d(TAG, "Media '${localMedia.fileName}' already existed on the server")
                     }
+                } else {
+                    consecutiveFailures++
                 }
 
-                updateStatus(false)
+                updateStatus(isScanning = false, isUploading = true)
+
+                // If we failed too many times, we're done
+                if (consecutiveFailures >= 3) {
+                    Log.e(TAG, "Media sync failed $consecutiveFailures times in a row due to server being unreachable. Stopping upload.")
+                    // Status update for when we end the backup process because of failures
+                    updateStatus(isScanning = false, isUploading = false)
+                    return@launch
+                }
             }
+
+            // Status update of happy
+            updateStatus(isScanning = false, isUploading = false)
         }
     }
 
@@ -170,10 +189,10 @@ class LocalLibraryRepository(
         cacheByCheckSum[localMedia.checksum] = localMedia
     }
 
-    private fun updateStatus(isScanning: Boolean) {
+    private fun updateStatus(isScanning: Boolean, isUploading: Boolean) {
         CoroutineScope(Dispatchers.Main).launch {
             mutableStatus.value =
-                LocalLibraryStatus(isScanning, cache.size, cache.count { !it.uploaded })
+                LocalLibraryStatus(isUploading, isScanning, cache.size, cache.count { !it.uploaded })
         }
     }
 
