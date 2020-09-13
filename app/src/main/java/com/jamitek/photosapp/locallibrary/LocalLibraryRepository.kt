@@ -26,6 +26,7 @@ class LocalLibraryRepository(
 
     private var initJob: Job? = null
     private var scanJob: Job? = null
+    private var backupJob: Job? = null
     private val cache = HashSet<LocalMedia>()
     private val cacheByCheckSum = HashMap<String, LocalMedia>()
 
@@ -67,6 +68,12 @@ class LocalLibraryRepository(
             return
         }
 
+        // Also, scanning cannot be started while backup is in progress
+        if (backupJob?.isActive == true) {
+            Log.d(TAG, "Scan cannot be started while backup is in progress...")
+            return
+        }
+
         requireNotNull(mutableStatus.value) { "Status should have been initialized by now" }
 
         cameraDirUriString?.also { uriString ->
@@ -88,6 +95,7 @@ class LocalLibraryRepository(
                         db.persist(localMedia)
                         cacheLocalMedia(localMedia)
                     }
+                    updateStatus(true)
                 }
 
                 // Update library status once scan is complete
@@ -110,7 +118,13 @@ class LocalLibraryRepository(
             return
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        // Also, only one backup job can be running at a time
+        if (backupJob?.isActive == true) {
+            Log.d(TAG, "Backup is already in progress, not starting a new one...")
+            return
+        }
+
+        backupJob = CoroutineScope(Dispatchers.IO).launch {
             // Get all files that don't appear to be backed up yet
             cache.filter { !it.uploaded }.forEach { localMedia ->
                 // First POST meta data. If the POST succeeds, the API responds with ID of the
@@ -145,6 +159,8 @@ class LocalLibraryRepository(
                         Log.d(TAG, "Media '${localMedia.fileName}' already existed on the server")
                     }
                 }
+
+                updateStatus(false)
             }
         }
     }
