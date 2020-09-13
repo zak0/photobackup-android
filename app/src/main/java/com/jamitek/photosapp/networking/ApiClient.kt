@@ -2,6 +2,7 @@ package com.jamitek.photosapp.networking
 
 import android.util.Log
 import com.jamitek.photosapp.model.LocalMedia
+import com.jamitek.photosapp.model.RemoteLibraryScanStatus
 import com.jamitek.photosapp.model.RemoteMedia
 import okhttp3.*
 import org.json.JSONException
@@ -108,6 +109,48 @@ class ApiClient(
         } catch (e: Exception) {
             Log.e(TAG, "POSTing media failed: ", e)
             ApiResponse(null, false)
+        }
+    }
+
+    /**
+     * Requires ADMIN account.
+     *
+     * Initializes a library scan at the server. Expects server to
+     * - Respond with 200 and empty body if a scan is started.
+     * - Respond with 409 if there already is a scan running.
+     */
+    fun initRemoteLibraryScan(): ApiResponse<Boolean> {
+        return try {
+            val response = retrofitService.initRemoteLibraryScan().execute()
+            ApiResponse(response.code(), response.isSuccessful)
+        } catch (e: Exception) {
+            Log.e(TAG, "Library scan initiation failed: ", e)
+            ApiResponse(null, false)
+        }
+    }
+
+    /**
+     * Requires ADMIN account.
+     *
+     * Fetches status of (possible) current library scan on the server. Expects server to
+     * - Respond with 200 and valid scan status body, if there has been a scan this server runtime.
+     * - Respond with 409 when there has NOT been a scan this server runtime. In this case the
+     *   response body will be null/empty.
+     */
+    fun getRemoteLibraryScanStatus(): ApiResponse<RemoteLibraryScanStatus> {
+        return try {
+            val response = retrofitService.getRemoteLibraryScanStatus().execute()
+            val statusObject = if (response.isSuccessful) {
+                response.body()?.string()?.let { bodyString ->
+                    serializer.parseRemoteLibraryScanStatusJson(bodyString)
+                }
+            } else {
+                null
+            }
+            ApiResponse(response.code(), statusObject)
+        } catch (e: Exception) {
+            Log.e(TAG, "Library scan status fetching failed: ", e)
+            ApiResponse(null, null)
         }
     }
 }

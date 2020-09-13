@@ -35,8 +35,31 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         localLibraryViewModel.libraryStatus.observe(viewLifecycleOwner, Observer {
             it?.also { status ->
-                libraryStatusLabel.text =
+                localLibScanStatus.text =
                     "scanning: ${status.isScanning}\nlocalFilesCount: ${status.localFilesCount}\nnotSyncedCount: ${status.waitingForBackupCount}"
+            }
+        })
+
+        initRemoteLibScanButton.setOnClickListener {
+            settingsViewModel.initRemoteLibraryScan()
+        }
+
+        refreshRemoteLibScanStatusButton.setOnClickListener {
+            settingsViewModel.refreshRemoteLibraryScanStatus()
+        }
+
+        settingsViewModel.remoteLibraryScanStatus.observe(viewLifecycleOwner, Observer {
+            it?.also { remoteLibraryScanStatus ->
+                remoteLibScanStatus.text =
+                    """
+                        Server scan state: ${remoteLibraryScanStatus.state}
+                        mediaFilesDetected: ${remoteLibraryScanStatus.mediaFilesDetected}
+                        filesMoved: ${remoteLibraryScanStatus.filesMoved}
+                        filesRemoved: ${remoteLibraryScanStatus.filesRemoved}
+                        newFiles: ${remoteLibraryScanStatus.newFiles}
+                        filesToProcess: ${remoteLibraryScanStatus.filesToProcess}
+                        filesProcessed: ${remoteLibraryScanStatus.filesProcessed}
+                    """.trimIndent()
             }
         })
     }

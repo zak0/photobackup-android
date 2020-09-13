@@ -9,9 +9,16 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when (modelClass) {
-            LocalLibraryViewModel::class.java -> LocalLibraryViewModel(dependencyRoot.localLibraryRepository)
-            RemoteLibraryViewModel::class.java -> RemoteLibraryViewModel(dependencyRoot.remoteLibraryRepository)
-            SettingsViewModel::class.java -> SettingsViewModel(dependencyRoot.keyValueStore)
+            LocalLibraryViewModel::class.java -> LocalLibraryViewModel(
+                dependencyRoot.localLibraryRepository
+            )
+            RemoteLibraryViewModel::class.java -> RemoteLibraryViewModel(
+                dependencyRoot.remoteLibraryRepository
+            )
+            SettingsViewModel::class.java -> SettingsViewModel(
+                dependencyRoot.keyValueStore,
+                dependencyRoot.remoteLibraryAdminRepository
+            )
             else -> throw IllegalArgumentException("Unknown ViewModel type")
         } as T
     }

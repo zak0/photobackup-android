@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:padding="20dp">
 
     <TextView
@@ -34,24 +34,42 @@
         android:id="@+id/manualSyncButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/setCameraDirButton"
+        android:text="Manual Sync"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Manual Sync" />
+        app:layout_constraintTop_toBottomOf="@id/setCameraDirButton" />
 
     <TextView
-        android:id="@+id/libraryStatusLabel"
+        android:id="@+id/localLibScanStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/manualSyncButton" />
+        app:layout_constraintTop_toBottomOf="@id/manualSyncButton"
+        tools:text="Local lib scan is in progress" />
+
+    <Button
+        android:id="@+id/initRemoteLibScanButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Init remote lib scan"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/localLibScanStatus" />
+
+    <Button
+        android:id="@+id/refreshRemoteLibScanStatusButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Refresh remote lib scan status"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/initRemoteLibScanButton" />
 
     <TextView
-        android:id="@+id/serverSyncStatusLabel"
+        android:id="@+id/remoteLibScanStatus"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="Server is synchronizing library"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/libraryStatusLabel" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/refreshRemoteLibScanStatusButton"
+        tools:text="Server is synchronizing library" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

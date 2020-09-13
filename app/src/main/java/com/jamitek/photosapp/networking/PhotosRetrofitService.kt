@@ -16,4 +16,10 @@ interface PhotosRetrofitService {
     @Multipart
     @POST("media/{id}/file")
     fun uploadPhoto(@Path(value = "id") serverId: Int, @Part file: MultipartBody.Part): Call<ResponseBody>
+
+    @GET("scanlibrary")
+    fun initRemoteLibraryScan(): Call<ResponseBody>
+
+    @GET("scanstatus")
+    fun getRemoteLibraryScanStatus(): Call<ResponseBody>
 }

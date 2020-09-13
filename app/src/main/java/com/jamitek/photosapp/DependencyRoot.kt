@@ -7,6 +7,7 @@ import com.jamitek.photosapp.locallibrary.LocalLibraryRepository
 import com.jamitek.photosapp.locallibrary.LocalLibraryScanner
 import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.networking.MediaSerializer
+import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 import com.jamitek.photosapp.storage.StorageAccessHelper
 
@@ -35,5 +36,6 @@ class DependencyRoot(app: Application) {
             apiClient
         )
     }
+    val remoteLibraryAdminRepository by lazy { RemoteLibraryAdminRepository(apiClient) }
 
 }

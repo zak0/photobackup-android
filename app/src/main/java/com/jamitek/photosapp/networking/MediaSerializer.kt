@@ -2,6 +2,7 @@ package com.jamitek.photosapp.networking
 
 import android.util.Log
 import com.jamitek.photosapp.model.LocalMedia
+import com.jamitek.photosapp.model.RemoteLibraryScanStatus
 import com.jamitek.photosapp.model.RemoteMedia
 import org.json.JSONArray
 import org.json.JSONException
@@ -55,6 +56,19 @@ class MediaSerializer {
             json.getString("checksum"),
             json.getString("dateTimeOriginal"),
             json.getString("status")
+        )
+    }
+
+    fun parseRemoteLibraryScanStatusJson(jsonString: String): RemoteLibraryScanStatus {
+        val json = JSONObject(jsonString)
+        return RemoteLibraryScanStatus(
+            state = json.getString("state"),
+            mediaFilesDetected = json.getInt("mediaFilesDetected"),
+            filesMoved = json.getInt("filesMoved"),
+            filesRemoved = json.getInt("filesRemoved"),
+            newFiles = json.getInt("newFiles"),
+            filesToProcess = json.getInt("filesToProcess"),
+            filesProcessed = json.getInt("filesProcessed")
         )
     }
 }
