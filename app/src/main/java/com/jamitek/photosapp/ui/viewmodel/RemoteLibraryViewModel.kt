@@ -3,10 +3,13 @@ package com.jamitek.photosapp.ui.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.bumptech.glide.load.model.GlideUrl
 import com.jamitek.photosapp.model.RemoteMedia
+import com.jamitek.photosapp.networking.UrlRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 
 class RemoteLibraryViewModel(
+    private val urlRepository: UrlRepository,
     private val repository: RemoteLibraryRepository
 ) : ViewModel() {
 
@@ -41,6 +44,16 @@ class RemoteLibraryViewModel(
 
     fun refreshRemotePhotos() {
         repository.fetchRemotePhotos()
+    }
+
+    fun authorizedThumbnailGlideUrl(mediIdOnServer: Int): GlideUrl {
+        val thumbUrl = urlRepository.thumbnailUrl(mediIdOnServer)
+        return urlRepository.authorizedGlideUrl(thumbUrl)
+    }
+
+    fun authorizedImageGlideUrl(mediaIdOnServer: Int): GlideUrl {
+        val imageUrl = urlRepository.photoUrl(mediaIdOnServer)
+        return urlRepository.authorizedGlideUrl(imageUrl)
     }
 
 

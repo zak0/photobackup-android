@@ -13,6 +13,7 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
                 dependencyRoot.localLibraryRepository
             )
             RemoteLibraryViewModel::class.java -> RemoteLibraryViewModel(
+                dependencyRoot.urlRepository,
                 dependencyRoot.remoteLibraryRepository
             )
             SettingsViewModel::class.java -> SettingsViewModel(

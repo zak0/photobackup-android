@@ -7,6 +7,7 @@ import com.jamitek.photosapp.locallibrary.LocalLibraryRepository
 import com.jamitek.photosapp.locallibrary.LocalLibraryScanner
 import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.networking.MediaSerializer
+import com.jamitek.photosapp.networking.UrlRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 import com.jamitek.photosapp.storage.StorageAccessHelper
@@ -21,7 +22,8 @@ class DependencyRoot(app: Application) {
 
     private val mediaSerializer by lazy { MediaSerializer() }
     private val localMediaDb by lazy { SqliteLocalMediaDb(app) }
-    private val apiClient by lazy { ApiClient(mediaSerializer) }
+    val urlRepository by lazy { UrlRepository(keyValueStore) }
+    private val apiClient by lazy { ApiClient(urlRepository, mediaSerializer) }
     private val localLibraryScanner by lazy { LocalLibraryScanner(app) }
     private val storageAccessHelper by lazy { StorageAccessHelper(app) }
 

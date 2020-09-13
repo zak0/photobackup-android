@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         arguments: Bundle?
     ) {
         val bottomNavlessFragments = arrayListOf(R.id.viewerFragment)
+        // TODO Copy nice sliding hiding animation for bottom nav bar from uptimeapp
         bottomNav.visibility = if (destination.id in bottomNavlessFragments) View.GONE else View.VISIBLE
     }
 

@@ -13,6 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ApiClient(
+    private val urlRepo: UrlRepository,
     private val serializer: MediaSerializer
 ) {
 
@@ -29,13 +30,24 @@ class ApiClient(
         }
         .build()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(UrlHelper.baseUrl)
-        .client(okHttpClient)
-        .addConverterFactory(ScalarsConverterFactory.create())
-        .build()
+    private lateinit var retrofitService: PhotosRetrofitService
 
-    private val retrofitService = retrofit.create(PhotosRetrofitService::class.java)
+    init {
+        buildRetrofit()
+
+        // Register to rebuild Retrofit service if/when server URL is changed
+        urlRepo.registerForSelectedUrlChanges(TAG) { buildRetrofit() }
+    }
+
+    private fun buildRetrofit() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(urlRepo.baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .build()
+
+        retrofitService = retrofit.create(PhotosRetrofitService::class.java)
+    }
 
     fun getAllMedia(callback: (Boolean, List<RemoteMedia>) -> Unit) = getAllMedia(0, callback)
 

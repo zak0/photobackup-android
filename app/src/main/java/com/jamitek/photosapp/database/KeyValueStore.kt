@@ -7,6 +7,10 @@ class KeyValueStore(context: Context) {
     companion object {
         private const val PREFS_NAME = "photosapp.prefs"
         const val KEY_CAMERA_DIR_URI = "camera.dir.uri"
+        const val KEY_SERVER_ALL_ADDRESSES = "server.address.all"
+        const val KEY_SERVER_SELECTED_ADDRESS = "server.address.selected"
+        const val KEY_USERNAME = "username"
+        const val KEY_PASSWORD = "password"
     }
 
     private val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

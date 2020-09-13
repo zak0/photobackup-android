@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.model.RemoteMedia
-import com.jamitek.photosapp.networking.UrlHelper
 import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 import kotlinx.android.synthetic.main.list_item_thumbnail.view.*
 
@@ -41,7 +40,7 @@ class ThumbnailsAdapter(
 
         // TODO Primarily try to use local thumbnails to prevent having to load anything over the
         //  network. Check local lib repo for this. FYI: Glide supports URIs as URLs.
-        val thumbnailAddress = UrlHelper.authorizedGlideUrl(UrlHelper.thumbnailUrl(photo.serverId))
+        val thumbnailAddress = viewModel.authorizedThumbnailGlideUrl(photo.serverId)
 
         Glide
             .with(holder.itemView)
