@@ -13,13 +13,13 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
                 dependencyRoot.localLibraryRepository
             )
             RemoteLibraryViewModel::class.java -> RemoteLibraryViewModel(
-                dependencyRoot.urlRepository,
+                dependencyRoot.serverConfigRepository,
                 dependencyRoot.remoteLibraryRepository
             )
             SettingsViewModel::class.java -> SettingsViewModel(
                 dependencyRoot.keyValueStore,
                 dependencyRoot.remoteLibraryAdminRepository,
-                dependencyRoot.urlRepository
+                dependencyRoot.serverConfigRepository
             )
             else -> throw IllegalArgumentException("Unknown ViewModel type")
         } as T

@@ -5,7 +5,7 @@ import com.bumptech.glide.load.model.LazyHeaders
 import com.jamitek.photosapp.database.KeyValueStore
 import org.json.JSONArray
 
-class UrlRepository(private val keyValueStore: KeyValueStore) {
+class ServerConfigRepository(private val keyValueStore: KeyValueStore) {
 
     val urlIsSet: Boolean
         get() {

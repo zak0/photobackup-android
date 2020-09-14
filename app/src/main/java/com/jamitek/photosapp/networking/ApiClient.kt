@@ -13,7 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ApiClient(
-    private val urlRepo: UrlRepository,
+    private val serverConfigRepo: ServerConfigRepository,
     private val serializer: MediaSerializer
 ) {
 
@@ -36,7 +36,7 @@ class ApiClient(
         buildRetrofit()
 
         // Register to rebuild Retrofit service if/when server URL is changed
-        urlRepo.registerForSelectedUrlChanges(TAG) { buildRetrofit() }
+        serverConfigRepo.registerForSelectedUrlChanges(TAG) { buildRetrofit() }
     }
 
     private fun buildRetrofit() {
@@ -45,9 +45,9 @@ class ApiClient(
         //
         // If the ApiClient is attempted to be used before Retrofit initialization, crash will
         // ensue.
-        if (urlRepo.urlIsSet) {
+        if (serverConfigRepo.urlIsSet) {
             val retrofit = Retrofit.Builder()
-                .baseUrl(urlRepo.baseUrl)
+                .baseUrl(serverConfigRepo.baseUrl)
                 .client(okHttpClient)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .build()

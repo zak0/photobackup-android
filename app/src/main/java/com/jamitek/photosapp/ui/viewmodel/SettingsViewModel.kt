@@ -2,13 +2,13 @@ package com.jamitek.photosapp.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.jamitek.photosapp.database.KeyValueStore
-import com.jamitek.photosapp.networking.UrlRepository
+import com.jamitek.photosapp.networking.ServerConfigRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 
 class SettingsViewModel(
     private val keyValueStore: KeyValueStore,
     private val adminRepo: RemoteLibraryAdminRepository,
-    private val urlRepo: UrlRepository
+    private val serverConfigRepo: ServerConfigRepository
 ) : ViewModel() {
 
     val cameraDirUriString: String?
@@ -17,9 +17,9 @@ class SettingsViewModel(
     val remoteLibraryScanStatus = adminRepo.libraryScanStatus
 
     val serverAddressIsSet
-        get() = urlRepo.urlIsSet
+        get() = serverConfigRepo.urlIsSet
     val currentServerAddress
-        get() = urlRepo.baseUrl
+        get() = serverConfigRepo.baseUrl
 
     fun initRemoteLibraryScan() {
         adminRepo.initLibraryScan()
@@ -30,12 +30,12 @@ class SettingsViewModel(
     }
 
     fun addServer(serverUrl: String) {
-        urlRepo.addServerAddress(serverUrl)
-        urlRepo.selectAddress(serverUrl)
+        serverConfigRepo.addServerAddress(serverUrl)
+        serverConfigRepo.selectAddress(serverUrl)
     }
 
     fun clearServers() {
-        urlRepo.allUrls.forEach { urlRepo.removeServerAddress(it) }
+        serverConfigRepo.allUrls.forEach { serverConfigRepo.removeServerAddress(it) }
     }
 
 }

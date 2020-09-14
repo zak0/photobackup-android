@@ -5,11 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bumptech.glide.load.model.GlideUrl
 import com.jamitek.photosapp.model.RemoteMedia
-import com.jamitek.photosapp.networking.UrlRepository
+import com.jamitek.photosapp.networking.ServerConfigRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 
 class RemoteLibraryViewModel(
-    private val urlRepository: UrlRepository,
+    private val serverConfigRepository: ServerConfigRepository,
     private val repository: RemoteLibraryRepository
 ) : ViewModel() {
 
@@ -17,7 +17,7 @@ class RemoteLibraryViewModel(
      * Flag telling if a (seemingly) valid URL is set
      */
     val urlIsSet
-        get() = urlRepository.urlIsSet
+        get() = serverConfigRepository.urlIsSet
 
     /**
      * List of currently loaded photos.
@@ -55,13 +55,13 @@ class RemoteLibraryViewModel(
     }
 
     fun authorizedThumbnailGlideUrl(mediIdOnServer: Int): GlideUrl {
-        val thumbUrl = urlRepository.thumbnailUrl(mediIdOnServer)
-        return urlRepository.authorizedGlideUrl(thumbUrl)
+        val thumbUrl = serverConfigRepository.thumbnailUrl(mediIdOnServer)
+        return serverConfigRepository.authorizedGlideUrl(thumbUrl)
     }
 
     fun authorizedImageGlideUrl(mediaIdOnServer: Int): GlideUrl {
-        val imageUrl = urlRepository.photoUrl(mediaIdOnServer)
-        return urlRepository.authorizedGlideUrl(imageUrl)
+        val imageUrl = serverConfigRepository.photoUrl(mediaIdOnServer)
+        return serverConfigRepository.authorizedGlideUrl(imageUrl)
     }
 
 
