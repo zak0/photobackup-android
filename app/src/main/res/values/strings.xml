@@ -4,4 +4,5 @@
     <string name="navFolders">Local Folders</string>
     <string name="navSettings">Settings</string>
 
+    <string name="errorServerUrlNotSet">No servers added.</string>
 </resources>

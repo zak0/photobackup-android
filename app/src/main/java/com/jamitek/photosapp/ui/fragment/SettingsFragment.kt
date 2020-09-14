@@ -67,5 +67,25 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     """.trimIndent()
             }
         })
+
+        setupServerUrlViews()
+    }
+
+    private fun setupServerUrlViews() {
+        if (settingsViewModel.serverAddressIsSet) {
+            currentServerUrl.text = settingsViewModel.currentServerAddress
+        } else {
+            currentServerUrl.setText(R.string.errorServerUrlNotSet)
+        }
+
+        addServerButton.setOnClickListener {
+            settingsViewModel.addServer(serverUrlEdit.text.toString())
+            setupServerUrlViews()
+        }
+
+        clearAllServerUrls.setOnClickListener {
+            settingsViewModel.clearServers()
+            setupServerUrlViews()
+        }
     }
 }

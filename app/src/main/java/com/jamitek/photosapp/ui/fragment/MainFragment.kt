@@ -1,6 +1,7 @@
 package com.jamitek.photosapp.ui.fragment
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -30,6 +31,16 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         //recycler.addOnScrollListener(ThumbnailsOnScrollListener(viewModel)) // TODO Uncomment when lazy loading is really built
         observe()
         viewModel.refreshRemotePhotos()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (viewModel.urlIsSet) {
+            errorText.visibility = View.GONE
+        } else {
+            errorText.visibility = View.VISIBLE
+            errorText.setText(R.string.errorServerUrlNotSet)
+        }
     }
 
     private fun observe() {

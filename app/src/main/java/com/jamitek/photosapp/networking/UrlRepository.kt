@@ -7,6 +7,12 @@ import org.json.JSONArray
 
 class UrlRepository(private val keyValueStore: KeyValueStore) {
 
+    val urlIsSet: Boolean
+        get() {
+            // Valid URL contains at least "http://" and starts with "http"
+            return baseUrl.length > 7 && baseUrl.startsWith("http")
+        }
+
     val baseUrl: String
         get() {
             var string = keyValueStore.getString(KeyValueStore.KEY_SERVER_SELECTED_ADDRESS) ?: ""
@@ -14,7 +20,7 @@ class UrlRepository(private val keyValueStore: KeyValueStore) {
             // Ensure that the URL contains the trailing forward slash.
             // It's added here so that it's not necessary to be added by the user
             if (string.isNotEmpty() && string.lastOrNull() != '/') {
-               string += "/"
+                string += "/"
             }
 
             return string

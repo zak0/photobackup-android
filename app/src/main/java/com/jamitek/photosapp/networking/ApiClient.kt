@@ -40,13 +40,20 @@ class ApiClient(
     }
 
     private fun buildRetrofit() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(urlRepo.baseUrl)
-            .client(okHttpClient)
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .build()
+        // Only init Retrofit if a server URL is set. This is likely not the case for example at
+        // first startup.
+        //
+        // If the ApiClient is attempted to be used before Retrofit initialization, crash will
+        // ensue.
+        if (urlRepo.urlIsSet) {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(urlRepo.baseUrl)
+                .client(okHttpClient)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build()
 
-        retrofitService = retrofit.create(PhotosRetrofitService::class.java)
+            retrofitService = retrofit.create(PhotosRetrofitService::class.java)
+        }
     }
 
     fun getAllMedia(callback: (Boolean, List<RemoteMedia>) -> Unit) = getAllMedia(0, callback)

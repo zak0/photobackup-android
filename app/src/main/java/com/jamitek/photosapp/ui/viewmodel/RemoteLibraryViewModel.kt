@@ -14,6 +14,12 @@ class RemoteLibraryViewModel(
 ) : ViewModel() {
 
     /**
+     * Flag telling if a (seemingly) valid URL is set
+     */
+    val urlIsSet
+        get() = urlRepository.urlIsSet
+
+    /**
      * List of currently loaded photos.
      */
     val photos = repository.allPhotos
@@ -43,7 +49,9 @@ class RemoteLibraryViewModel(
     }
 
     fun refreshRemotePhotos() {
-        repository.fetchRemotePhotos()
+        if (urlIsSet) {
+            repository.fetchRemotePhotos()
+        }
     }
 
     fun authorizedThumbnailGlideUrl(mediIdOnServer: Int): GlideUrl {
