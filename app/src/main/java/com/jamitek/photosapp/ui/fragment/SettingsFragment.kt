@@ -53,6 +53,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             settingsViewModel.refreshRemoteLibraryScanStatus()
         }
 
+        setCredentialsButton.setOnClickListener {
+            settingsViewModel.setCredentials(
+                userName.text.toString(),
+                password.text.toString()
+            )
+        }
+
         settingsViewModel.remoteLibraryScanStatus.observe(viewLifecycleOwner, Observer {
             it?.also { remoteLibraryScanStatus ->
                 remoteLibScanStatus.text =

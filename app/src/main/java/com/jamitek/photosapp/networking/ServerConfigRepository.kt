@@ -4,8 +4,15 @@ import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.jamitek.photosapp.database.KeyValueStore
 import org.json.JSONArray
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 class ServerConfigRepository(private val keyValueStore: KeyValueStore) {
+
+    var authHeader =
+        "Authorization" to "Basic ${keyValueStore.getString(KeyValueStore.KEY_TOKEN, "")}"
+        private set
 
     val urlIsSet: Boolean
         get() {
@@ -40,22 +47,19 @@ class ServerConfigRepository(private val keyValueStore: KeyValueStore) {
             return allUrls
         }
 
-    private val urlChangeListeners = HashMap<String, (String) -> Unit>()
+    private val configChangeListeners = HashMap<String, () -> Unit>()
 
-    fun unRegisterFromSelectedUrlChanges(tag: String) {
-        urlChangeListeners.remove(tag)
+    fun unsubscribeFromServerConfigChanges(tag: String) {
+        configChangeListeners.remove(tag)
     }
 
-    fun registerForSelectedUrlChanges(tag: String, block: (String) -> Unit) {
-        urlChangeListeners[tag] = block
+    fun subscribeToServerConfigChanges(tag: String, block: () -> Unit) {
+        configChangeListeners[tag] = block
     }
 
     fun selectAddress(address: String) {
         keyValueStore.putString(KeyValueStore.KEY_SERVER_SELECTED_ADDRESS, address)
-        urlChangeListeners.forEach {
-            val callback = it.value
-            callback(address)
-        }
+        notifyConfigChangeListeners()
     }
 
     fun addServerAddress(address: String) {
@@ -78,6 +82,25 @@ class ServerConfigRepository(private val keyValueStore: KeyValueStore) {
             .addHeader("Authorization", "Basic amFha2tvYWRtaW46U2FsYWluZW5TYW5hMTMyNCFA")
             .build()
     )
+
+    fun setCredentials(username: String, password: String) {
+        val authString = "$username:$password"
+        val baseSixtyFour = Base64.getEncoder().encodeToString(authString.toByteArray())
+        authHeader = authHeader.first to "Basic $baseSixtyFour"
+
+        // Persist
+        keyValueStore.putString(KeyValueStore.KEY_USERNAME, username)
+        keyValueStore.putString(KeyValueStore.KEY_TOKEN, baseSixtyFour)
+
+        notifyConfigChangeListeners()
+    }
+
+    private fun notifyConfigChangeListeners() {
+        configChangeListeners.forEach {
+            val callback = it.value
+            callback()
+        }
+    }
 
     private fun persistServerAddresses(addresses: Set<String>) {
         val jsonArray = JSONArray()

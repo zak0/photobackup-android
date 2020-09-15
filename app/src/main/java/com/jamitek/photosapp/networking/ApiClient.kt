@@ -23,8 +23,9 @@ class ApiClient(
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
+            val authHeader = serverConfigRepo.authHeader
             val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Basic amFha2tvYWRtaW46U2FsYWluZW5TYW5hMTMyNCFA")
+                .addHeader(authHeader.first, authHeader.second) //"Basic amFha2tvYWRtaW46U2FsYWluZW5TYW5hMTMyNCFA"
                 .build()
             chain.proceed(request)
         }
@@ -36,7 +37,7 @@ class ApiClient(
         buildRetrofit()
 
         // Register to rebuild Retrofit service if/when server URL is changed
-        serverConfigRepo.registerForSelectedUrlChanges(TAG) { buildRetrofit() }
+        serverConfigRepo.subscribeToServerConfigChanges(TAG) { buildRetrofit() }
     }
 
     private fun buildRetrofit() {

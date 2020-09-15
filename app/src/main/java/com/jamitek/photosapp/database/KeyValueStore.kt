@@ -9,8 +9,8 @@ class KeyValueStore(context: Context) {
         const val KEY_CAMERA_DIR_URI = "camera.dir.uri"
         const val KEY_SERVER_ALL_ADDRESSES = "server.address.all"
         const val KEY_SERVER_SELECTED_ADDRESS = "server.address.selected"
-        const val KEY_USERNAME = "username"
-        const val KEY_PASSWORD = "password"
+        const val KEY_USERNAME = "server.auth.username"
+        const val KEY_TOKEN = "server.auth.token"
     }
 
     private val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

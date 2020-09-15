@@ -1,108 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp">
 
-    <TextView
-        android:id="@+id/cameraDirLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Camera dir: "
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/setCameraDirButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cameraDirLabel" />
+        <TextView
+            android:id="@+id/cameraDirLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera dir: "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/scanCameraDirButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Rescan"
-        app:layout_constraintStart_toEndOf="@id/setCameraDirButton"
-        app:layout_constraintTop_toBottomOf="@id/cameraDirLabel" />
+        <Button
+            android:id="@+id/setCameraDirButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cameraDirLabel" />
 
-    <Button
-        android:id="@+id/manualSyncButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Manual Sync"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/setCameraDirButton" />
+        <Button
+            android:id="@+id/scanCameraDirButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rescan"
+            app:layout_constraintStart_toEndOf="@id/setCameraDirButton"
+            app:layout_constraintTop_toBottomOf="@id/cameraDirLabel" />
 
-    <TextView
-        android:id="@+id/localLibScanStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/manualSyncButton"
-        tools:text="Local lib scan is in progress" />
+        <Button
+            android:id="@+id/manualSyncButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manual Sync"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setCameraDirButton" />
 
-    <Button
-        android:id="@+id/initRemoteLibScanButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Init remote lib scan"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/localLibScanStatus" />
+        <TextView
+            android:id="@+id/localLibScanStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/manualSyncButton"
+            tools:text="Local lib scan is in progress" />
 
-    <Button
-        android:id="@+id/refreshRemoteLibScanStatusButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Refresh remote lib scan status"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/initRemoteLibScanButton" />
+        <Button
+            android:id="@+id/initRemoteLibScanButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Init remote lib scan"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/localLibScanStatus" />
 
-    <TextView
-        android:id="@+id/remoteLibScanStatus"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/refreshRemoteLibScanStatusButton"
-        tools:text="Server is synchronizing library" />
+        <Button
+            android:id="@+id/refreshRemoteLibScanStatusButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh remote lib scan status"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/initRemoteLibScanButton" />
 
-    <EditText
-        android:id="@+id/serverUrlEdit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/remoteLibScanStatus" />
+        <TextView
+            android:id="@+id/remoteLibScanStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/refreshRemoteLibScanStatusButton"
+            tools:text="Server is synchronizing library" />
 
-    <Button
-        android:id="@+id/addServerButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Server"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/serverUrlEdit" />
+        <EditText
+            android:id="@+id/serverUrlEdit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/remoteLibScanStatus" />
 
-    <Button
-        android:id="@+id/clearAllServerUrls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Clear Servers"
-        app:layout_constraintStart_toEndOf="@id/addServerButton"
-        app:layout_constraintTop_toTopOf="@id/addServerButton" />
+        <Button
+            android:id="@+id/addServerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Server"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/serverUrlEdit" />
 
-    <TextView
-        android:id="@+id/currentServerUrl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/addServerButton"
-        tools:text="No server set!!" />
+        <Button
+            android:id="@+id/clearAllServerUrls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear Servers"
+            app:layout_constraintStart_toEndOf="@id/addServerButton"
+            app:layout_constraintTop_toTopOf="@id/addServerButton" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/currentServerUrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/addServerButton"
+            tools:text="No server set!!" />
+
+        <EditText
+            android:id="@+id/userName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:hint="username"
+            app:layout_constraintEnd_toStartOf="@id/verticalCenter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/currentServerUrl" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="password"
+            android:inputType="textPassword"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/verticalCenter"
+            app:layout_constraintTop_toTopOf="@id/userName" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verticalCenter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <Button
+            android:id="@+id/setCredentialsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set credentials"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/userName" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

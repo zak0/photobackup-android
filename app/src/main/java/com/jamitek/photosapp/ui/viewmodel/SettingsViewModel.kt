@@ -38,4 +38,8 @@ class SettingsViewModel(
         serverConfigRepo.allUrls.forEach { serverConfigRepo.removeServerAddress(it) }
     }
 
+    fun setCredentials(username: String, password: String) {
+        serverConfigRepo.setCredentials(username, password)
+    }
+
 }
