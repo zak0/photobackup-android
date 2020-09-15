@@ -3,7 +3,7 @@ package com.jamitek.photosapp
 import android.app.Application
 import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.SqliteLocalMediaDb
-import com.jamitek.photosapp.locallibrary.LocalLibraryRepository
+import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 import com.jamitek.photosapp.locallibrary.LocalLibraryScanner
 import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.networking.MediaSerializer
@@ -30,7 +30,7 @@ class DependencyRoot(app: Application) {
     val keyValueStore by lazy { KeyValueStore(app) }
     val remoteLibraryRepository by lazy { RemoteLibraryRepository(apiClient) }
     val localLibraryRepository by lazy {
-        LocalLibraryRepository(
+        LocalCameraRepository(
             keyValueStore,
             localMediaDb,
             localLibraryScanner,

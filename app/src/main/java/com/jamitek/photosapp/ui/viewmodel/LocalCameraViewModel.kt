@@ -2,9 +2,9 @@ package com.jamitek.photosapp.ui.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.jamitek.photosapp.locallibrary.LocalLibraryRepository
+import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 
-class LocalLibraryViewModel(private val repository: LocalLibraryRepository) : ViewModel() {
+class LocalCameraViewModel(private val repository: LocalCameraRepository) : ViewModel() {
 
     val libraryStatus = repository.status
 

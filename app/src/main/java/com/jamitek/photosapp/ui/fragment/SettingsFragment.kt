@@ -7,20 +7,20 @@ import androidx.lifecycle.Observer
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
-import com.jamitek.photosapp.ui.viewmodel.LocalLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.LocalCameraViewModel
 import com.jamitek.photosapp.ui.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_settings.*
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private val settingsViewModel by lazy { getActivityViewModel(SettingsViewModel::class.java) }
-    private val localLibraryViewModel by lazy { getActivityViewModel(LocalLibraryViewModel::class.java) }
+    private val localLibraryViewModel by lazy { getActivityViewModel(LocalCameraViewModel::class.java) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setCameraDirButton.setOnClickListener {
-            StorageAccessHelper.promptRootDirSelection(requireActivity())
+            StorageAccessHelper.promptCameraDirSelection(requireActivity())
         }
 
         scanCameraDirButton.setOnClickListener {

@@ -12,7 +12,7 @@ import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.coroutines.*
 
-class LocalLibraryRepository(
+class LocalCameraRepository(
     private val keyValueStore: KeyValueStore,
     private val db: LocalMediaDb,
     private val scanner: LocalLibraryScanner,

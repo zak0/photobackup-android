@@ -14,7 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.dependencyRoot
 import com.jamitek.photosapp.storage.StorageAccessHelper
-import com.jamitek.photosapp.ui.viewmodel.LocalLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.LocalCameraViewModel
 import com.jamitek.photosapp.ui.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private val viewModelFactory by lazy { ViewModelFactory(dependencyRoot) }
     private val localLibraryViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(
-            LocalLibraryViewModel::class.java
+            LocalCameraViewModel::class.java
         )
     }
 
@@ -63,7 +63,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                 StorageAccessHelper.REQUEST_CODE_SET_CAMERA_DIR -> {
                     data?.data?.let { uri ->
                         localLibraryViewModel.onCameraDirChanged(uri)
-                    } ?: Unit
+                    }
+                }
+
+                StorageAccessHelper.REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR -> {
+                    data?.data?.let { uri ->
+                        // TODO Notify appropriate ViewModel of root folder selection
+                    }
                 }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }
