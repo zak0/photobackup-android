@@ -5,4 +5,7 @@
     <string name="navSettings">Settings</string>
 
     <string name="errorServerUrlNotSet">No servers added.</string>
+    <string name="errorLocalFoldersRootNotSet">Please grant access to storage.</string>
+
+    <string name="localFoldersSetRootDirButton">Grant Access</string>
 </resources>

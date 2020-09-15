@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val actionId = when(item.itemId) {
             R.id.photos -> R.id.action_global_mainFragment
+            R.id.local -> R.id.action_global_localFoldersFragment
             R.id.settings -> R.id.action_global_settingsFragment
             else -> R.id.action_global_mainFragment
         }
