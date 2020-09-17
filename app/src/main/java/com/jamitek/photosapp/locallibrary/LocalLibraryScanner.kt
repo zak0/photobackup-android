@@ -18,12 +18,23 @@ class LocalLibraryScanner(private val context: Context) {
 
     /**
      * Iterates the user set camera directory and all its sub-directories for supported media files.
-     * With each detected media file, calls [onMediaFile] callback.
+     * With each detected media file, calls [onMediaFile] callback. Parameters of the callback are
+     * [LocalMedia] of the discovered media file, and [DocumentFile] of the containing directory.
      */
-    fun iterateCameraDir(cameraDirUri: String, onMediaFile: (LocalMedia) -> Unit) {
+    fun iterateCameraDir(cameraDirUri: String, onMediaFile: (LocalMedia, DocumentFile) -> Unit) {
         DocumentFile.fromTreeUri(context, Uri.parse(cameraDirUri))?.also { docFile ->
             if (!docFile.isDirectory) {
                 throw IllegalStateException("Selected camera directory is not a directory.")
+            }
+
+            iterateDirectory(docFile, onMediaFile)
+        }
+    }
+
+    fun iterateLocalFolders(localFoldersRootUri: String, onMediaFile: (LocalMedia, DocumentFile) -> Unit) {
+        DocumentFile.fromTreeUri(context, Uri.parse(localFoldersRootUri))?.also { docFile ->
+            if (!docFile.isDirectory) {
+                throw IllegalStateException("Selected local folders root directory is not a directory.")
             }
 
             iterateDirectory(docFile, onMediaFile)
@@ -35,7 +46,7 @@ class LocalLibraryScanner(private val context: Context) {
      * [onMediaFile] with it as the parameter. If a directory is encountered, calls this same
      * method again to scan that directory.
      */
-    private fun iterateDirectory(directory: DocumentFile, onMediaFile: (LocalMedia) -> Unit) {
+    private fun iterateDirectory(directory: DocumentFile, onMediaFile: (LocalMedia, DocumentFile) -> Unit) {
         directory.listFiles().forEach { childDocFile ->
             val fileName = childDocFile.name ?: ""
 
@@ -51,10 +62,9 @@ class LocalLibraryScanner(private val context: Context) {
                 val fileSize = childDocFile.length()
                 val digest = calculateMd5ForFile(context, childDocFile)
                 val fileUriString = childDocFile.uri.toString()
-                onMediaFile(LocalMedia(-1, fileName, fileUriString, fileSize, digest, false))
-                Log.d(
-                    StorageAccessHelper.TAG,
-                    "filename: $fileName, filesize: $fileSize, digest: $digest"
+                onMediaFile(
+                    LocalMedia(-1, fileName, fileUriString, fileSize, digest, false),
+                    directory
                 )
             }
         }

@@ -4,6 +4,7 @@ import android.app.Application
 import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.SqliteLocalMediaDb
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
+import com.jamitek.photosapp.locallibrary.LocalFoldersRepository
 import com.jamitek.photosapp.locallibrary.LocalLibraryScanner
 import com.jamitek.photosapp.networking.ApiClient
 import com.jamitek.photosapp.networking.MediaSerializer
@@ -36,6 +37,12 @@ class DependencyRoot(app: Application) {
             localLibraryScanner,
             storageAccessHelper,
             apiClient
+        )
+    }
+    val localFoldersRepository by lazy {
+        LocalFoldersRepository(
+            keyValueStore,
+            localLibraryScanner
         )
     }
     val remoteLibraryAdminRepository by lazy { RemoteLibraryAdminRepository(apiClient) }

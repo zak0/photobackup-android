@@ -1,6 +1,6 @@
 package com.jamitek.photosapp.locallibrary
 
-data class LocalLibraryStatus(
+data class LocalCameraLibraryStatus(
     val isUploading: Boolean,
     val isScanning: Boolean,
     val localFilesCount: Int,

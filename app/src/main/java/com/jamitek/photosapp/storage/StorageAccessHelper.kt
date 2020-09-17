@@ -10,7 +10,7 @@ import java.io.InputStream
 class StorageAccessHelper(private val context: Context) {
 
     companion object {
-        const val TAG = "StorageAccessHelper"
+        private const val TAG = "StorageAccessHelper"
         const val REQUEST_CODE_SET_CAMERA_DIR = 100
         const val REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR = 200
         val SUPPORTED_EXTENSIONS = listOf("png", "jpg") // TODO Add video files

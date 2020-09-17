@@ -43,8 +43,8 @@ class LocalCameraRepository(
         }
     }
 
-    private val mutableStatus = MutableLiveData<LocalLibraryStatus?>().apply { value = null }
-    val status: LiveData<LocalLibraryStatus?> = mutableStatus
+    private val mutableStatus = MutableLiveData<LocalCameraLibraryStatus?>().apply { value = null }
+    val status: LiveData<LocalCameraLibraryStatus?> = mutableStatus
 
     var cameraDirUriString: String?
         get() = keyValueStore.getString(KEY_CAMERA_DIR_URI)
@@ -80,7 +80,13 @@ class LocalCameraRepository(
         cameraDirUriString?.also { uriString ->
             updateStatus(true, false)
             scanJob = CoroutineScope(Dispatchers.IO).launch {
-                scanner.iterateCameraDir(uriString) { localMedia ->
+                scanner.iterateCameraDir(uriString) { localMedia, _ ->
+
+                    Log.d(
+                        TAG,
+                        "filename: ${localMedia.fileName}, filesize: ${localMedia.fileSize}, digest: ${localMedia.checksum}"
+                    )
+
                     cacheByCheckSum[localMedia.checksum]?.also { existingMedia ->
                         // We're here if this file was already known. It could be that the URI
                         // has changed, so let's check for that, and update the DB if that's the
@@ -172,7 +178,10 @@ class LocalCameraRepository(
 
                 // If we failed too many times, we're done
                 if (consecutiveFailures >= 3) {
-                    Log.e(TAG, "Media sync failed $consecutiveFailures times in a row due to server being unreachable. Stopping upload.")
+                    Log.e(
+                        TAG,
+                        "Media sync failed $consecutiveFailures times in a row due to server being unreachable. Stopping upload."
+                    )
                     // Status update for when we end the backup process because of failures
                     updateStatus(isScanning = false, isUploading = false)
                     return@launch
@@ -192,7 +201,11 @@ class LocalCameraRepository(
     private fun updateStatus(isScanning: Boolean, isUploading: Boolean) {
         CoroutineScope(Dispatchers.Main).launch {
             mutableStatus.value =
-                LocalLibraryStatus(isUploading, isScanning, cache.size, cache.count { !it.uploaded })
+                LocalCameraLibraryStatus(
+                    isUploading,
+                    isScanning,
+                    cache.size,
+                    cache.count { !it.uploaded })
         }
     }
 

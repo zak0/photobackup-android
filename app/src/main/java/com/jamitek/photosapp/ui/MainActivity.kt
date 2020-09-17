@@ -15,16 +15,23 @@ import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.dependencyRoot
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import com.jamitek.photosapp.ui.viewmodel.LocalCameraViewModel
+import com.jamitek.photosapp.ui.viewmodel.LocalFoldersViewModel
 import com.jamitek.photosapp.ui.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener, BottomNavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener,
+    BottomNavigationView.OnNavigationItemSelectedListener {
 
     private val navController by lazy { findNavController(R.id.navHostFragment) }
     private val viewModelFactory by lazy { ViewModelFactory(dependencyRoot) }
-    private val localLibraryViewModel by lazy {
+    private val localCameraViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(
             LocalCameraViewModel::class.java
+        )
+    }
+    private val localFoldersViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(
+            LocalFoldersViewModel::class.java
         )
     }
 
@@ -42,11 +49,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     ) {
         val bottomNavlessFragments = arrayListOf(R.id.viewerFragment)
         // TODO Copy nice sliding hiding animation for bottom nav bar from uptimeapp
-        bottomNav.visibility = if (destination.id in bottomNavlessFragments) View.GONE else View.VISIBLE
+        bottomNav.visibility =
+            if (destination.id in bottomNavlessFragments) View.GONE else View.VISIBLE
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        val actionId = when(item.itemId) {
+        val actionId = when (item.itemId) {
             R.id.photos -> R.id.action_global_mainFragment
             R.id.local -> R.id.action_global_localFoldersFragment
             R.id.settings -> R.id.action_global_settingsFragment
@@ -62,13 +70,13 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             when (requestCode) {
                 StorageAccessHelper.REQUEST_CODE_SET_CAMERA_DIR -> {
                     data?.data?.let { uri ->
-                        localLibraryViewModel.onCameraDirChanged(uri)
+                        localCameraViewModel.onCameraDirChanged(uri)
                     }
                 }
 
                 StorageAccessHelper.REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR -> {
                     data?.data?.let { uri ->
-                        // TODO Notify appropriate ViewModel of root folder selection
+                        localFoldersViewModel.onRootDirChanged(uri)
                     }
                 }
                 else -> super.onActivityResult(requestCode, resultCode, data)
