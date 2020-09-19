@@ -6,40 +6,30 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.getActivityViewModel
-import com.jamitek.photosapp.storage.StorageAccessHelper
+import com.jamitek.photosapp.ui.adapter.LocalFoldersAdapter
 import com.jamitek.photosapp.ui.viewmodel.LocalFoldersViewModel
 import kotlinx.android.synthetic.main.fragment_local_folders.*
 
 class LocalFoldersFragment : Fragment(R.layout.fragment_local_folders) {
 
     private val viewModel by lazy { getActivityViewModel(LocalFoldersViewModel::class.java) }
+    private val adapter by lazy { LocalFoldersAdapter(viewModel) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        grantStorageAccessButton.setOnClickListener {
-            StorageAccessHelper.promptLocalFoldersRootDirSelection(requireActivity())
-        }
+        recyclerView.adapter = adapter
 
-        grantStorageAccessButton.setOnLongClickListener {
-            viewModel.initScan()
-            false
-        }
+        // TODO Don't do this here...
+        viewModel.initScan()
 
         observe()
+        errorText.visibility = if (viewModel.rootDirSet) View.GONE else View.VISIBLE
     }
 
     private fun observe() {
         viewModel.localFolders.observe(viewLifecycleOwner, Observer {
-            val sb = StringBuilder()
-            it!!.forEach {
-                sb.append(it.name)
-                sb.append(" - ")
-                sb.append(it.media.size)
-                sb.append("\n")
-            }
-
-            errorText.text = sb
+            adapter.notifyDataSetChanged()
         })
     }
 }

@@ -145,6 +145,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/userName" />
 
+        <Button
+            android:id="@+id/setLocalFoldersRootButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Set Local Folders Root"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/setCredentialsButton" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

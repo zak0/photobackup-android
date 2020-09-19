@@ -60,6 +60,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             )
         }
 
+        setLocalFoldersRootButton.setOnClickListener {
+            StorageAccessHelper.promptLocalFoldersRootDirSelection(requireActivity())
+        }
+
         settingsViewModel.remoteLibraryScanStatus.observe(viewLifecycleOwner, Observer {
             it?.also { remoteLibraryScanStatus ->
                 remoteLibScanStatus.text =
