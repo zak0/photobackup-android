@@ -43,7 +43,8 @@ class DependencyRoot(app: Application) {
         LocalFoldersRepository(
             keyValueStore,
             localLibraryScanner,
-            localMediaDb
+            localMediaDb,
+            storageAccessHelper
         )
     }
     val remoteLibraryAdminRepository by lazy { RemoteLibraryAdminRepository(apiClient) }

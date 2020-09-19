@@ -48,6 +48,10 @@ class StorageAccessHelper(private val context: Context) {
         }
     }
 
+    fun uriToDocFile(uriString: String): DocumentFile? {
+        return DocumentFile.fromSingleUri(context, Uri.parse(uriString))
+    }
+
     fun getFileAsByteArray(uriString: String): ByteArray? {
         var bytes: ByteArray? = null
         var stream: InputStream? = null
