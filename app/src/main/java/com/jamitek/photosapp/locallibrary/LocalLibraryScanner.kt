@@ -31,7 +31,10 @@ class LocalLibraryScanner(private val context: Context) {
         }
     }
 
-    fun iterateLocalFolders(localFoldersRootUri: String, onMediaFile: (LocalMedia, DocumentFile) -> Unit) {
+    fun iterateLocalFolders(
+        localFoldersRootUri: String,
+        onMediaFile: (LocalMedia, DocumentFile) -> Unit
+    ) {
         DocumentFile.fromTreeUri(context, Uri.parse(localFoldersRootUri))?.also { docFile ->
             if (!docFile.isDirectory) {
                 throw IllegalStateException("Selected local folders root directory is not a directory.")
@@ -45,28 +48,43 @@ class LocalLibraryScanner(private val context: Context) {
      * Scans a directory and all subdirectories for supported media files. If a supported file is encountered, calls
      * [onMediaFile] with it as the parameter. If a directory is encountered, calls this same
      * method again to scan that directory.
+     *
+     * Ignores folders (and their subfolders) that contain a ".nomedia" file.
      */
-    private fun iterateDirectory(directory: DocumentFile, onMediaFile: (LocalMedia, DocumentFile) -> Unit) {
-        directory.listFiles().forEach { childDocFile ->
-            val fileName = childDocFile.name ?: ""
+    private fun iterateDirectory(
+        directory: DocumentFile,
+        onMediaFile: (LocalMedia, DocumentFile) -> Unit
+    ) {
 
-            // Iterate subfolders as well
-            if (childDocFile.isDirectory) {
-                iterateDirectory(childDocFile, onMediaFile)
-            }
+        val dirHasNoMedia = directory.findFile(".nomedia") != null
 
-            // Only accept media files
-            if (fileName.split(".").last()
-                    .toLowerCase(Locale.ROOT) in StorageAccessHelper.SUPPORTED_EXTENSIONS
-            ) {
-                val fileSize = childDocFile.length()
-                val digest = calculateMd5ForFile(context, childDocFile)
-                val fileUriString = childDocFile.uri.toString()
-                onMediaFile(
-                    LocalMedia(-1, fileName, fileUriString, fileSize, digest, false),
-                    directory
-                )
+        if (!dirHasNoMedia) {
+            directory.listFiles().forEach { childDocFile ->
+                val fileName = childDocFile.name ?: ""
+
+                // Iterate subfolders as well
+                if (childDocFile.isDirectory) {
+                    iterateDirectory(childDocFile, onMediaFile)
+                }
+
+                // Only accept media files
+                if (fileName.split(".").last()
+                        .toLowerCase(Locale.ROOT) in StorageAccessHelper.SUPPORTED_EXTENSIONS
+                ) {
+                    val fileSize = childDocFile.length()
+                    val digest = calculateMd5ForFile(context, childDocFile)
+                    val fileUriString = childDocFile.uri.toString()
+                    onMediaFile(
+                        LocalMedia(-1, fileName, fileUriString, fileSize, digest, false),
+                        directory
+                    )
+                }
             }
+        } else {
+            Log.d(
+                TAG,
+                "Directory '${directory.name}' contains '.nomedia' file. Scanning for it and its subdirectories is skipped."
+            )
         }
     }
 
