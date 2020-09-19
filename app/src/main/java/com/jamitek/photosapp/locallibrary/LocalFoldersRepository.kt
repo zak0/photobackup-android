@@ -53,9 +53,13 @@ class LocalFoldersRepository(
                         folderDocFile.name ?: "N/A",
                         folderUriString,
                         ArrayList()
-                    ).also { localFoldersByUri[folderUriString] = it }
+                    ).also {
+                        // Folder didn't exist yet in memory, let's add it to the maps.
+                        localFoldersByUri[folderUriString] = it
+                    }
 
                     folder.media.add(media)
+
 
                     Log.d(
                         TAG,
@@ -63,7 +67,11 @@ class LocalFoldersRepository(
                     )
                 }
 
+                // Expose folders in a way that is consumable by the UI
+                val newLocalFolders = localFoldersByUri.entries.map { it.value }.sortedBy { it.name }
+
                 CoroutineScope(Dispatchers.Main).launch {
+                    mutableLocalFolders.value = newLocalFolders
                     mutableScanRunning.value = false
                 }
             }

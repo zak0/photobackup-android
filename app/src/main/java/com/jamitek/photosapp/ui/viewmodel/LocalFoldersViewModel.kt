@@ -8,6 +8,8 @@ class LocalFoldersViewModel(private val repo: LocalFoldersRepository) : ViewMode
 
     val localFolders = repo.localFolders
     val scanRunning = repo.scanRunning
+    val rootDirSet: Boolean
+        get() = repo.localFoldersRootUri != null
 
     fun initScan() {
         repo.scan()

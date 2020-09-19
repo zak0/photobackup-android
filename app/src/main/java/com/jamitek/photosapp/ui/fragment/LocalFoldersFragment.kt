@@ -3,6 +3,7 @@ package com.jamitek.photosapp.ui.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
@@ -24,5 +25,21 @@ class LocalFoldersFragment : Fragment(R.layout.fragment_local_folders) {
             viewModel.initScan()
             false
         }
+
+        observe()
+    }
+
+    private fun observe() {
+        viewModel.localFolders.observe(viewLifecycleOwner, Observer {
+            val sb = StringBuilder()
+            it!!.forEach {
+                sb.append(it.name)
+                sb.append(" - ")
+                sb.append(it.media.size)
+                sb.append("\n")
+            }
+
+            errorText.text = sb
+        })
     }
 }
