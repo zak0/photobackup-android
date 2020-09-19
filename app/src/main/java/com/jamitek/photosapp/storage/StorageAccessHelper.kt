@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.documentfile.provider.DocumentFile
 import java.io.InputStream
 
 class StorageAccessHelper(private val context: Context) {
@@ -28,7 +29,22 @@ class StorageAccessHelper(private val context: Context) {
         }
 
         fun promptLocalFoldersRootDirSelection(activity: Activity) {
-            activity.startActivityForResult(SAF_ACCESS_INTENT, REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR)
+            activity.startActivityForResult(
+                SAF_ACCESS_INTENT,
+                REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR
+            )
+        }
+    }
+
+    fun treeUriStringToDocFileUriString(treeUriString: String?): String? {
+        treeUriString ?: return null
+
+        return DocumentFile.fromTreeUri(context, Uri.parse(treeUriString))?.let { docFile ->
+            if (!docFile.isDirectory) {
+                throw IllegalStateException("Tree uri root is not a directory.")
+            }
+
+            docFile.uri.toString()
         }
     }
 

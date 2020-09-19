@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jamitek.photosapp.database.KeyValueStore
+import com.jamitek.photosapp.database.LocalMediaDb
 import com.jamitek.photosapp.model.LocalFolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +13,8 @@ import kotlinx.coroutines.launch
 
 class LocalFoldersRepository(
     private val keyValueStore: KeyValueStore,
-    private val scanner: LocalLibraryScanner
+    private val scanner: LocalLibraryScanner,
+    private val db: LocalMediaDb
 ) {
 
     companion object {
@@ -60,6 +62,7 @@ class LocalFoldersRepository(
 
                     folder.media.add(media)
 
+                    db.persist(media)
 
                     Log.d(
                         TAG,

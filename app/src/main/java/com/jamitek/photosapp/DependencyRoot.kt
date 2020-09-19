@@ -42,7 +42,8 @@ class DependencyRoot(app: Application) {
     val localFoldersRepository by lazy {
         LocalFoldersRepository(
             keyValueStore,
-            localLibraryScanner
+            localLibraryScanner,
+            localMediaDb
         )
     }
     val remoteLibraryAdminRepository by lazy { RemoteLibraryAdminRepository(apiClient) }

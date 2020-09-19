@@ -31,18 +31,6 @@ class LocalCameraRepository(
     private val cache = HashSet<LocalMedia>()
     private val cacheByCheckSum = HashMap<String, LocalMedia>()
 
-    init {
-        initJob = GlobalScope.launch {
-            cache.clear()
-            cache.addAll(db.getAll())
-
-            cacheByCheckSum.clear()
-            cacheByCheckSum.putAll(cache.map { it.checksum to it })
-
-            updateStatus(false, false)
-        }
-    }
-
     private val mutableStatus = MutableLiveData<LocalCameraLibraryStatus?>().apply { value = null }
     val status: LiveData<LocalCameraLibraryStatus?> = mutableStatus
 
@@ -51,6 +39,21 @@ class LocalCameraRepository(
         set(value) {
             keyValueStore.putString(KEY_CAMERA_DIR_URI, value)
         }
+
+    init {
+        initJob = GlobalScope.launch {
+            cache.clear()
+
+            storageHelper.treeUriStringToDocFileUriString(cameraDirUriString)?.also {
+                cache.addAll(db.getAllInDirectory(it))
+            }
+
+            cacheByCheckSum.clear()
+            cacheByCheckSum.putAll(cache.map { it.checksum to it })
+
+            updateStatus(false, false)
+        }
+    }
 
     /**
      * Scans camera directory for media files and maintains an index of them in a database.

@@ -6,4 +6,5 @@ interface LocalMediaDb {
     fun getAll(): ArrayList<LocalMedia>
     fun persist(localMedia: LocalMedia)
     fun delete(localMedia: LocalMedia)
+    fun getAllInDirectory(directoryUri: String): ArrayList<LocalMedia>
 }

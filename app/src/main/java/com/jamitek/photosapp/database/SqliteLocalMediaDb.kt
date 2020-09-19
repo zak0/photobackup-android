@@ -22,6 +22,7 @@ class SqliteLocalMediaDb(context: Context) :
         object Column {
             const val ID = "id"
             const val FILENAME = "filename"
+            const val DIRECTORY_URI = "directoryuri"
             const val URI = "uri"
             const val FILESIZE = "filesize"
             const val CHECKSUM = "checksum"
@@ -44,10 +45,27 @@ class SqliteLocalMediaDb(context: Context) :
                 QueryBuilder.FieldType.TEXT,
                 nullable = false
             )
+            .addField(
+                LocalMediaSchema.Column.DIRECTORY_URI,
+                QueryBuilder.FieldType.TEXT,
+                nullable = false
+            )
             .addField(LocalMediaSchema.Column.URI, QueryBuilder.FieldType.TEXT, nullable = false)
-            .addField(LocalMediaSchema.Column.FILESIZE, QueryBuilder.FieldType.INTEGER, nullable = false)
-            .addField(LocalMediaSchema.Column.CHECKSUM, QueryBuilder.FieldType.TEXT, nullable = false)
-            .addField(LocalMediaSchema.Column.IS_UPLOADED, QueryBuilder.FieldType.INTEGER, nullable = false)
+            .addField(
+                LocalMediaSchema.Column.FILESIZE,
+                QueryBuilder.FieldType.INTEGER,
+                nullable = false
+            )
+            .addField(
+                LocalMediaSchema.Column.CHECKSUM,
+                QueryBuilder.FieldType.TEXT,
+                nullable = false
+            )
+            .addField(
+                LocalMediaSchema.Column.IS_UPLOADED,
+                QueryBuilder.FieldType.INTEGER,
+                nullable = false
+            )
             .build()
 
         db.execSQL(sql)
@@ -76,6 +94,7 @@ class SqliteLocalMediaDb(context: Context) :
         if (localMedia.id > 0) {
             val sql = QueryBuilder(QueryBuilder.QueryType.UPDATE, LocalMediaSchema.TABLE)
                 .addTextValue(LocalMediaSchema.Column.FILENAME, localMedia.fileName)
+                .addTextValue(LocalMediaSchema.Column.DIRECTORY_URI, localMedia.directoryUri)
                 .addTextValue(LocalMediaSchema.Column.URI, localMedia.uri)
                 .addTextValue(LocalMediaSchema.Column.CHECKSUM, localMedia.checksum)
                 .addLongValue(LocalMediaSchema.Column.FILESIZE, localMedia.fileSize)
@@ -89,10 +108,14 @@ class SqliteLocalMediaDb(context: Context) :
         } else {
             val sql = QueryBuilder(QueryBuilder.QueryType.INSERT, LocalMediaSchema.TABLE)
                 .addTextValue(LocalMediaSchema.Column.FILENAME, localMedia.fileName)
+                .addTextValue(LocalMediaSchema.Column.DIRECTORY_URI, localMedia.directoryUri)
                 .addTextValue(LocalMediaSchema.Column.URI, localMedia.uri)
                 .addTextValue(LocalMediaSchema.Column.CHECKSUM, localMedia.checksum)
                 .addLongValue(LocalMediaSchema.Column.FILESIZE, localMedia.fileSize)
-                .addIntegerValue(LocalMediaSchema.Column.IS_UPLOADED, if (localMedia.uploaded) 1 else 0)
+                .addIntegerValue(
+                    LocalMediaSchema.Column.IS_UPLOADED,
+                    if (localMedia.uploaded) 1 else 0
+                )
                 .build()
             if (safeTransaction { db.execSQL(sql) }) {
                 localMedia.id = getLastInsertRowId()
@@ -108,15 +131,33 @@ class SqliteLocalMediaDb(context: Context) :
         safeTransaction { db.execSQL(sql) }
     }
 
+    override fun getAllInDirectory(directoryUri: String): ArrayList<LocalMedia> {
+        val sql = QueryBuilder(QueryBuilder.QueryType.SELECT_ALL, LocalMediaSchema.TABLE)
+            .addTextCondition(LocalMediaSchema.Column.DIRECTORY_URI, directoryUri)
+            .build()
+        val ret = ArrayList<LocalMedia>()
+        val cursor = db.rawQuery(sql, null)
+        cursor.moveToFirst()
+        while (!cursor.isAfterLast) {
+            ret.add(cursorToLocalMedia(cursor))
+            cursor.moveToNext()
+        }
+        cursor.close()
+        return ret
+    }
+
     private fun cursorToLocalMedia(cursor: Cursor): LocalMedia {
         val id = cursor.getInt(cursor.getColumnIndex(LocalMediaSchema.Column.ID))
         val fileName = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.FILENAME))
+        val directoryUri =
+            cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.DIRECTORY_URI))
         val uri = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.URI))
         val fileSize = cursor.getLong(cursor.getColumnIndex(LocalMediaSchema.Column.FILESIZE))
         val checksum = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.CHECKSUM))
-        val isUploaded = cursor.getInt(cursor.getColumnIndex(LocalMediaSchema.Column.IS_UPLOADED)) == 1
+        val isUploaded =
+            cursor.getInt(cursor.getColumnIndex(LocalMediaSchema.Column.IS_UPLOADED)) == 1
 
-        return LocalMedia(id, fileName, uri, fileSize, checksum, isUploaded)
+        return LocalMedia(id, fileName, directoryUri, uri, fileSize, checksum, isUploaded)
     }
 
     private fun safeTransaction(block: () -> Unit): Boolean {

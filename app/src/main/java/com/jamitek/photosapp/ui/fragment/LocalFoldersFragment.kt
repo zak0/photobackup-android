@@ -21,8 +21,10 @@ class LocalFoldersFragment : Fragment(R.layout.fragment_local_folders) {
 
         recyclerView.adapter = adapter
 
-        // TODO Don't do this here...
-        viewModel.initScan()
+        // TODO Figure out a better place to trigger the scan. Manual and/or automatic...
+        temporaryButton.setOnClickListener {
+            viewModel.initScan()
+        }
 
         observe()
         errorText.visibility = if (viewModel.rootDirSet) View.GONE else View.VISIBLE

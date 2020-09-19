@@ -60,6 +60,7 @@ class LocalLibraryScanner(private val context: Context) {
         onMediaFile: (LocalMedia, DocumentFile) -> Unit
     ) {
 
+        val dirUriString = directory.uri.toString()
         val dirHasNoMedia = directory.findFile(".nomedia") != null
 
         if (!dirHasNoMedia) {
@@ -79,7 +80,15 @@ class LocalLibraryScanner(private val context: Context) {
                     val digest = if (calculateChecksum) calculateMd5ForFile(context, childDocFile) else ""
                     val fileUriString = childDocFile.uri.toString()
                     onMediaFile(
-                        LocalMedia(-1, fileName, fileUriString, fileSize, digest, false),
+                        LocalMedia(
+                            -1,
+                            fileName,
+                            dirUriString,
+                            fileUriString,
+                            fileSize,
+                            digest,
+                            false
+                        ),
                         directory
                     )
                 }
