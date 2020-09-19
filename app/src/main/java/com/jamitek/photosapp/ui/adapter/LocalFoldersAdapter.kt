@@ -23,7 +23,9 @@ class LocalFoldersAdapter(
         viewModel.localFolders.value?.get(position)?.also { localFolder ->
             holder.itemView.folderName.text = localFolder.name
             holder.itemView.mediaCount.text = "${localFolder.media.size}"
-            holder.itemView.setOnClickListener {  }
+            holder.itemView.setOnClickListener {
+                viewModel.onFolderClicked(localFolder)
+            }
         }
     }
 

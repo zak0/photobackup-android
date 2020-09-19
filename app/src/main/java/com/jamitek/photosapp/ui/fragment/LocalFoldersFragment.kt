@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.ui.adapter.LocalFoldersAdapter
@@ -30,6 +31,10 @@ class LocalFoldersFragment : Fragment(R.layout.fragment_local_folders) {
     private fun observe() {
         viewModel.localFolders.observe(viewLifecycleOwner, Observer {
             adapter.notifyDataSetChanged()
+        })
+
+        viewModel.selectedFolder.observe(viewLifecycleOwner, Observer {
+            findNavController().navigate(R.id.action_localFoldersFragment_to_thumbnailsGridFragment)
         })
     }
 }

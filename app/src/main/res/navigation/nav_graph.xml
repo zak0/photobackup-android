@@ -28,7 +28,11 @@
     <fragment
         android:id="@+id/localFoldersFragment"
         android:name="com.jamitek.photosapp.ui.fragment.LocalFoldersFragment"
-        android:label="LocalFoldersFragment" />
+        android:label="LocalFoldersFragment">
+        <action
+            android:id="@+id/action_localFoldersFragment_to_thumbnailsGridFragment"
+            app:destination="@id/thumbnailsGridFragment" />
+    </fragment>
 
     <action
         android:id="@+id/action_global_mainFragment"
@@ -41,5 +45,10 @@
     <action
         android:id="@+id/action_global_localFoldersFragment"
         app:destination="@id/localFoldersFragment" />
+
+    <fragment
+        android:id="@+id/thumbnailsGridFragment"
+        android:name="com.jamitek.photosapp.ui.fragment.ThumbnailsGridFragment"
+        android:label="ThumbnailsGridFragment" />
 
 </navigation>
