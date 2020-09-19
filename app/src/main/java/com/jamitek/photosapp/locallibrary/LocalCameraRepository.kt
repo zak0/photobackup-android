@@ -21,7 +21,7 @@ class LocalCameraRepository(
 ) {
 
     companion object {
-        private const val TAG = "LocalLibRepo"
+        private const val TAG = "LocalCameraRepo"
         private const val UPLOAD_MAX_FAILURES = 2
     }
 

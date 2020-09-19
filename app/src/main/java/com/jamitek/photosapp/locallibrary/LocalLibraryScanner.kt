@@ -27,7 +27,7 @@ class LocalLibraryScanner(private val context: Context) {
                 throw IllegalStateException("Selected camera directory is not a directory.")
             }
 
-            iterateDirectory(docFile, onMediaFile)
+            iterateDirectory(docFile, true, onMediaFile)
         }
     }
 
@@ -40,7 +40,7 @@ class LocalLibraryScanner(private val context: Context) {
                 throw IllegalStateException("Selected local folders root directory is not a directory.")
             }
 
-            iterateDirectory(docFile, onMediaFile)
+            iterateDirectory(docFile, false, onMediaFile)
         }
     }
 
@@ -49,10 +49,14 @@ class LocalLibraryScanner(private val context: Context) {
      * [onMediaFile] with it as the parameter. If a directory is encountered, calls this same
      * method again to scan that directory.
      *
+     * When [calculateChecksum] is set to true, calculates MD5 hash for media files and stores it in
+     * [LocalMedia.checksum], otherwise sets [LocalMedia.checksum] to an empty string ("").
+     *
      * Ignores folders (and their subfolders) that contain a ".nomedia" file.
      */
     private fun iterateDirectory(
         directory: DocumentFile,
+        calculateChecksum: Boolean,
         onMediaFile: (LocalMedia, DocumentFile) -> Unit
     ) {
 
@@ -64,7 +68,7 @@ class LocalLibraryScanner(private val context: Context) {
 
                 // Iterate subfolders as well
                 if (childDocFile.isDirectory) {
-                    iterateDirectory(childDocFile, onMediaFile)
+                    iterateDirectory(childDocFile, calculateChecksum, onMediaFile)
                 }
 
                 // Only accept media files
@@ -72,7 +76,7 @@ class LocalLibraryScanner(private val context: Context) {
                         .toLowerCase(Locale.ROOT) in StorageAccessHelper.SUPPORTED_EXTENSIONS
                 ) {
                     val fileSize = childDocFile.length()
-                    val digest = calculateMd5ForFile(context, childDocFile)
+                    val digest = if (calculateChecksum) calculateMd5ForFile(context, childDocFile) else ""
                     val fileUriString = childDocFile.uri.toString()
                     onMediaFile(
                         LocalMedia(-1, fileName, fileUriString, fileSize, digest, false),
