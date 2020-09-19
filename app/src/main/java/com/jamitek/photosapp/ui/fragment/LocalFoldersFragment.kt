@@ -36,7 +36,9 @@ class LocalFoldersFragment : Fragment(R.layout.fragment_local_folders) {
         })
 
         viewModel.selectedFolder.observe(viewLifecycleOwner, Observer {
-            findNavController().navigate(R.id.action_localFoldersFragment_to_thumbnailsGridFragment)
+            it?.also {
+                findNavController().navigate(R.id.action_localFoldersFragment_to_thumbnailsGridFragment)
+            }
         })
     }
 }
