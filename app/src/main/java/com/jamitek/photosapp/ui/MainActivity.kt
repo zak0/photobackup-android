@@ -2,6 +2,7 @@ package com.jamitek.photosapp.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -70,12 +71,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             when (requestCode) {
                 StorageAccessHelper.REQUEST_CODE_SET_CAMERA_DIR -> {
                     data?.data?.let { uri ->
+                        persistUriPermission(uri)
                         localCameraViewModel.onCameraDirChanged(uri)
                     }
                 }
 
                 StorageAccessHelper.REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR -> {
                     data?.data?.let { uri ->
+                        persistUriPermission(uri)
                         localFoldersViewModel.onRootDirChanged(uri)
                     }
                 }
@@ -84,5 +87,12 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    private fun persistUriPermission(uri: Uri) {
+        contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION.or(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        )
     }
 }
