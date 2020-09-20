@@ -17,8 +17,8 @@ class LocalFoldersViewModel(private val repo: LocalFoldersRepository) : ViewMode
     val rootDirSet: Boolean
         get() = repo.localFoldersRootUri != null
 
-    fun initScan() {
-        repo.scan()
+    fun initReScan() {
+        repo.reScanLocalFolders()
     }
 
     fun onRootDirChanged(newRootDir: Uri) {

@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class LocalFoldersRepository(
     private val keyValueStore: KeyValueStore,
+    private val cameraRepository: LocalCameraRepository,
     private val scanner: LocalLibraryScanner,
     private val db: LocalMediaDb,
     private val storageHelper: StorageAccessHelper
@@ -70,7 +71,10 @@ class LocalFoldersRepository(
         }
     }
 
-    fun scan() {
+    /**
+     * Clears cached local folders and scans local folders root again.
+     */
+    fun reScanLocalFolders() {
         // Initialization needs to be complete
         if (initJob?.isActive == true) {
             Log.d(TAG, "Local folders repo not initialized yet. Not starting scan...")
@@ -86,11 +90,34 @@ class LocalFoldersRepository(
         localFoldersRootUri?.also { rootUri ->
             mutableScanRunning.value = true
             scanJob = CoroutineScope(Dispatchers.IO).launch {
+                Log.d(TAG, "Local folders scan started")
+                val scanStartTime = System.currentTimeMillis()
+
+                // First delete all exiting cached local folders data from the DB.
+                // Camera directory data will be kept - even if camera directory is within
+                // local folders directory tree.
+                localFolders.value?.forEach { localFolder ->
+                    val cameraDir =
+                        storageHelper.treeUriStringToDocFileUriString(cameraRepository.cameraDirUriString)
+
+                    if (localFolder.uriString != cameraDir) {
+                        localFolder.media.forEach {
+                            db.delete(it)
+                        }
+                    }
+                }
+
+                // Also clear in memory caches
+                localFoldersByUri.clear()
+
+                // Then scan local folders
                 scanner.iterateLocalFolders(rootUri) { media, folderDocFile ->
                     mediaFileToInMemoryCache(media, folderDocFile)
                     db.persist(media)
                 }
 
+                val scanDuration = System.currentTimeMillis() - scanStartTime
+                Log.d(TAG, "Local folders scan complete in $scanDuration ms")
                 publishFolders()
             }
 

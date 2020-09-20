@@ -23,7 +23,7 @@ class LocalFoldersFragment : Fragment(R.layout.fragment_local_folders) {
 
         // TODO Figure out a better place to trigger the scan. Manual and/or automatic...
         temporaryButton.setOnClickListener {
-            viewModel.initScan()
+            viewModel.initReScan()
         }
 
         observe()

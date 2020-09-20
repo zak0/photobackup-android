@@ -30,7 +30,7 @@ class DependencyRoot(app: Application) {
 
     val keyValueStore by lazy { KeyValueStore(app) }
     val remoteLibraryRepository by lazy { RemoteLibraryRepository(apiClient) }
-    val localLibraryRepository by lazy {
+    val localCameraRepository by lazy {
         LocalCameraRepository(
             keyValueStore,
             localMediaDb,
@@ -42,6 +42,7 @@ class DependencyRoot(app: Application) {
     val localFoldersRepository by lazy {
         LocalFoldersRepository(
             keyValueStore,
+            localCameraRepository,
             localLibraryScanner,
             localMediaDb,
             storageAccessHelper
