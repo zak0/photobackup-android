@@ -36,6 +36,11 @@ class StorageAccessHelper(private val context: Context) {
             )
         }
 
+        /**
+         * Prompts the new permission to keep accessing storage freely through SAF.
+         *
+         * TODO: This is currently not used, see if this should be used instead.
+         */
         fun promptStorageAccess(activity: Activity) {
             val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
             activity.startActivityForResult(intent, 9002)
