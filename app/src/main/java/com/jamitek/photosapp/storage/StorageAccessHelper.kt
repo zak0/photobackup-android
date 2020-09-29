@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import java.io.InputStream
@@ -33,6 +34,11 @@ class StorageAccessHelper(private val context: Context) {
                 SAF_ACCESS_INTENT,
                 REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR
             )
+        }
+
+        fun promptStorageAccess(activity: Activity) {
+            val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            activity.startActivityForResult(intent, 9002)
         }
     }
 
