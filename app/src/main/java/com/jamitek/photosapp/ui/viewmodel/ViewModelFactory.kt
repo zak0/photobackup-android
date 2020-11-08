@@ -22,7 +22,7 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
                 dependencyRoot.serverConfigRepository
             )
             BackupViewModel::class.java -> BackupViewModel(
-                dependencyRoot.backupRepository
+                dependencyRoot.backupUseCase
             )
             else -> throw IllegalArgumentException("Unknown ViewModel type")
         } as T

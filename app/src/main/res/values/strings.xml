@@ -17,4 +17,6 @@
     <string name="backupPhotosStatus">Local photos and videos</string>
     <string name="backupBackupStatus">Status</string>
     <string name="backupCameraDir">Camera directory</string>
+    <string name="backupSectionTitleServerAdmin">Server admin</string>
+    <string name="backupRescanLibrary">Rescan remote library</string>
 </resources>
