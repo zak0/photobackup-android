@@ -1,6 +1,7 @@
 package com.jamitek.photosapp
 
 import android.app.Application
+import com.jamitek.photosapp.backup.BackupRepository
 import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.SqliteLocalMediaDb
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
@@ -39,5 +40,6 @@ class DependencyRoot(app: Application) {
         )
     }
     val remoteLibraryAdminRepository by lazy { RemoteLibraryAdminRepository(apiClient) }
+    val backupRepository by lazy { BackupRepository() }
 
 }
