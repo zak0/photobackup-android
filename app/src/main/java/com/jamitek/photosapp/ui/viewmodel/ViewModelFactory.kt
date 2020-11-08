@@ -21,8 +21,8 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
                 dependencyRoot.remoteLibraryAdminRepository,
                 dependencyRoot.serverConfigRepository
             )
-            LocalFoldersViewModel::class.java -> LocalFoldersViewModel(
-                dependencyRoot.localFoldersRepository
+            BackupViewModel::class.java -> BackupViewModel(
+                dependencyRoot.localCameraRepository
             )
             else -> throw IllegalArgumentException("Unknown ViewModel type")
         } as T

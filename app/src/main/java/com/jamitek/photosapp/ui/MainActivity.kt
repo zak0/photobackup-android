@@ -16,7 +16,7 @@ import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.dependencyRoot
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import com.jamitek.photosapp.ui.viewmodel.LocalCameraViewModel
-import com.jamitek.photosapp.ui.viewmodel.LocalFoldersViewModel
+import com.jamitek.photosapp.ui.viewmodel.BackupViewModel
 import com.jamitek.photosapp.ui.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     }
     private val localFoldersViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(
-            LocalFoldersViewModel::class.java
+            BackupViewModel::class.java
         )
     }
 
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val actionId = when (item.itemId) {
             R.id.photos -> R.id.action_global_mainFragment
-            R.id.local -> R.id.action_global_localFoldersFragment
+            R.id.backup -> R.id.action_global_localFoldersFragment
             R.id.settings -> R.id.action_global_settingsFragment
             else -> R.id.action_global_mainFragment
         }
@@ -76,12 +76,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
                     }
                 }
 
-                StorageAccessHelper.REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR -> {
-                    data?.data?.let { uri ->
-                        persistUriPermission(uri)
-                        localFoldersViewModel.onRootDirChanged(uri)
-                    }
-                }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }
         } else {

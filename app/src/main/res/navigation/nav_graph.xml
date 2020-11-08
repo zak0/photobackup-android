@@ -27,7 +27,7 @@
 
     <fragment
         android:id="@+id/localFoldersFragment"
-        android:name="com.jamitek.photosapp.ui.fragment.LocalFoldersFragment"
+        android:name="com.jamitek.photosapp.ui.fragment.BackupFragment"
         android:label="LocalFoldersFragment">
         <action
             android:id="@+id/action_localFoldersFragment_to_thumbnailsGridFragment"

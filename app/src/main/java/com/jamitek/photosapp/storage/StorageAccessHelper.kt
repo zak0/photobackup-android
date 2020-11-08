@@ -14,7 +14,6 @@ class StorageAccessHelper(private val context: Context) {
     companion object {
         private const val TAG = "StorageAccessHelper"
         const val REQUEST_CODE_SET_CAMERA_DIR = 100
-        const val REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR = 200
         val SUPPORTED_EXTENSIONS = listOf("png", "jpg") // TODO Add video files
         val SAF_ACCESS_INTENT = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
             addFlags(
@@ -27,13 +26,6 @@ class StorageAccessHelper(private val context: Context) {
 
         fun promptCameraDirSelection(activity: Activity) {
             activity.startActivityForResult(SAF_ACCESS_INTENT, REQUEST_CODE_SET_CAMERA_DIR)
-        }
-
-        fun promptLocalFoldersRootDirSelection(activity: Activity) {
-            activity.startActivityForResult(
-                SAF_ACCESS_INTENT,
-                REQUEST_CODE_SET_LOCAL_FOLDERS_ROOT_DIR
-            )
         }
 
         /**

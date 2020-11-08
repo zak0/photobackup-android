@@ -7,9 +7,9 @@
         android:title="@string/navLibrary" />
 
     <item
-        android:id="@+id/local"
-        android:icon="@drawable/ic_folder_24dp"
-        android:title="@string/navFolders" />
+        android:id="@+id/backup"
+        android:icon="@drawable/ic_backup_24dp"
+        android:title="@string/navBackup" />
 
     <item
         android:id="@+id/settings"
