@@ -12,6 +12,7 @@
 
     <string name="backupSectionTitleConnectionStatus">Server</string>
     <string name="backupConnectionStatus">Connection status</string>
+    <string name="backupServerDetails">Server address</string>
     <string name="backupSectionTitleBackupStatus">Back up</string>
     <string name="backupPhotosStatus">Local photos and videos</string>
     <string name="backupBackupStatus">Status</string>

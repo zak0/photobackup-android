@@ -71,6 +71,7 @@ private fun BackupSettingItemKey.asTitle(context: Context): String = context.get
     when (this) {
         BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS -> R.string.backupSectionTitleConnectionStatus
         BackupSettingItemKey.ITEM_CONNECTION_STATUS -> R.string.backupConnectionStatus
+        BackupSettingItemKey.ITEM_SERVER_DETAILS -> R.string.backupServerDetails
         BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS -> R.string.backupSectionTitleBackupStatus
         BackupSettingItemKey.ITEM_PHOTOS_STATUS -> R.string.backupPhotosStatus
         BackupSettingItemKey.ITEM_BACKUP_STATUS -> R.string.backupBackupStatus

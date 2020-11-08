@@ -16,6 +16,7 @@ class BackupRepository {
         mutableSettings.value = listOf(
             BackupSettingItem(BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS),
             BackupSettingItem(BackupSettingItemKey.ITEM_CONNECTION_STATUS),
+            BackupSettingItem(BackupSettingItemKey.ITEM_SERVER_DETAILS),
             BackupSettingItem(BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
             BackupSettingItem(BackupSettingItemKey.ITEM_PHOTOS_STATUS),
             BackupSettingItem(BackupSettingItemKey.ITEM_BACKUP_STATUS),
