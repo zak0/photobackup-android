@@ -7,10 +7,11 @@ import com.jamitek.photosapp.backup.BackupUseCase
 
 class BackupViewModel(private val useCase: BackupUseCase) : ViewModel() {
 
+    val uiEvent = useCase.uiEvent
     val items = useCase.settingItems
 
-    fun onItemClicked(key: BackupSettingItemKey, activityContext: Context) {
-        useCase.onItemClicked(key, activityContext)
+    fun onItemClicked(key: BackupSettingItemKey) {
+        useCase.onItemClicked(key)
     }
 
 }

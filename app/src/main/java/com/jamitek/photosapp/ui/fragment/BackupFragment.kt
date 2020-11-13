@@ -1,11 +1,14 @@
 package com.jamitek.photosapp.ui.fragment
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.getActivityViewModel
+import com.jamitek.photosapp.storage.StorageAccessHelper
+import com.jamitek.photosapp.ui.BackupScreenEvent
 import com.jamitek.photosapp.ui.adapter.BackupAdapter
 import com.jamitek.photosapp.ui.viewmodel.BackupViewModel
 import kotlinx.android.synthetic.main.fragment_backup.*
@@ -24,6 +27,15 @@ class BackupFragment : Fragment(R.layout.fragment_backup) {
     private fun observe() {
         viewModel.items.observe(viewLifecycleOwner) {
             adapter.notifyDataSetChanged()
+        }
+
+        viewModel.uiEvent.observe(viewLifecycleOwner) {
+            when (it.get()) {
+                BackupScreenEvent.ShowCameraDirSelection -> StorageAccessHelper
+                    .promptCameraDirSelection(
+                        requireActivity()
+                    )
+            }
         }
     }
 }
