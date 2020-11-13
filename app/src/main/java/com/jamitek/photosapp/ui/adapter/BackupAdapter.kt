@@ -61,7 +61,7 @@ class BackupAdapter(private val viewModel: BackupViewModel) :
     private fun bindSettingItem(holder: BackupViewHolder, item: BackupSettingItem) {
         holder.itemView.title.text = item.key.asTitle(holder.context)
         holder.itemView.value.text = item.value()
-        holder.itemView.setOnClickListener { viewModel.onItemClicked(item.key) }
+        holder.itemView.setOnClickListener { viewModel.onItemClicked(item.key, holder.context) }
     }
 
     class BackupViewHolder(view: View) : RecyclerView.ViewHolder(view)

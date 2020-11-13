@@ -1,10 +1,14 @@
 package com.jamitek.photosapp.backup
 
+import android.app.Activity
+import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 import com.jamitek.photosapp.networking.ServerConfigRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
+import com.jamitek.photosapp.storage.StorageAccessHelper
 
 class BackupUseCase(
     private val serverConfigRepository: ServerConfigRepository,
@@ -12,25 +16,32 @@ class BackupUseCase(
     private val cameraRepository: LocalCameraRepository
 ) {
 
-    private val mutableSettings = MutableLiveData<List<BackupSettingItem>>(emptyList())
-    val settingItems: LiveData<List<BackupSettingItem>> = mutableSettings
-
-    init {
-        buildSettings()
+    private val initialSettings = MutableLiveData<List<BackupSettingItem>>(emptyList())
+    val settingItems: LiveData<List<BackupSettingItem>> = MediatorLiveData<List<BackupSettingItem>>().apply {
+        addSource(cameraRepository.status) { value = buildSettings() }
+        addSource(serverAdminRepository.libraryScanStatus) { value = buildSettings() }
+        addSource(initialSettings) { value = it}
     }
 
-    fun onItemClicked(key: BackupSettingItemKey) {
+    init {
+        initialSettings.value = buildSettings()
+    }
+
+    fun onItemClicked(key: BackupSettingItemKey, activityContext: Context) {
         when (key) {
             BackupSettingItemKey.ITEM_PHOTOS_STATUS -> cameraRepository.scan()
-            // TODO Add rest of the items
+            BackupSettingItemKey.ITEM_BACKUP_STATUS -> cameraRepository.backup() // TODO Do this after scan, if conditions for upload are met
+            BackupSettingItemKey.ITEM_CAMERA_DIR -> StorageAccessHelper.promptCameraDirSelection(activityContext as Activity)
+
+            BackupSettingItemKey.ITEM_RESCAN_LIBRARY -> serverAdminRepository.initLibraryScan(refreshStatusUntilDone = true)
         }
     }
 
-    private fun buildSettings() {
-        mutableSettings.value = listOf(
+    private fun buildSettings(): List<BackupSettingItem> {
+        return listOf(
             BackupSettingItem(BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
             BackupSettingItem(BackupSettingItemKey.ITEM_PHOTOS_STATUS) {
-                "${cameraRepository.status.value?.localFilesCount ?: -1} (-1 GB) - Tap to rescan"
+                "${cameraRepository.status.value?.localFilesCount ?: -1} photos - Tap to rescan"
             },
             BackupSettingItem(BackupSettingItemKey.ITEM_BACKUP_STATUS) {
                 cameraRepository.status.value?.let { status ->
