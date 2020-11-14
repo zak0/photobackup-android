@@ -10,6 +10,10 @@ class ServerConfigUseCase(
     private val repo: ServerConfigRepository
 ) {
 
+    private val mutableNewConfig =
+        MutableLiveData<Triple<String?, String?, String?>>(Triple(null, null, null))
+    val newConfig: LiveData<Triple<String?, String?, String?>> = mutableNewConfig
+
     private val mutableUiEvent = MutableLiveData<Event<ServerSetupScreenEvent>>()
     val uiEvent: LiveData<Event<ServerSetupScreenEvent>> = mutableUiEvent
     val items: LiveData<List<SettingsItem>> = MutableLiveData<List<SettingsItem>>(buildSettings())
@@ -23,14 +27,44 @@ class ServerConfigUseCase(
         }
     }
 
+    fun newServerUrlSet(serverUrl: String) {
+        mutableNewConfig.value = mutableNewConfig.value!!.copy(first = serverUrl)
+    }
+
+    fun newUsername(username: String) {
+        mutableNewConfig.value = mutableNewConfig.value!!.copy(second = username)
+    }
+
+    fun newPassword(password: String) {
+        mutableNewConfig.value = mutableNewConfig.value!!.copy(third = password)
+    }
+
+    fun saveServerConfig() {
+        // TODO Validate before saving?
+        newConfig.value?.also { config ->
+            repo.addServerAddress(config.first!!)
+            repo.selectAddress(config.first!!)
+            repo.setCredentials(config.second!!, config.third!!)
+        }
+
+    }
+
     private fun emitScreenEvent(event: ServerSetupScreenEvent) {
         mutableUiEvent.value = Event(event)
     }
 
-    /**
-     * TODO Write me
-     */
-    private fun buildSettings(): List<SettingsItem> =
-        ServerSetupSettingsItemKey.values().map { SettingsItem(it) }
+    private fun buildSettings(): List<SettingsItem> = listOf(
+        SettingsItem(ServerSetupSettingsItemKey.SectionTitleAddress),
+        SettingsItem(ServerSetupSettingsItemKey.ItemAddress) {
+            newConfig.value?.first ?: "Not set"
+        },
+        SettingsItem(ServerSetupSettingsItemKey.SectionTitleCredentials),
+        SettingsItem(ServerSetupSettingsItemKey.ItemUsername) {
+            newConfig.value?.second ?: "Not set"
+        },
+        SettingsItem(ServerSetupSettingsItemKey.ItemPassword) {
+            newConfig.value?.third?.let { "****************" } ?: "Not set"
+        }
+    )
 
 }
