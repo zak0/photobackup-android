@@ -6,7 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.jamitek.photosapp.R
-import com.jamitek.photosapp.backup.BackupSettingItem
+import com.jamitek.photosapp.SettingsItem
+import com.jamitek.photosapp.SettingsItemKey
 import com.jamitek.photosapp.backup.BackupSettingItemKey
 import com.jamitek.photosapp.extension.context
 import com.jamitek.photosapp.ui.viewmodel.BackupViewModel
@@ -54,21 +55,23 @@ class BackupAdapter(private val viewModel: BackupViewModel) :
 
     override fun getItemCount(): Int = items.size
 
-    private fun bindTitle(holder: BackupViewHolder, item: BackupSettingItem) {
+    private fun bindTitle(holder: BackupViewHolder, item: SettingsItem) {
         holder.itemView.title.text = item.key.asTitle(holder.context)
     }
 
-    private fun bindSettingItem(holder: BackupViewHolder, item: BackupSettingItem) {
+    private fun bindSettingItem(holder: BackupViewHolder, item: SettingsItem) {
         holder.itemView.title.text = item.key.asTitle(holder.context)
         holder.itemView.value.text = item.value()
-        holder.itemView.setOnClickListener { viewModel.onItemClicked(item.key) }
+        holder.itemView.setOnClickListener { viewModel.onItemClicked(item.key as BackupSettingItemKey) }
     }
+
+    private fun getTitle(itemKey: SettingsItemKey, context: Context): String = itemKey.asTitle(context)
 
     class BackupViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }
 
-private fun BackupSettingItemKey.asTitle(context: Context): String = context.getString(
-    when (this) {
+private fun SettingsItemKey.asTitle(context: Context): String = context.getString(
+    when (this as BackupSettingItemKey) {
         BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS -> R.string.backupSectionTitleBackupStatus
         BackupSettingItemKey.ITEM_PHOTOS_STATUS -> R.string.backupPhotosStatus
         BackupSettingItemKey.ITEM_BACKUP_STATUS -> R.string.backupBackupStatus

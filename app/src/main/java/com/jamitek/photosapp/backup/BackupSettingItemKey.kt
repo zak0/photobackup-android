@@ -1,6 +1,8 @@
 package com.jamitek.photosapp.backup
 
-enum class BackupSettingItemKey(val isTitle: Boolean = false) {
+import com.jamitek.photosapp.SettingsItemKey
+
+enum class BackupSettingItemKey(override val isTitle: Boolean = false) : SettingsItemKey {
     SECTION_TITLE_CONNECTION_STATUS(true),
     ITEM_CONNECTION_STATUS,
     ITEM_SERVER_DETAILS,

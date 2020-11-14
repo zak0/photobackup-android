@@ -26,12 +26,12 @@
         android:label="SettingsFragment" />
 
     <fragment
-        android:id="@+id/localFoldersFragment"
+        android:id="@+id/backupFragment"
         android:name="com.jamitek.photosapp.ui.fragment.BackupFragment"
         android:label="LocalFoldersFragment">
         <action
-            android:id="@+id/action_localFoldersFragment_to_thumbnailsGridFragment"
-            app:destination="@id/thumbnailsGridFragment" />
+            android:id="@+id/action_backupFragment_to_serverSetupFragment"
+            app:destination="@id/serverSetupFragment" />
     </fragment>
 
     <action
@@ -44,11 +44,11 @@
 
     <action
         android:id="@+id/action_global_localFoldersFragment"
-        app:destination="@id/localFoldersFragment" />
+        app:destination="@id/backupFragment" />
 
     <fragment
-        android:id="@+id/thumbnailsGridFragment"
-        android:name="com.jamitek.photosapp.ui.fragment.ThumbnailsGridFragment"
-        android:label="ThumbnailsGridFragment" />
+        android:id="@+id/serverSetupFragment"
+        android:name="com.jamitek.photosapp.ui.fragment.ServerSetupFragment"
+        android:label="ServerSetupFragment" />
 
 </navigation>

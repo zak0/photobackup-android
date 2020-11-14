@@ -4,6 +4,7 @@
     <string name="navFolders">Local Folders</string>
     <string name="navBackup">Back up</string>
     <string name="navSettings">Settings</string>
+    <string name="commonSave">Save</string>
 
     <string name="errorServerUrlNotSet">No servers added.</string>
     <string name="errorLocalFoldersRootNotSet">Please grant access to storage.</string>
@@ -19,4 +20,10 @@
     <string name="backupCameraDir">Camera directory</string>
     <string name="backupSectionTitleServerAdmin">Server admin</string>
     <string name="backupRescanLibrary">Rescan remote library</string>
+
+    <string name="serverConfigSectionTitleAddress">Host</string>
+    <string name="serverConfigSectionTitleCredentials">Credentials</string>
+    <string name="serverConfigAddress">Address</string>
+    <string name="serverConfigUsername">Username</string>
+    <string name="serverConfigPassword">Password</string>
 </resources>

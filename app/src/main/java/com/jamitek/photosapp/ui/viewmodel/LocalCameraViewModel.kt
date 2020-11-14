@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 
+// TODO Remove?
 class LocalCameraViewModel(private val repository: LocalCameraRepository) : ViewModel() {
 
     val libraryStatus = repository.status
