@@ -30,11 +30,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             LocalCameraViewModel::class.java
         )
     }
-    private val localFoldersViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(
-            BackupViewModel::class.java
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +53,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         val actionId = when (item.itemId) {
             R.id.photos -> R.id.action_global_mainFragment
             R.id.backup -> R.id.action_global_localFoldersFragment
-            R.id.settings -> R.id.action_global_settingsFragment
             else -> R.id.action_global_mainFragment
         }
 

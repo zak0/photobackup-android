@@ -26,10 +26,6 @@ class BackupUseCase(
         addSource(initialSettings) { value = it}
     }
 
-    init {
-        initialSettings.value = buildSettings()
-    }
-
     fun onItemClicked(key: BackupSettingItemKey) {
         when (key) {
             BackupSettingItemKey.ITEM_PHOTOS_STATUS -> cameraRepository.scan()
@@ -39,6 +35,8 @@ class BackupUseCase(
             BackupSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(BackupScreenEvent.ShowServerSetup)
 
             BackupSettingItemKey.ITEM_RESCAN_LIBRARY -> serverAdminRepository.initLibraryScan(refreshStatusUntilDone = true)
+
+            else -> error("No click handler for $key")
         }
     }
 

@@ -21,11 +21,6 @@
         android:label="ViewerFragment" />
 
     <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.jamitek.photosapp.ui.fragment.SettingsFragment"
-        android:label="SettingsFragment" />
-
-    <fragment
         android:id="@+id/backupFragment"
         android:name="com.jamitek.photosapp.ui.fragment.BackupFragment"
         android:label="LocalFoldersFragment">
@@ -37,10 +32,6 @@
     <action
         android:id="@+id/action_global_mainFragment"
         app:destination="@id/mainFragment" />
-
-    <action
-        android:id="@+id/action_global_settingsFragment"
-        app:destination="@id/settingsFragment" />
 
     <action
         android:id="@+id/action_global_localFoldersFragment"

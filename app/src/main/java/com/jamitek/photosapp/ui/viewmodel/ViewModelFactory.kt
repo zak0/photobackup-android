@@ -16,11 +16,6 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
                 dependencyRoot.serverConfigRepository,
                 dependencyRoot.remoteLibraryRepository
             )
-            SettingsViewModel::class.java -> SettingsViewModel(
-                dependencyRoot.keyValueStore,
-                dependencyRoot.remoteLibraryAdminRepository,
-                dependencyRoot.serverConfigRepository
-            )
             BackupViewModel::class.java -> BackupViewModel(
                 dependencyRoot.backupUseCase
             )

@@ -11,9 +11,4 @@
         android:icon="@drawable/ic_backup_24dp"
         android:title="@string/navBackup" />
 
-    <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_settings_24dp"
-        android:title="@string/navSettings" />
-
 </menu>
