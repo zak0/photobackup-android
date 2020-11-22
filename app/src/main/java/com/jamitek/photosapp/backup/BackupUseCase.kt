@@ -19,11 +19,10 @@ class BackupUseCase(
     private val mutableUiEvent = MutableLiveData<Event<BackupScreenEvent?>>()
     val uiEvent: LiveData<Event<BackupScreenEvent?>> = mutableUiEvent
 
-    private val initialSettings = MutableLiveData<List<SettingsItem>>(emptyList())
     val settingItems: LiveData<List<SettingsItem>> = MediatorLiveData<List<SettingsItem>>().apply {
         addSource(cameraRepository.status) { value = buildSettings() }
         addSource(serverAdminRepository.libraryScanStatus) { value = buildSettings() }
-        addSource(initialSettings) { value = it}
+        value = buildSettings()
     }
 
     fun onItemClicked(key: BackupSettingItemKey) {
@@ -34,9 +33,11 @@ class BackupUseCase(
 
             BackupSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(BackupScreenEvent.ShowServerSetup)
 
-            BackupSettingItemKey.ITEM_RESCAN_LIBRARY -> serverAdminRepository.initLibraryScan(refreshStatusUntilDone = true)
+            BackupSettingItemKey.ITEM_RESCAN_LIBRARY -> serverAdminRepository.initLibraryScan(
+                refreshStatusUntilDone = true
+            )
 
-            else -> error("No click handler for $key")
+            else -> Unit //error("No click handler for $key")
         }
     }
 
