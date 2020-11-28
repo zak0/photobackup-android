@@ -1,6 +1,7 @@
 package com.jamitek.photosapp
 
 import android.app.Application
+import com.jamitek.photosapp.worker.BackupWorker
 
 class PhotosApplication : Application() {
 
@@ -9,5 +10,6 @@ class PhotosApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         dependencyRoot = DependencyRoot(this)
+        BackupWorker.scheduleRecurring(this)
     }
 }

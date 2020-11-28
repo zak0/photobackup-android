@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.*
 import com.jamitek.photosapp.PhotosApplication
@@ -13,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -42,6 +44,20 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appCo
         fun startNow(context: Context) {
             val request = OneTimeWorkRequestBuilder<BackupWorker>().build()
             WorkManager.getInstance(context).enqueue(request)
+        }
+
+        fun scheduleRecurring(context: Context) {
+            val constraints = Constraints.Builder()
+                .setRequiresCharging(true)
+                .build()
+
+            val request = PeriodicWorkRequestBuilder<BackupWorker>(1, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.REPLACE, request)
+
+            Log.d(TAG, "Scheduled background backup")
         }
     }
 
