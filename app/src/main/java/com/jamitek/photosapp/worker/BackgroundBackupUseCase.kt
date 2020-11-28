@@ -1,5 +1,6 @@
 package com.jamitek.photosapp.worker
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.jamitek.photosapp.locallibrary.LocalCameraLibraryStatus
@@ -9,14 +10,30 @@ class BackgroundBackupUseCase(
     private val cameraRepository: LocalCameraRepository
 ) {
 
+    private companion object {
+        const val TAG = "BackgroundBuUseCase"
+    }
+
     private val mutableWorkStatus = MediatorLiveData<WorkStatus>().apply {
         addSource(cameraRepository.status) {
+            // TODO Use the received status to update progress of upload
+            //  (counts of all and not-backed-up files are in it).
             handleWorkStatusTransition(to = it.asWorkStatus())
         }
 
         value = cameraRepository.status.value.asWorkStatus()
     }
+
     val workStatus: LiveData<WorkStatus> = mutableWorkStatus
+
+    val completionNotificationMessage: String
+        get() = cameraRepository.status.value?.let {
+            if (it.waitingForBackupCount == 0) {
+                "Done. All backed up!"
+            } else {
+                "Done with error: ${it.waitingForBackupCount} files not backed up."
+            }
+        } ?: "Done with error: unable to read library state."
 
     /**
      * Initiates a background process of scanning and uploading of media files.
@@ -53,7 +70,14 @@ class BackgroundBackupUseCase(
                 to
             }
 
-        newStatus?.also { mutableWorkStatus.value = it }
+
+        newStatus?.also {
+            // Only emit new state if it changed from previous
+            if (workStatus.value != newStatus) {
+                Log.d(TAG, "Transition to: $newStatus")
+                mutableWorkStatus.value = it
+            }
+        }
     }
 
 }

@@ -20,8 +20,21 @@ class WorkerService : LifecycleService() {
 
     companion object {
         private const val TAG = "WorkerService"
-        private const val NOTIFICATION_ID = 715519
-        private const val NOTIFICATION_CHANNEL_ID = "PhotosAppWork"
+
+        /**
+         * ID of the notification that is bound to the foreground [Service].
+         */
+        private const val BOUND_NOTIFICATION_ID = 715519
+        private const val BOUND_NOTIFICATION_CHANNEL_ID = "PhotosAppWork"
+        private const val BOUND_NOTIFICATION_CHANNEL_NAME = "Photos Worker"
+
+        /**
+         * ID of the notification to report the result of the backup job.
+         * This is not bound to the [Service] and is meant to stay until
+         * user dismisses it.
+         */
+        private const val NOTIFICATION_ID = 715518
+        private const val NOTIFICATION_CHANNEL_ID = "PhotosApp"
         private const val NOTIFICATION_CHANNEL_NAME = "Photos Worker"
 
         fun start(context: Context) {
@@ -35,14 +48,14 @@ class WorkerService : LifecycleService() {
     }
 
     private val baseNotificationBuilder: NotificationCompat.Builder by lazy {
-        NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        NotificationCompat.Builder(this, BOUND_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(getString(R.string.appName))
+            .setContentTitle("Backing up camera")
     }
 
-    private val notification: Notification by lazy {
+    private val boundNotification: Notification by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel()
+            createNotificationChannels()
         }
 
         baseNotificationBuilder
@@ -54,7 +67,7 @@ class WorkerService : LifecycleService() {
         super.onCreate()
 
         Log.d(TAG, "onCreate()")
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(BOUND_NOTIFICATION_ID, boundNotification)
 
         val dependencyRoot = (application as PhotosApplication).dependencyRoot
         val useCase = dependencyRoot.backgroundBackupUseCase
@@ -63,39 +76,56 @@ class WorkerService : LifecycleService() {
 
         useCase.workStatus.observe(this) {
             when (it) {
-                WorkStatus.Scanning -> updateNotificationText("Scanning camera directory...")
-                WorkStatus.Uploading -> updateNotificationText("Uploading new files...")
+                WorkStatus.Scanning -> updateBoundNotificationText("Scanning camera directory...")
+                WorkStatus.Uploading -> updateBoundNotificationText("Uploading new files...")
                 WorkStatus.Done -> {
-                    // TODO Display notification of a completed job
+                    showNotification(useCase.completionNotificationMessage)
                     stop(applicationContext)
                 }
                 WorkStatus.Unknown,
-                WorkStatus.Idle -> {
-                    // TODO Display notification of an error
-                    stop(applicationContext)
-                }
+                WorkStatus.Idle -> Unit
             }
         }
     }
 
-    private fun createNotificationChannel() {
+    private fun createNotificationChannels() {
         (getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.also {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
+            val boundNotificationChannel = NotificationChannel(
+                BOUND_NOTIFICATION_CHANNEL_ID,
+                BOUND_NOTIFICATION_CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW
             )
-            it.createNotificationChannel(channel)
+
+            val normalChannel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+
+            it.createNotificationChannel(boundNotificationChannel)
+            it.createNotificationChannel(normalChannel)
         }
     }
 
-    private fun updateNotificationText(newText: String) {
-        val newNotification = baseNotificationBuilder
+    private fun updateBoundNotificationText(newText: String) {
+        baseNotificationBuilder
             .setContentText(newText)
             .build()
+            .show(BOUND_NOTIFICATION_ID)
+    }
 
+    private fun showNotification(message: String) {
+        NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Backup complete")
+            .setContentText(message)
+            .build()
+            .show(NOTIFICATION_ID)
+    }
+
+    private fun Notification.show(id: Int) {
         (getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.also {
-            it.notify(NOTIFICATION_ID, newNotification)
+            it.notify(id, this)
         }
     }
 }
