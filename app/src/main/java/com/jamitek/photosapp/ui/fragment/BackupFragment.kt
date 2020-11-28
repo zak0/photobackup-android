@@ -12,6 +12,7 @@ import com.jamitek.photosapp.storage.StorageAccessHelper
 import com.jamitek.photosapp.ui.BackupScreenEvent
 import com.jamitek.photosapp.ui.adapter.BackupAdapter
 import com.jamitek.photosapp.ui.viewmodel.BackupViewModel
+import com.jamitek.photosapp.worker.BackupWorker
 import kotlinx.android.synthetic.main.fragment_backup.*
 
 class BackupFragment : Fragment(R.layout.fragment_backup) {

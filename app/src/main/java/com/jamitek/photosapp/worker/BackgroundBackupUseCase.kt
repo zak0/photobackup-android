@@ -5,6 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.jamitek.photosapp.locallibrary.LocalCameraLibraryStatus
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BackgroundBackupUseCase(
     private val cameraRepository: LocalCameraRepository
@@ -21,7 +24,9 @@ class BackgroundBackupUseCase(
             handleWorkStatusTransition(to = it.asWorkStatus())
         }
 
-        value = cameraRepository.status.value.asWorkStatus()
+        CoroutineScope(Dispatchers.Main).launch {
+            value = cameraRepository.status.value.asWorkStatus()
+        }
     }
 
     val workStatus: LiveData<WorkStatus> = mutableWorkStatus
@@ -75,7 +80,9 @@ class BackgroundBackupUseCase(
             // Only emit new state if it changed from previous
             if (workStatus.value != newStatus) {
                 Log.d(TAG, "Transition to: $newStatus")
-                mutableWorkStatus.value = it
+                CoroutineScope(Dispatchers.Main).launch {
+                    mutableWorkStatus.value = it
+                }
             }
         }
     }

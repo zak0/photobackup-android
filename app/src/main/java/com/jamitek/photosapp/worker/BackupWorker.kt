@@ -4,25 +4,27 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.observe
+import androidx.work.*
 import com.jamitek.photosapp.PhotosApplication
 import com.jamitek.photosapp.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Background scanning of local camera directory and uploading of files that are not yet backed up.
  */
-class WorkerService : LifecycleService() {
+class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appContext, params) {
 
     companion object {
         private const val TAG = "WorkerService"
 
         /**
-         * ID of the notification that is bound to the foreground [Service].
+         * ID of the notification that is bound to the [Worker].
          */
         private const val BOUND_NOTIFICATION_ID = 715519
         private const val BOUND_NOTIFICATION_CHANNEL_ID = "PhotosAppWork"
@@ -30,25 +32,21 @@ class WorkerService : LifecycleService() {
 
         /**
          * ID of the notification to report the result of the backup job.
-         * This is not bound to the [Service] and is meant to stay until
+         * This is not bound to the [Worker] and is meant to stay until
          * user dismisses it.
          */
         private const val NOTIFICATION_ID = 715518
         private const val NOTIFICATION_CHANNEL_ID = "PhotosApp"
         private const val NOTIFICATION_CHANNEL_NAME = "Photos Worker"
 
-        fun start(context: Context) {
-            val intent = Intent(context, WorkerService::class.java)
-            context.startForegroundService(intent)
-        }
-
-        fun stop(context: Context) {
-            context.stopService(Intent(context, WorkerService::class.java))
+        fun startNow(context: Context) {
+            val request = OneTimeWorkRequestBuilder<BackupWorker>().build()
+            WorkManager.getInstance(context).enqueue(request)
         }
     }
 
     private val baseNotificationBuilder: NotificationCompat.Builder by lazy {
-        NotificationCompat.Builder(this, BOUND_NOTIFICATION_CHANNEL_ID)
+        NotificationCompat.Builder(applicationContext, BOUND_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Backing up camera")
     }
@@ -63,33 +61,48 @@ class WorkerService : LifecycleService() {
             .build()
     }
 
-    override fun onCreate() {
-        super.onCreate()
+    private val notificationManager: NotificationManager? by lazy {
+        applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+    }
 
-        Log.d(TAG, "onCreate()")
-        startForeground(BOUND_NOTIFICATION_ID, boundNotification)
-
-        val dependencyRoot = (application as PhotosApplication).dependencyRoot
+    override fun doWork(): Result {
+        val backupDone = AtomicBoolean(false)
+        val dependencyRoot = (applicationContext as PhotosApplication).dependencyRoot
         val useCase = dependencyRoot.backgroundBackupUseCase
 
-        useCase.scanAndBackup()
+        // We need to switch to a coroutine context in order to be able to await the
+        // binding to a FG service. See KDoc of setForegroundAsync.
+        GlobalScope.launch {
+            setForegroundAsync(ForegroundInfo(BOUND_NOTIFICATION_ID, boundNotification)).await()
 
-        useCase.workStatus.observe(this) {
-            when (it) {
-                WorkStatus.Scanning -> updateBoundNotificationText("Scanning camera directory...")
-                WorkStatus.Uploading -> updateBoundNotificationText("Uploading new files...")
-                WorkStatus.Done -> {
-                    showNotification(useCase.completionNotificationMessage)
-                    stop(applicationContext)
+            // Observing a LiveData has to happen in the main thread...
+            withContext(Dispatchers.Main) {
+                useCase.scanAndBackup()
+                useCase.workStatus.observeForever {
+                    when (it) {
+                        WorkStatus.Scanning -> updateBoundNotificationText("Scanning camera directory...")
+                        WorkStatus.Uploading -> updateBoundNotificationText("Uploading new files...")
+                        WorkStatus.Done -> {
+                            showNotification(useCase.completionNotificationMessage)
+                            backupDone.set(true)
+                        }
+                        WorkStatus.Unknown,
+                        WorkStatus.Idle,
+                        null -> Unit
+                    }
                 }
-                WorkStatus.Unknown,
-                WorkStatus.Idle -> Unit
             }
         }
+
+        while(!backupDone.get()) {
+            Thread.sleep(1)
+        }
+
+        return Result.success()
     }
 
     private fun createNotificationChannels() {
-        (getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.also {
+        notificationManager?.also {
             val boundNotificationChannel = NotificationChannel(
                 BOUND_NOTIFICATION_CHANNEL_ID,
                 BOUND_NOTIFICATION_CHANNEL_NAME,
@@ -115,7 +128,7 @@ class WorkerService : LifecycleService() {
     }
 
     private fun showNotification(message: String) {
-        NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Backup complete")
             .setContentText(message)
@@ -124,8 +137,6 @@ class WorkerService : LifecycleService() {
     }
 
     private fun Notification.show(id: Int) {
-        (getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.also {
-            it.notify(id, this)
-        }
+        notificationManager?.notify(id, this)
     }
 }
