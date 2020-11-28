@@ -3,18 +3,20 @@ package com.jamitek.photosapp.worker
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.IBinder
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.observe
 import com.jamitek.photosapp.PhotosApplication
 import com.jamitek.photosapp.R
 
-class WorkerService : Service() {
+/**
+ * Background scanning of local camera directory and uploading of files that are not yet backed up.
+ */
+class WorkerService : LifecycleService() {
 
     companion object {
         private const val TAG = "WorkerService"
@@ -24,12 +26,7 @@ class WorkerService : Service() {
 
         fun start(context: Context) {
             val intent = Intent(context, WorkerService::class.java)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(Intent(context, WorkerService::class.java))
-            }
+            context.startForegroundService(intent)
         }
 
         fun stop(context: Context) {
@@ -53,10 +50,6 @@ class WorkerService : Service() {
             .build()
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
     override fun onCreate() {
         super.onCreate()
 
@@ -64,45 +57,27 @@ class WorkerService : Service() {
         startForeground(NOTIFICATION_ID, notification)
 
         val dependencyRoot = (application as PhotosApplication).dependencyRoot
+        val useCase = dependencyRoot.backgroundBackupUseCase
 
-        // Scan local folders
-        // Upload photos that are not yet backed up
+        useCase.scanAndBackup()
 
-//        GlobalScope.launch {
-//            updateNotificationText("Scanning local photos...")
-//
-//            // Scan local camera directory
-//            SharedPrefsPersistence.cameraDirUriString?.also { cameraDirUriString ->
-//                Log.d(TAG, "Processing camera dir... 1")
-//                StorageAccessHelper.iterateCameraDir(applicationContext, cameraDirUriString)
-//                Log.d(TAG, "Processing camera dir... 2")
-//            }
-//
-//            // Get changes from the server
-//            Log.d(TAG, "Requesting photos from server... 1")
-//            updateNotificationText("Fetching changes from the server...")
-//            ApiClient.getAllPhotos { success, photos ->
-//                Log.d(TAG, "Requesting photos from server... 2")
-//                GlobalScope.launch {
-//                    Log.d(TAG, "Requesting photos from server... 3")
-//                    if (success) {
-//                        RemoteLibraryRepository.onRemotePhotosLoaded(photos)
-//                    }
-//                    Log.d(TAG, "Requesting photos from server... 4")
-//
-//                    // Upload photos that are pending to be uploaded
-//                    if (success) {
-//                        uploadPhotosPendingBackup()
-//                    }
-//
-//                    // Stop the service when done
-//                    stop(applicationContext)
-//                }
-//            }
-//        }
+        useCase.workStatus.observe(this) {
+            when (it) {
+                WorkStatus.Scanning -> updateNotificationText("Scanning camera directory...")
+                WorkStatus.Uploading -> updateNotificationText("Uploading new files...")
+                WorkStatus.Done -> {
+                    // TODO Display notification of a completed job
+                    stop(applicationContext)
+                }
+                WorkStatus.Unknown,
+                WorkStatus.Idle -> {
+                    // TODO Display notification of an error
+                    stop(applicationContext)
+                }
+            }
+        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         (getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.also {
             val channel = NotificationChannel(
@@ -112,44 +87,6 @@ class WorkerService : Service() {
             )
             it.createNotificationChannel(channel)
         }
-    }
-
-    private fun uploadPhotosPendingBackup() {
-//        updateNotificationText("Uploading new photos...")
-//
-//        val uploadLambda = { photo: Photo ->
-//            ApiClient.uploadPhoto(applicationContext, photo) { success ->
-//                if (success) {
-//                    Log.d(
-//                        TAG,
-//                        "Upload successful: serverId: ${photo.serverId}, '${photo.fileName}'"
-//                    )
-//                } else {
-//                    Log.e(TAG, "Upload failed: serverId: ${photo.serverId}, '${photo.fileName}'")
-//                }
-//            }
-//        }
-//
-//        // Get all photos that are only local
-//        RemoteLibraryRepository.allPhotos.value?.filter {
-//            it.isLocal || (it.isLocal && it.isPendingUpload)
-//        }?.forEach { photo ->
-//            // If meta data is already uploaded, then just upload the file
-//            if (photo.isPendingUpload) {
-//                uploadLambda(photo)
-//            } else {
-//                // First upload meta data, then the file itself
-//                ApiClient.postPhotoMetaData(photo) { serverId ->
-//                    serverId?.also {
-//                        photo.serverId = serverId
-//                        Log.d(TAG, "Metadata POST successful, serverId: $serverId, '${photo.fileName}'")
-//                        uploadLambda(photo)
-//                    } ?: run {
-//                        Log.d(TAG, "Metadata POST failed, '${photo.fileName}'")
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun updateNotificationText(newText: String) {

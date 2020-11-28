@@ -13,6 +13,7 @@ import com.jamitek.photosapp.networking.ServerConfigUseCase
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 import com.jamitek.photosapp.storage.StorageAccessHelper
+import com.jamitek.photosapp.worker.BackgroundBackupUseCase
 
 /**
  * Pure DI dependency manager.
@@ -44,5 +45,6 @@ class DependencyRoot(app: Application) {
 
     val backupUseCase by lazy { BackupUseCase(serverConfigRepository, remoteLibraryAdminRepository, localCameraRepository) }
     val serverConfigUseCase by lazy { ServerConfigUseCase(serverConfigRepository) }
+    val backgroundBackupUseCase by lazy { BackgroundBackupUseCase(localCameraRepository) }
 
 }
