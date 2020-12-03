@@ -23,7 +23,7 @@
     <fragment
         android:id="@+id/backupFragment"
         android:name="com.jamitek.photosapp.ui.fragment.BackupFragment"
-        android:label="LocalFoldersFragment">
+        android:label="@string/navBackup">
         <action
             android:id="@+id/action_backupFragment_to_serverSetupFragment"
             app:destination="@id/serverSetupFragment" />
@@ -40,6 +40,6 @@
     <fragment
         android:id="@+id/serverSetupFragment"
         android:name="com.jamitek.photosapp.ui.fragment.ServerSetupFragment"
-        android:label="ServerSetupFragment" />
+        android:label="@string/serverConfigTitle" />
 
 </navigation>

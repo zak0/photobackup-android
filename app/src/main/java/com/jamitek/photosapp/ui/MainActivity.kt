@@ -31,8 +31,10 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         navController.addOnDestinationChangedListener(this)
         NavigationUI.setupWithNavController(bottomNav, navController)
+        NavigationUI.setupWithNavController(toolbar, navController)
     }
 
     override fun onDestinationChanged(
@@ -40,10 +42,14 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         destination: NavDestination,
         arguments: Bundle?
     ) {
+        val toolbarlessFragments = listOf(R.id.mainFragment, R.id.viewerFragment)
         val bottomNavlessFragments = arrayListOf(R.id.viewerFragment)
+
         // TODO Copy nice sliding hiding animation for bottom nav bar from uptimeapp
         bottomNav.visibility =
             if (destination.id in bottomNavlessFragments) View.GONE else View.VISIBLE
+        toolbar.visibility =
+            if (destination.id in toolbarlessFragments) View.GONE else View.VISIBLE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
