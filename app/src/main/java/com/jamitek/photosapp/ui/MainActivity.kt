@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        val toolbarlessFragments = listOf(R.id.mainFragment, R.id.viewerFragment)
+        val toolbarlessFragments = listOf(R.id.mainFragment, R.id.viewerFragment, R.id.backupFragment)
         val bottomNavlessFragments = arrayListOf(R.id.viewerFragment)
 
         // TODO Copy nice sliding hiding animation for bottom nav bar from uptimeapp
