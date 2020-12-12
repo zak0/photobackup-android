@@ -32,14 +32,14 @@ class BackupFragment : Fragment(R.layout.fragment_backup) {
 
         viewModel.uiEvent.observe(viewLifecycleOwner) {
             val event = it.get()
-            when (it.get()) {
+            when (event) {
                 BackupScreenEvent.ShowCameraDirSelection -> StorageAccessHelper
                     .promptCameraDirSelection(
                         requireActivity()
                     )
                 BackupScreenEvent.ShowServerSetup -> findNavController().navigate(R.id.action_backupFragment_to_serverSetupFragment)
                 BackupScreenEvent.StartBackupWorker -> BackupWorker.startNow(requireContext())
-                else -> error("Unhandled BackupScreenEvent: $event")
+                else -> event?.also { error("Unhandled BackupScreenEvent: $event") }
             }
         }
     }
