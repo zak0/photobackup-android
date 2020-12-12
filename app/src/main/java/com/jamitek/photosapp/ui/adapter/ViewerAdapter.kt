@@ -10,7 +10,10 @@ import com.jamitek.photosapp.R
 import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
 import kotlinx.android.synthetic.main.view_viewer_image.view.*
 
-class ViewerAdapter(private val viewModel: RemoteLibraryViewModel) :
+class ViewerAdapter(
+    private val viewModel: RemoteLibraryViewModel,
+    private val popBackStack: () -> Unit
+) :
     RecyclerView.Adapter<ViewerAdapter.ViewerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewerViewHolder {
@@ -35,6 +38,7 @@ class ViewerAdapter(private val viewModel: RemoteLibraryViewModel) :
                 .into(holder.itemView.image)
 
             holder.itemView.filenameLabel.text = photo.fileName
+            holder.itemView.backButton.setOnClickListener { popBackStack() }
 
         }
     }
