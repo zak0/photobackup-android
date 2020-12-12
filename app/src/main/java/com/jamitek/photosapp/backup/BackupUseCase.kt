@@ -27,8 +27,7 @@ class BackupUseCase(
 
     fun onItemClicked(key: BackupSettingItemKey) {
         when (key) {
-            BackupSettingItemKey.ITEM_PHOTOS_STATUS -> cameraRepository.scan()
-            BackupSettingItemKey.ITEM_BACKUP_STATUS -> cameraRepository.backup() // TODO Do this after scan, if conditions for upload are met
+            BackupSettingItemKey.ITEM_PHOTOS_STATUS -> emitUiEvent(BackupScreenEvent.StartBackupWorker)
             BackupSettingItemKey.ITEM_CAMERA_DIR -> emitUiEvent(BackupScreenEvent.ShowCameraDirSelection)
 
             BackupSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(BackupScreenEvent.ShowServerSetup)
@@ -49,7 +48,7 @@ class BackupUseCase(
         return listOf(
             SettingsItem(BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
             SettingsItem(BackupSettingItemKey.ITEM_PHOTOS_STATUS) {
-                "${cameraRepository.status.value?.localFilesCount ?: -1} photos - Tap to rescan"
+                "${cameraRepository.status.value?.localFilesCount ?: -1} photos - Tap to rescan & backup"
             },
             SettingsItem(BackupSettingItemKey.ITEM_BACKUP_STATUS) {
                 cameraRepository.status.value?.let { status ->

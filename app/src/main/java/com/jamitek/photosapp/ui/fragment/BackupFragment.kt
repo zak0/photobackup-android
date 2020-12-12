@@ -1,6 +1,5 @@
 package com.jamitek.photosapp.ui.fragment
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -32,13 +31,15 @@ class BackupFragment : Fragment(R.layout.fragment_backup) {
         }
 
         viewModel.uiEvent.observe(viewLifecycleOwner) {
+            val event = it.get()
             when (it.get()) {
                 BackupScreenEvent.ShowCameraDirSelection -> StorageAccessHelper
                     .promptCameraDirSelection(
                         requireActivity()
                     )
-
                 BackupScreenEvent.ShowServerSetup -> findNavController().navigate(R.id.action_backupFragment_to_serverSetupFragment)
+                BackupScreenEvent.StartBackupWorker -> BackupWorker.startNow(requireContext())
+                else -> error("Unhandled BackupScreenEvent: $event")
             }
         }
     }
