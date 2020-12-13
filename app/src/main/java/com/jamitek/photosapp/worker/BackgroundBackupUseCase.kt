@@ -24,6 +24,7 @@ class BackgroundBackupUseCase(
             handleWorkStatusTransition(to = it.asWorkStatus())
         }
 
+        // Below is initial status
         CoroutineScope(Dispatchers.Main).launch {
             value = cameraRepository.status.value.asWorkStatus()
         }
@@ -66,6 +67,9 @@ class BackgroundBackupUseCase(
                     // upload is started. (Even if there's nothing to upload, it should
                     // still start the upload process, and reflect this in its status.)
                     null
+                } else if (workStatus.value == WorkStatus.Done) {
+                    // If previous status was Done, we're okay transitioning back to Idle.
+                    WorkStatus.Idle
                 } else {
                     // This is an unknown transition, and should not happen.
                     null
@@ -78,10 +82,18 @@ class BackgroundBackupUseCase(
 
         newStatus?.also {
             // Only emit new state if it changed from previous
-            if (workStatus.value != newStatus) {
+            val previousStatus = workStatus.value
+            if (previousStatus != newStatus) {
                 Log.d(TAG, "Transition to: $newStatus")
                 CoroutineScope(Dispatchers.Main).launch {
                     mutableWorkStatus.value = it
+
+                    // If we're now done, mark the worker to be Idle. Without this, logic for
+                    // consecutive works will not work as expected because of status being
+                    // immediately Done.
+                    if (newStatus == WorkStatus.Done) {
+                        handleWorkStatusTransition(WorkStatus.Idle)
+                    }
                 }
             }
         }
