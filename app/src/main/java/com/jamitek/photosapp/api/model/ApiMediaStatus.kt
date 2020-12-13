@@ -1,11 +1,9 @@
 package com.jamitek.photosapp.api.model
 
 import com.jamitek.photosapp.serializer.EnumAsStringSerializer
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 
-@ExperimentalSerializationApi
 @Serializable(with = ApiMediaStatusSerializer::class)
 enum class ApiMediaStatus(val serialName: String) {
     UploadPending("upload_pending"),
@@ -14,7 +12,6 @@ enum class ApiMediaStatus(val serialName: String) {
     NotOnServer("")
 }
 
-@ExperimentalSerializationApi
 @Serializer(forClass = ApiMediaStatus::class)
 object ApiMediaStatusSerializer :
     EnumAsStringSerializer<ApiMediaStatus>("ApiMediaStatusSerializer") {
