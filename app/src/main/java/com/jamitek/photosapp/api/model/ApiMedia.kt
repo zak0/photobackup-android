@@ -3,7 +3,7 @@ package com.jamitek.photosapp.api.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiMediaFile(
+data class ApiMedia(
     val id: Int,
     val fileName: String,
     val fileSize: Long,

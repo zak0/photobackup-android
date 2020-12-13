@@ -10,7 +10,8 @@ import kotlinx.serialization.Serializer
 enum class ApiMediaStatus(val serialName: String) {
     UploadPending("upload_pending"),
     Processing("processing"),
-    Ready("ready")
+    Ready("ready"),
+    NotOnServer("")
 }
 
 @ExperimentalSerializationApi

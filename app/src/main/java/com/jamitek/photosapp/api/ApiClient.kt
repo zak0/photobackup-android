@@ -1,11 +1,13 @@
 package com.jamitek.photosapp.api
 
 import android.util.Log
+import com.jamitek.photosapp.api.model.ApiMedia
+import com.jamitek.photosapp.api.model.ApiMediaStatus
+import com.jamitek.photosapp.api.model.ApiRemoteLibraryScanStatus
 import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.model.RemoteLibraryScanStatus
 import com.jamitek.photosapp.model.RemoteMedia
 import okhttp3.*
-import org.json.JSONException
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -14,7 +16,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ApiClient(
     private val serverConfigRepo: ServerConfigRepository,
-    private val serializer: MediaSerializer
+    private val serializer: ApiSerializer
 ) {
 
     companion object {
@@ -25,7 +27,10 @@ class ApiClient(
         .addInterceptor { chain ->
             val authHeader = serverConfigRepo.authHeader
             val request = chain.request().newBuilder()
-                .addHeader(authHeader.first, authHeader.second) //"Basic amFha2tvYWRtaW46U2FsYWluZW5TYW5hMTMyNCFA"
+                .addHeader(
+                    authHeader.first,
+                    authHeader.second
+                ) //"Basic amFha2tvYWRtaW46U2FsYWluZW5TYW5hMTMyNCFA"
                 .build()
             chain.proceed(request)
         }
@@ -65,8 +70,10 @@ class ApiClient(
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.code() == 200) {
                     val photos =
-                        response.body()?.let { serializer.parseRemoteMediasJson(it.string()) }
-                            ?: emptyList()
+                        response.body().parseOrNull {
+                            serializer.deserialize<List<ApiMedia>>(it)
+                                .map { body -> body.asRemoteMedia() }
+                        } ?: emptyList()
                     callback(true, photos)
                     Log.d(TAG, "getAllPhotos() - response: 200")
                 } else {
@@ -84,7 +91,7 @@ class ApiClient(
     }
 
     fun postMetaData(localMedia: LocalMedia): ApiResponse<RemoteMedia> {
-        val body = serializer.localMediaToMetaDataPostBody(localMedia)
+        val body = serializer.serialize(localMedia.asApiMedia())
 
         try {
             val response = retrofitService.postPhotoMetaData(
@@ -94,18 +101,13 @@ class ApiClient(
                 )
             ).execute()
 
-
-            var remoteMedia: RemoteMedia? = null
-            if (response.isSuccessful) {
-                remoteMedia = response.body()?.string()?.let {
-                    try {
-                        serializer.parseRemoteMediaJson(it)
-                    } catch (e: JSONException) {
-                        null
-                    }
+            val remoteMedia: RemoteMedia? = if (response.isSuccessful) {
+                response.body().parseOrNull { responseBody ->
+                    serializer.deserialize<ApiMedia>(responseBody).asRemoteMedia()
                 }
             } else {
                 Log.e(TAG, "POSTing media meta failed")
+                null
             }
 
             return ApiResponse(response.code(), remoteMedia)
@@ -161,8 +163,9 @@ class ApiClient(
         return try {
             val response = retrofitService.getRemoteLibraryScanStatus().execute()
             val statusObject = if (response.isSuccessful) {
-                response.body()?.string()?.let { bodyString ->
-                    serializer.parseRemoteLibraryScanStatusJson(bodyString)
+                response.body().parseOrNull {
+                    serializer.deserialize<ApiRemoteLibraryScanStatus>(it)
+                        .asRemoteLibraryScanStatus()
                 }
             } else {
                 null
@@ -173,4 +176,43 @@ class ApiClient(
             ApiResponse(null, null)
         }
     }
+
+    private fun <T> ResponseBody?.parseOrNull(block: (body: String) -> T): T? {
+        return try {
+            block(this!!.string())
+        } catch (e: Throwable) {
+            Log.e(TAG, "HTTP response parsing failed: ", e)
+            null
+        }
+    }
 }
+
+private fun ApiMedia.asRemoteMedia() = RemoteMedia(
+    serverId = this.id,
+    fileName = this.fileName,
+    fileSize = this.fileSize,
+    serverDirPath = this.dirPath,
+    hash = this.checksum,
+    dateTimeOriginal = this.dateTimeOriginal,
+    status = this.status.serialName // TODO Change to an enum in RemoteMedia
+)
+
+private fun LocalMedia.asApiMedia() = ApiMedia(
+    id = -1,
+    fileName = this.fileName,
+    fileSize = this.fileSize,
+    dirPath = "",
+    checksum = this.checksum,
+    dateTimeOriginal = "",
+    status = ApiMediaStatus.NotOnServer
+)
+
+private fun ApiRemoteLibraryScanStatus.asRemoteLibraryScanStatus() = RemoteLibraryScanStatus(
+    state = this.state.serialName,
+    mediaFilesDetected = this.mediaFilesDetected,
+    filesMoved = this.filesMoved,
+    filesRemoved = this.filesRemoved,
+    newFiles = this.newFiles,
+    filesToProcess = this.filesToProcess,
+    filesProcessed = this.filesProcessed
+)
