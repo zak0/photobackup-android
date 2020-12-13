@@ -51,7 +51,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appCo
                 .setRequiresCharging(true)
                 .build()
 
-            val request = PeriodicWorkRequestBuilder<BackupWorker>(1, TimeUnit.DAYS)
+            val request = PeriodicWorkRequestBuilder<BackupWorker>(12, TimeUnit.HOURS)
                 .setConstraints(constraints)
                 .build()
 
