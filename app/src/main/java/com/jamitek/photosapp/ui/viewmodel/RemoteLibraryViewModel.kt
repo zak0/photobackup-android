@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bumptech.glide.load.model.GlideUrl
 import com.jamitek.photosapp.model.RemoteMedia
-import com.jamitek.photosapp.networking.ServerConfigRepository
+import com.jamitek.photosapp.api.ServerConfigRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 
 class RemoteLibraryViewModel(

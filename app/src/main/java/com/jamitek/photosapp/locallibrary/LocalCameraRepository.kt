@@ -8,7 +8,7 @@ import com.jamitek.photosapp.database.KeyValueStore.Companion.KEY_CAMERA_DIR_URI
 import com.jamitek.photosapp.database.LocalMediaDb
 import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.model.RemoteMedia
-import com.jamitek.photosapp.networking.ApiClient
+import com.jamitek.photosapp.api.ApiClient
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.coroutines.*
 

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.jamitek.photosapp.Event
 import com.jamitek.photosapp.SettingsItem
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
-import com.jamitek.photosapp.networking.ServerConfigRepository
+import com.jamitek.photosapp.api.ServerConfigRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 import com.jamitek.photosapp.ui.BackupScreenEvent
 

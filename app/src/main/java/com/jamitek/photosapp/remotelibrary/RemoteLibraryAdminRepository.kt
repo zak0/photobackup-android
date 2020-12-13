@@ -1,10 +1,9 @@
 package com.jamitek.photosapp.remotelibrary
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jamitek.photosapp.model.RemoteLibraryScanStatus
-import com.jamitek.photosapp.networking.ApiClient
+import com.jamitek.photosapp.api.ApiClient
 import kotlinx.coroutines.*
 
 class RemoteLibraryAdminRepository(private val libraryApi: ApiClient) {

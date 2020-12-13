@@ -1,4 +1,4 @@
-package com.jamitek.photosapp.networking
+package com.jamitek.photosapp.api
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

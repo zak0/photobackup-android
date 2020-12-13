@@ -6,10 +6,10 @@ import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.SqliteLocalMediaDb
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 import com.jamitek.photosapp.locallibrary.LocalLibraryScanner
-import com.jamitek.photosapp.networking.ApiClient
-import com.jamitek.photosapp.networking.MediaSerializer
-import com.jamitek.photosapp.networking.ServerConfigRepository
-import com.jamitek.photosapp.networking.ServerConfigUseCase
+import com.jamitek.photosapp.api.ApiClient
+import com.jamitek.photosapp.api.MediaSerializer
+import com.jamitek.photosapp.api.ServerConfigRepository
+import com.jamitek.photosapp.api.ServerConfigUseCase
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 import com.jamitek.photosapp.storage.StorageAccessHelper

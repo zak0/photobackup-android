@@ -1,4 +1,4 @@
-package com.jamitek.photosapp.networking
+package com.jamitek.photosapp.api
 
 import android.util.Log
 import com.jamitek.photosapp.model.LocalMedia

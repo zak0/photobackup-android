@@ -1,8 +1,8 @@
 package com.jamitek.photosapp.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.jamitek.photosapp.networking.ServerSetupSettingsItemKey
-import com.jamitek.photosapp.networking.ServerConfigUseCase
+import com.jamitek.photosapp.api.ServerSetupSettingsItemKey
+import com.jamitek.photosapp.api.ServerConfigUseCase
 
 class ServerSetupViewModel(private val useCase: ServerConfigUseCase) : ViewModel() {
     val newConfig = useCase.newConfig

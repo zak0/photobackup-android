@@ -3,7 +3,7 @@ package com.jamitek.photosapp.ui.adapter
 import android.content.Context
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.SettingsItemKey
-import com.jamitek.photosapp.networking.ServerSetupSettingsItemKey
+import com.jamitek.photosapp.api.ServerSetupSettingsItemKey
 import com.jamitek.photosapp.ui.viewmodel.ServerSetupViewModel
 
 class ServerSetupAdapter(private val viewModel: ServerSetupViewModel) : SettingsAdapter() {

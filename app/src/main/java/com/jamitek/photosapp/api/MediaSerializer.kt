@@ -1,9 +1,12 @@
-package com.jamitek.photosapp.networking
+package com.jamitek.photosapp.api
 
 import android.util.Log
+import com.jamitek.photosapp.api.model.ApiMediaFile
 import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.model.RemoteLibraryScanStatus
 import com.jamitek.photosapp.model.RemoteMedia
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -48,11 +51,25 @@ class MediaSerializer {
     }
 
     fun parseRemoteMediaJson(json: JSONObject): RemoteMedia {
+        val jsonn = """
+                {
+                    "id": 1,
+                    "fileName": "IMG_20190606_202357.jpg",
+                    "fileSize": 330349,
+                    "dirPath": "/photosapp/media/2019-2020_pixel3",
+                    "checksum": "6eff5c285dceb0777fd902ee99ddf72b",
+                    "dateTimeOriginal": "2019:06:06 20:23:57",
+                    "status": "ready"
+                }
+        """.trimIndent()
+
+        val apiMediaFile = Json { ignoreUnknownKeys = true }.decodeFromString<ApiMediaFile>(jsonn)
+
         return RemoteMedia(
             json.getInt("id"),
             json.getString("fileName"),
             json.getLong("fileSize"),
-            "dirpath goes here",
+            json.getString("dirPath"),
             json.getString("checksum"),
             json.getString("dateTimeOriginal"),
             json.getString("status")
