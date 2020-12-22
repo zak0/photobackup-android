@@ -79,7 +79,7 @@ class ServerConfigRepository(private val keyValueStore: KeyValueStore) {
     fun authorizedGlideUrl(url: String) = GlideUrl(
         url,
         LazyHeaders.Builder()
-            .addHeader("Authorization", "Basic amFha2tvYWRtaW46U2FsYWluZW5TYW5hMTMyNCFA")
+            .addHeader(authHeader.first, authHeader.second)
             .build()
     )
 
