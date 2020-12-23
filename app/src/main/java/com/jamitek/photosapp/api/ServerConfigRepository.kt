@@ -74,8 +74,8 @@ class ServerConfigRepository(private val keyValueStore: KeyValueStore) {
         persistServerAddresses(newAllUrls)
     }
 
-    fun thumbnailUrl(photoIdOnServer: Int) = "${baseUrl}media/$photoIdOnServer/thumbnail"
-    fun photoUrl(photoIdOnServer: Int) = "${baseUrl}media/$photoIdOnServer/file"
+    fun thumbnailUrl(mediaIdOnServer: Int) = "${baseUrl}media/$mediaIdOnServer/thumbnail"
+    fun mediaUrl(mediaIdOnServer: Int) = "${baseUrl}media/$mediaIdOnServer/file"
     fun authorizedGlideUrl(url: String) = GlideUrl(
         url,
         LazyHeaders.Builder()

@@ -1,5 +1,6 @@
 package com.jamitek.photosapp.ui.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -60,9 +61,16 @@ class RemoteLibraryViewModel(
     }
 
     fun authorizedImageGlideUrl(mediaIdOnServer: Int): GlideUrl {
-        val imageUrl = serverConfigRepository.photoUrl(mediaIdOnServer)
+        val imageUrl = serverConfigRepository.mediaUrl(mediaIdOnServer)
         return serverConfigRepository.authorizedGlideUrl(imageUrl)
     }
 
+    fun mediaUri(mediaIdOnServer: Int): Uri {
+        return Uri.parse(serverConfigRepository.mediaUrl(mediaIdOnServer))
+    }
+
+    fun mediaUriHeaders(): Map<String, String> {
+        return mapOf(serverConfigRepository.authHeader)
+    }
 
 }
