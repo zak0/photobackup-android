@@ -21,6 +21,7 @@ class SqliteLocalMediaDb(context: Context) :
 
         object Column {
             const val ID = "id"
+            const val TYPE = "type"
             const val FILENAME = "filename"
             const val DIRECTORY_URI = "directoryuri"
             const val URI = "uri"
@@ -39,6 +40,11 @@ class SqliteLocalMediaDb(context: Context) :
                 QueryBuilder.FieldType.INTEGER,
                 nullable = false,
                 primaryKey = true
+            )
+            .addField(
+                LocalMediaSchema.Column.TYPE,
+                QueryBuilder.FieldType.TEXT,
+                nullable = false
             )
             .addField(
                 LocalMediaSchema.Column.FILENAME,
@@ -93,6 +99,7 @@ class SqliteLocalMediaDb(context: Context) :
         // If the media doesn't already exist in the DB, INSERT it.
         if (localMedia.id > 0) {
             val sql = QueryBuilder(QueryBuilder.QueryType.UPDATE, LocalMediaSchema.TABLE)
+                .addTextValue(LocalMediaSchema.Column.TYPE, localMedia.type)
                 .addTextValue(LocalMediaSchema.Column.FILENAME, localMedia.fileName)
                 .addTextValue(LocalMediaSchema.Column.DIRECTORY_URI, localMedia.directoryUri)
                 .addTextValue(LocalMediaSchema.Column.URI, localMedia.uri)
@@ -107,6 +114,7 @@ class SqliteLocalMediaDb(context: Context) :
             safeTransaction { db.execSQL(sql) }
         } else {
             val sql = QueryBuilder(QueryBuilder.QueryType.INSERT, LocalMediaSchema.TABLE)
+                .addTextValue(LocalMediaSchema.Column.TYPE, localMedia.type)
                 .addTextValue(LocalMediaSchema.Column.FILENAME, localMedia.fileName)
                 .addTextValue(LocalMediaSchema.Column.DIRECTORY_URI, localMedia.directoryUri)
                 .addTextValue(LocalMediaSchema.Column.URI, localMedia.uri)
@@ -148,6 +156,7 @@ class SqliteLocalMediaDb(context: Context) :
 
     private fun cursorToLocalMedia(cursor: Cursor): LocalMedia {
         val id = cursor.getInt(cursor.getColumnIndex(LocalMediaSchema.Column.ID))
+        val type = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.TYPE))
         val fileName = cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.FILENAME))
         val directoryUri =
             cursor.getString(cursor.getColumnIndex(LocalMediaSchema.Column.DIRECTORY_URI))
@@ -157,7 +166,7 @@ class SqliteLocalMediaDb(context: Context) :
         val isUploaded =
             cursor.getInt(cursor.getColumnIndex(LocalMediaSchema.Column.IS_UPLOADED)) == 1
 
-        return LocalMedia(id, fileName, directoryUri, uri, fileSize, checksum, isUploaded)
+        return LocalMedia(id, type, fileName, directoryUri, uri, fileSize, checksum, isUploaded)
     }
 
     private fun safeTransaction(block: () -> Unit): Boolean {

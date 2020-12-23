@@ -14,7 +14,8 @@ class StorageAccessHelper(private val context: Context) {
     companion object {
         private const val TAG = "StorageAccessHelper"
         const val REQUEST_CODE_SET_CAMERA_DIR = 100
-        val SUPPORTED_EXTENSIONS = listOf("png", "jpg") // TODO Add video files
+        val SUPPORTED_PICTURE_EXTENSIONS = listOf("png", "jpg")
+        val SUPPORTED_VIDEO_EXTENSIONS = listOf("mp4")
         val SAF_ACCESS_INTENT = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
             addFlags(
                 Intent.FLAG_GRANT_READ_URI_PERMISSION

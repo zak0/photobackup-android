@@ -201,7 +201,7 @@ private fun ApiMedia.asRemoteMedia() = RemoteMedia(
 
 private fun LocalMedia.asApiMedia() = ApiMedia(
     id = -1,
-    type = ApiMediaType.Picture, // TODO Handle Videos too!
+    type = ApiMediaType.fromString(this.type),
     fileName = this.fileName,
     fileSize = this.fileSize,
     dirPath = "",

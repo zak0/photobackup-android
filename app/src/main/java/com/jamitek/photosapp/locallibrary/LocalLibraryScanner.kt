@@ -73,15 +73,18 @@ class LocalLibraryScanner(private val context: Context) {
                 }
 
                 // Only accept media files
-                if (fileName.split(".").last()
-                        .toLowerCase(Locale.ROOT) in StorageAccessHelper.SUPPORTED_EXTENSIONS
-                ) {
+                val fileExtension = fileName.split(".").last().toLowerCase(Locale.ROOT)
+                val isPicture = fileExtension in StorageAccessHelper.SUPPORTED_PICTURE_EXTENSIONS
+                val isVideo = fileExtension in StorageAccessHelper.SUPPORTED_VIDEO_EXTENSIONS
+                if (isPicture || isVideo) {
                     val fileSize = childDocFile.length()
-                    val digest = if (calculateChecksum) calculateMd5ForFile(context, childDocFile) else ""
+                    val digest =
+                        if (calculateChecksum) calculateMd5ForFile(context, childDocFile) else ""
                     val fileUriString = childDocFile.uri.toString()
                     onMediaFile(
                         LocalMedia(
                             -1,
+                            if (isPicture) "Picture" else if (isVideo) "Video" else error("Media must have a type!"),
                             fileName,
                             dirUriString,
                             fileUriString,
