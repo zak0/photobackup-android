@@ -22,31 +22,42 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
     val allPhotos: LiveData<List<RemoteMedia>> = mutableAllPhotos
 
     /**
-     * Photos for "timeline" neatly organized into per-date buckets.
+     * Media for "timeline" neatly organized into per-date buckets.
      */
-    private val mutablePhotosPerDate =
+    private val mutableMediaPerDate =
         MutableLiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>>().apply {
             value = ArrayList()
         }
-    val photosPerDate: LiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>> =
-        mutablePhotosPerDate
+    val mediaPerDate: LiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>> =
+        mutableMediaPerDate
+
+    /**
+     * Media in monthly buckets
+     */
+    private val mutableMediaPerMonth =
+        MutableLiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>>().apply {
+            value = ArrayList()
+        }
+    val mediaPerMonth: LiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>> =
+        mutableMediaPerMonth
 
     fun fetchRemotePhotos() {
         libraryApi.getAllMedia { success, photos ->
             GlobalScope.launch {
                 arrangeIntoDateBuckets(photos)
+                arrangeIntoMonthBuckets(photos)
             }
         }
     }
 
     /**
-     * Arranges photos into "buckets" based on their date. This allows for nice grouping of photos
+     * Arranges media into "buckets" based on their date. This allows for nice grouping of media
      * and displaying then on a timeline.
      *
-     * Only local photos and remote photos on state [RemoteMedia.Status.READY] are included in the
+     * Only remote media on state [RemoteMedia.Status.READY] is included in the
      * buckets.
      *
-     * The resulting grouping is stored in observable [photosPerDate] [ArrayList].
+     * The resulting grouping is stored in observable [mediaPerDate] [ArrayList].
      */
     private suspend fun arrangeIntoDateBuckets(remoteMedia: List<RemoteMedia>) {
         val newPhotosPerDate = ArrayList<Pair<String, ArrayList<RemoteMedia>>>()
@@ -98,8 +109,57 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
 
         Log.d(TAG, "Arrange by date - Done. Notifying observers...")
         withContext(Dispatchers.Main) {
-            mutablePhotosPerDate.value = newPhotosPerDate
+            mutableMediaPerDate.value = newPhotosPerDate
             mutableAllPhotos.value = newAllPhotos
+        }
+    }
+
+    /**
+     * Arranges media into "buckets" based on the month they were created. This allows for nice
+     * grouping of media and displaying then on a timeline.
+     *
+     * Ony remote media on state [RemoteMedia.Status.READY] are included in the
+     * buckets.
+     *
+     * The resulting grouping is stored in observable [mediaPerMonth] [ArrayList].
+     */
+    private suspend fun arrangeIntoMonthBuckets(remoteMedia: List<RemoteMedia>) {
+        val newPhotosPerMonth = ArrayList<Pair<String, ArrayList<RemoteMedia>>>()
+
+        var currentMonth = ""
+        var photosForCurrentMonth = ArrayList<RemoteMedia>()
+
+        remoteMedia.sortedByDescending { it.dateTimeOriginal }.forEach { photo ->
+            // Skip if this is not on state READY.
+            if (photo.status != RemoteMedia.Status.READY) {
+                Log.d(TAG, "Arrange by date - skipping unready ${photo.fileName}")
+                return@forEach
+            }
+
+            val month = DateUtil.exifDateToNiceMonthAndYear(photo.dateTimeOriginal)
+
+            if (currentMonth != month) {
+                if (photosForCurrentMonth.size > 0) {
+                    val pair = Pair(currentMonth, photosForCurrentMonth)
+                    newPhotosPerMonth.add(pair)
+                }
+                currentMonth = month
+                photosForCurrentMonth = ArrayList()
+            }
+
+            photosForCurrentMonth.add(photo)
+
+        }
+
+        // Add the last pair
+        val pair = Pair(currentMonth, photosForCurrentMonth)
+        newPhotosPerMonth.add(pair)
+
+        newPhotosPerMonth.sortByDescending { it.second.firstOrNull()?.dateTimeOriginal }
+
+        Log.d(TAG, "Arrange by month - Done. Notifying observers...")
+        withContext(Dispatchers.Main) {
+            mutableMediaPerMonth.value = newPhotosPerMonth
         }
     }
 }

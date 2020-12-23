@@ -31,7 +31,7 @@ class RemoteLibraryViewModel(
     private val mutableSelectedPhoto = MutableLiveData<RemoteMedia>().apply { value = null }
     val selectedRemoteMedia: LiveData<RemoteMedia> = mutableSelectedPhoto
 
-    val photosPerDate = repository.photosPerDate
+    val photosPerDate = repository.mediaPerMonth
 
     /**
      * Callback for when a thumbnail is clicked on library screen. Marks the clicked image as
