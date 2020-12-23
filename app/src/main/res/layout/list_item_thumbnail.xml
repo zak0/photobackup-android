@@ -10,11 +10,25 @@
         android:id="@+id/image"
         android:layout_width="128dp"
         android:layout_height="128dp"
+        android:src="@drawable/ic_broken_image_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/ic_broken_image_24dp"
         tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/playButtonOverlay"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_play_arrow_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/image"
+        app:layout_constraintEnd_toEndOf="@id/image"
+        app:layout_constraintStart_toStartOf="@id/image"
+        app:layout_constraintTop_toTopOf="@id/image"
+        app:tint="@android:color/white"
+        tools:ignore="ContentDescription"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

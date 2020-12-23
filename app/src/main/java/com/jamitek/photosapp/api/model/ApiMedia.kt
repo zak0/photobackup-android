@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ApiMedia(
     val id: Int,
+    val type: ApiMediaType,
     val fileName: String,
     val fileSize: Long,
     val dirPath: String,

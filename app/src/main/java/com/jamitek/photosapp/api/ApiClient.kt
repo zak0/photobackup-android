@@ -3,6 +3,7 @@ package com.jamitek.photosapp.api
 import android.util.Log
 import com.jamitek.photosapp.api.model.ApiMedia
 import com.jamitek.photosapp.api.model.ApiMediaStatus
+import com.jamitek.photosapp.api.model.ApiMediaType
 import com.jamitek.photosapp.api.model.ApiRemoteLibraryScanStatus
 import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.model.RemoteLibraryScanStatus
@@ -189,6 +190,7 @@ class ApiClient(
 
 private fun ApiMedia.asRemoteMedia() = RemoteMedia(
     serverId = this.id,
+    type = this.type.name,
     fileName = this.fileName,
     fileSize = this.fileSize,
     serverDirPath = this.dirPath,
@@ -199,6 +201,7 @@ private fun ApiMedia.asRemoteMedia() = RemoteMedia(
 
 private fun LocalMedia.asApiMedia() = ApiMedia(
     id = -1,
+    type = ApiMediaType.Picture, // TODO Handle Videos too!
     fileName = this.fileName,
     fileSize = this.fileSize,
     dirPath = "",

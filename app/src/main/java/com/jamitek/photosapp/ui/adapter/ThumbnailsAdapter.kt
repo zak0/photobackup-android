@@ -36,11 +36,14 @@ class ThumbnailsAdapter(
     override fun getItemCount(): Int = dataSet.size
 
     override fun onBindViewHolder(holder: ThumbnailsViewHolder, position: Int) {
-        val photo = dataSet[position]
+        val media = dataSet[position]
 
         // TODO Primarily try to use local thumbnails to prevent having to load anything over the
         //  network. Check local lib repo for this. FYI: Glide supports URIs as URLs.
-        val thumbnailAddress = viewModel.authorizedThumbnailGlideUrl(photo.serverId)
+        val thumbnailAddress = viewModel.authorizedThumbnailGlideUrl(media.serverId)
+
+        holder.itemView.playButtonOverlay.visibility =
+            if (media.type == "Video") View.VISIBLE else View.GONE
 
         Glide
             .with(holder.itemView)
@@ -50,7 +53,7 @@ class ThumbnailsAdapter(
             .into(holder.itemView.image)
 
         holder.itemView.setOnClickListener {
-            viewModel.onThumbnailClicked(photo)
+            viewModel.onThumbnailClicked(media)
         }
     }
 
