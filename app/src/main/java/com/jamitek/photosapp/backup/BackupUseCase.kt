@@ -47,10 +47,10 @@ class BackupUseCase(
     private fun buildSettings(): List<SettingsItem> {
         return listOf(
             SettingsItem(BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
-            SettingsItem(BackupSettingItemKey.ITEM_PHOTOS_STATUS) {
+            SettingsItem(BackupSettingItemKey.ITEM_PHOTOS_STATUS, value = {
                 "${cameraRepository.status.value?.localFilesCount ?: -1} photos - Tap to rescan & backup"
-            },
-            SettingsItem(BackupSettingItemKey.ITEM_BACKUP_STATUS) {
+            }),
+            SettingsItem(BackupSettingItemKey.ITEM_BACKUP_STATUS, value = {
                 cameraRepository.status.value?.let { status ->
                     when {
                         status.isScanning -> "Scanning local files..."
@@ -61,19 +61,28 @@ class BackupUseCase(
                         }
                     }
                 } ?: "Error - Unable to read status"
-            },
-            SettingsItem(BackupSettingItemKey.ITEM_CAMERA_DIR) {
+            }),
+            SettingsItem(BackupSettingItemKey.ITEM_CAMERA_DIR, value = {
                 cameraRepository.cameraDirUriString?.let {
                     "Tap to change"
                 } ?: "Tap to set"
-            },
+            }),
+            SettingsItem(
+                BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE,
+                value = { "write me" },
+                isToggled = { true }
+            ),
+            SettingsItem(
+                BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE,
+                value = { "write me" }
+            ),
             SettingsItem(BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS),
             SettingsItem(BackupSettingItemKey.ITEM_CONNECTION_STATUS),
-            SettingsItem(BackupSettingItemKey.ITEM_SERVER_DETAILS) {
+            SettingsItem(BackupSettingItemKey.ITEM_SERVER_DETAILS, value = {
                 serverConfigRepository.baseUrl.takeUnless { it.isEmpty() } ?: "Tap to set"
-            },
+            }),
             SettingsItem(BackupSettingItemKey.SECTION_TITLE_SERVER_ADMIN),
-            SettingsItem(BackupSettingItemKey.ITEM_RESCAN_LIBRARY) {
+            SettingsItem(BackupSettingItemKey.ITEM_RESCAN_LIBRARY, value = {
                 serverAdminRepository.libraryScanStatus.value?.let {
                     """
                         Server scan state: ${it.state}
@@ -85,7 +94,7 @@ class BackupUseCase(
                         filesProcessed: ${it.filesProcessed}
                     """.trimIndent()
                 } ?: "Server scan state: UNKNOWN"
-            }
+            })
         )
     }
 

@@ -58,6 +58,14 @@ abstract class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsVi
         holder.itemView.title.text = getItemTitle(item.key, holder.context)
         holder.itemView.value.text = item.value()
         holder.itemView.setOnClickListener { onItemClicked(item.key) }
+
+        // Handling of toggle, if this item is toggleable
+        if (item.key.isToggleable) {
+            holder.itemView.toggle.visibility = View.VISIBLE
+            holder.itemView.toggle.isChecked = item.isToggled()
+        } else {
+            holder.itemView.toggle.visibility = View.GONE
+        }
     }
 
 

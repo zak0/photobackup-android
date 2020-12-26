@@ -55,16 +55,16 @@ class ServerConfigUseCase(
 
     private fun buildSettings(): List<SettingsItem> = listOf(
         SettingsItem(ServerSetupSettingsItemKey.SectionTitleAddress),
-        SettingsItem(ServerSetupSettingsItemKey.ItemAddress) {
+        SettingsItem(ServerSetupSettingsItemKey.ItemAddress, value = {
             newConfig.value?.first ?: "Not set"
-        },
+        }),
         SettingsItem(ServerSetupSettingsItemKey.SectionTitleCredentials),
-        SettingsItem(ServerSetupSettingsItemKey.ItemUsername) {
+        SettingsItem(ServerSetupSettingsItemKey.ItemUsername, value = {
             newConfig.value?.second ?: "Not set"
-        },
-        SettingsItem(ServerSetupSettingsItemKey.ItemPassword) {
+        }),
+        SettingsItem(ServerSetupSettingsItemKey.ItemPassword, value = {
             newConfig.value?.third?.let { "****************" } ?: "Not set"
-        }
+        })
     )
 
 }

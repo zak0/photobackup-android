@@ -16,6 +16,8 @@ class BackupAdapter(private val viewModel: BackupViewModel) : SettingsAdapter() 
             BackupSettingItemKey.ITEM_PHOTOS_STATUS -> R.string.backupPhotosStatus
             BackupSettingItemKey.ITEM_BACKUP_STATUS -> R.string.backupBackupStatus
             BackupSettingItemKey.ITEM_CAMERA_DIR -> R.string.backupCameraDir
+            BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE -> R.string.backupPhotosToggle
+            BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE -> R.string.backupVideosToggle
             BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS -> R.string.backupSectionTitleConnectionStatus
             BackupSettingItemKey.ITEM_CONNECTION_STATUS -> R.string.backupConnectionStatus
             BackupSettingItemKey.ITEM_SERVER_DETAILS -> R.string.backupServerDetails
