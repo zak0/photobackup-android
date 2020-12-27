@@ -14,4 +14,8 @@ class BackupViewModel(private val useCase: BackupUseCase) : ViewModel() {
         useCase.onItemClicked(key)
     }
 
+    fun onItemToggled(key: BackupSettingItemKey, isChecked: Boolean) {
+        useCase.onItemToggled(key, isChecked)
+    }
+
 }

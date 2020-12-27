@@ -23,5 +23,7 @@ class ServerSetupAdapter(private val viewModel: ServerSetupViewModel) : Settings
         viewModel.onItemClicked(key as ServerSetupSettingsItemKey)
     }
 
+    override fun onItemToggled(key: SettingsItemKey, isChecked: Boolean) = Unit
+
     override val items = viewModel.items.value ?: emptyList()
 }

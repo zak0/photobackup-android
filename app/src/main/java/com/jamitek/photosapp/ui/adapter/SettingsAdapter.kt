@@ -21,6 +21,7 @@ abstract class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsVi
     protected abstract val items: List<SettingsItem>
     protected abstract fun getItemTitle(itemKey: SettingsItemKey, context: Context): String
     protected abstract fun onItemClicked(key: SettingsItemKey)
+    protected abstract fun onItemToggled(key: SettingsItemKey, isChecked: Boolean)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingsViewHolder {
         return SettingsViewHolder(
@@ -55,16 +56,36 @@ abstract class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsVi
     }
 
     private fun bindSettingItem(holder: SettingsViewHolder, item: SettingsItem) {
-        holder.itemView.title.text = getItemTitle(item.key, holder.context)
-        holder.itemView.value.text = item.value()
-        holder.itemView.setOnClickListener { onItemClicked(item.key) }
+        holder.itemView.apply {
+            title.text = getItemTitle(item.key, holder.context)
+            value.text = item.value()
 
-        // Handling of toggle, if this item is toggleable
-        if (item.key.isToggleable) {
-            holder.itemView.toggle.visibility = View.VISIBLE
-            holder.itemView.toggle.isChecked = item.isToggled()
-        } else {
-            holder.itemView.toggle.visibility = View.GONE
+            val isToggleable = item.key.isToggleable
+            setOnClickListener {
+                if (isToggleable) {
+                    // Clicking on an toggleable setting item will just toggle it
+                    toggle.toggle()
+                } else {
+                    // Clicking on a "normal" setting item will trigger its onClick action
+                    onItemClicked(item.key)
+                }
+            }
+
+            // Handling of toggle, if this item is toggleable
+            if (isToggleable) {
+                toggle.setOnCheckedChangeListener(null)
+                toggle.visibility = View.VISIBLE
+                toggle.isChecked = item.isToggled()
+                toggle.setOnCheckedChangeListener { _, isChecked ->
+                    onItemToggled(
+                        item.key,
+                        isChecked
+                    )
+                    notifyItemChanged(items.indexOf(item))
+                }
+            } else {
+                toggle.visibility = View.GONE
+            }
         }
     }
 

@@ -7,12 +7,14 @@ import com.jamitek.photosapp.Event
 import com.jamitek.photosapp.SettingsItem
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 import com.jamitek.photosapp.api.ServerConfigRepository
+import com.jamitek.photosapp.appsettings.AppSettingsRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 import com.jamitek.photosapp.ui.BackupScreenEvent
 
 class BackupUseCase(
     private val serverConfigRepository: ServerConfigRepository,
     private val serverAdminRepository: RemoteLibraryAdminRepository,
+    private val appSettingsRepository: AppSettingsRepository,
     private val cameraRepository: LocalCameraRepository
 ) {
 
@@ -37,6 +39,20 @@ class BackupUseCase(
             )
 
             else -> Unit //error("No click handler for $key")
+        }
+    }
+
+    fun onItemToggled(key: BackupSettingItemKey, isChecked: Boolean) {
+        when (key) {
+            BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE -> {
+                appSettingsRepository.backupPhotos = isChecked
+            }
+
+            BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE -> {
+                appSettingsRepository.backupVideos = isChecked
+            }
+
+            else -> Unit
         }
     }
 
@@ -69,12 +85,19 @@ class BackupUseCase(
             }),
             SettingsItem(
                 BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE,
-                value = { "write me" },
-                isToggled = { true }
+                value = {
+                    if (appSettingsRepository.backupPhotos) "Photos will be backed up"
+                    else "Photos will not be backed up"
+                },
+                isToggled = { appSettingsRepository.backupPhotos }
             ),
             SettingsItem(
                 BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE,
-                value = { "write me" }
+                value = {
+                    if (appSettingsRepository.backupVideos) "Videos will be backed up"
+                    else "Videos will not be backed up"
+                },
+                isToggled = { appSettingsRepository.backupVideos }
             ),
             SettingsItem(BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS),
             SettingsItem(BackupSettingItemKey.ITEM_CONNECTION_STATUS),

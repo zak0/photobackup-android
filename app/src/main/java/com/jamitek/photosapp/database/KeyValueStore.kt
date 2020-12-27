@@ -24,6 +24,14 @@ class KeyValueStore(context: Context) {
         sharedPrefs.edit().putString(key, value).apply()
     }
 
+    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean {
+        return sharedPrefs.getBoolean(key, defaultValue)
+    }
+
+    fun putBoolean(key: String, value: Boolean) {
+        sharedPrefs.edit().putBoolean(key, value).apply()
+    }
+
     fun clear(key: String) {
         sharedPrefs.edit().clear().apply()
     }

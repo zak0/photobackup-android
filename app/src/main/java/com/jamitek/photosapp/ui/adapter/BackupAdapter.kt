@@ -10,22 +10,26 @@ class BackupAdapter(private val viewModel: BackupViewModel) : SettingsAdapter() 
 
     override val items = viewModel.items.value ?: emptyList()
 
-    override fun getItemTitle(itemKey: SettingsItemKey, context: Context): String = context.getString(
-        when (itemKey as BackupSettingItemKey) {
-            BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS -> R.string.backupSectionTitleBackupStatus
-            BackupSettingItemKey.ITEM_PHOTOS_STATUS -> R.string.backupPhotosStatus
-            BackupSettingItemKey.ITEM_BACKUP_STATUS -> R.string.backupBackupStatus
-            BackupSettingItemKey.ITEM_CAMERA_DIR -> R.string.backupCameraDir
-            BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE -> R.string.backupPhotosToggle
-            BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE -> R.string.backupVideosToggle
-            BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS -> R.string.backupSectionTitleConnectionStatus
-            BackupSettingItemKey.ITEM_CONNECTION_STATUS -> R.string.backupConnectionStatus
-            BackupSettingItemKey.ITEM_SERVER_DETAILS -> R.string.backupServerDetails
-            BackupSettingItemKey.SECTION_TITLE_SERVER_ADMIN -> R.string.backupSectionTitleServerAdmin
-            BackupSettingItemKey.ITEM_RESCAN_LIBRARY -> R.string.backupRescanLibrary
-        }
-    )
+    override fun getItemTitle(itemKey: SettingsItemKey, context: Context): String =
+        context.getString(
+            when (itemKey as BackupSettingItemKey) {
+                BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS -> R.string.backupSectionTitleBackupStatus
+                BackupSettingItemKey.ITEM_PHOTOS_STATUS -> R.string.backupPhotosStatus
+                BackupSettingItemKey.ITEM_BACKUP_STATUS -> R.string.backupBackupStatus
+                BackupSettingItemKey.ITEM_CAMERA_DIR -> R.string.backupCameraDir
+                BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE -> R.string.backupPhotosToggle
+                BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE -> R.string.backupVideosToggle
+                BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS -> R.string.backupSectionTitleConnectionStatus
+                BackupSettingItemKey.ITEM_CONNECTION_STATUS -> R.string.backupConnectionStatus
+                BackupSettingItemKey.ITEM_SERVER_DETAILS -> R.string.backupServerDetails
+                BackupSettingItemKey.SECTION_TITLE_SERVER_ADMIN -> R.string.backupSectionTitleServerAdmin
+                BackupSettingItemKey.ITEM_RESCAN_LIBRARY -> R.string.backupRescanLibrary
+            }
+        )
 
-    override fun onItemClicked(key: SettingsItemKey) = viewModel.onItemClicked(key as BackupSettingItemKey)
+    override fun onItemClicked(key: SettingsItemKey) =
+        viewModel.onItemClicked(key as BackupSettingItemKey)
 
+    override fun onItemToggled(key: SettingsItemKey, isChecked: Boolean) =
+        viewModel.onItemToggled(key as BackupSettingItemKey, isChecked)
 }
