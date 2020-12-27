@@ -64,7 +64,7 @@ class BackupUseCase(
         return listOf(
             SettingsItem(BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
             SettingsItem(BackupSettingItemKey.ITEM_PHOTOS_STATUS, value = {
-                "${cameraRepository.status.value?.localFilesCount ?: -1} photos - Tap to rescan & backup"
+                "${cameraRepository.status.value?.localFilesCount ?: -1} photos/videos - Tap to rescan & backup"
             }),
             SettingsItem(BackupSettingItemKey.ITEM_BACKUP_STATUS, value = {
                 cameraRepository.status.value?.let { status ->
