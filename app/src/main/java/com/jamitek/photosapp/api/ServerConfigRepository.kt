@@ -1,7 +1,5 @@
 package com.jamitek.photosapp.api
 
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
 import com.jamitek.photosapp.database.KeyValueStore
 import org.json.JSONArray
 import java.util.*
@@ -76,12 +74,6 @@ class ServerConfigRepository(private val keyValueStore: KeyValueStore) {
 
     fun thumbnailUrl(mediaIdOnServer: Int) = "${baseUrl}media/$mediaIdOnServer/thumbnail"
     fun mediaUrl(mediaIdOnServer: Int) = "${baseUrl}media/$mediaIdOnServer/file"
-    fun authorizedGlideUrl(url: String) = GlideUrl(
-        url,
-        LazyHeaders.Builder()
-            .addHeader(authHeader.first, authHeader.second)
-            .build()
-    )
 
     fun setCredentials(username: String, password: String) {
         val authString = "$username:$password"

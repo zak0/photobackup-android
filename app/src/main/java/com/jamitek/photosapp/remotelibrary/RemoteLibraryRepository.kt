@@ -19,7 +19,7 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
 
     private val mutableAllPhotos =
         MutableLiveData<List<RemoteMedia>>().apply { value = emptyList() }
-    val allPhotos: LiveData<List<RemoteMedia>> = mutableAllPhotos
+    val allMedia: LiveData<List<RemoteMedia>> = mutableAllPhotos
 
     /**
      * Media for "timeline" neatly organized into per-date buckets.

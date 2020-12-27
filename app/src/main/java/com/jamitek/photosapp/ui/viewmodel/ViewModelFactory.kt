@@ -9,12 +9,11 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when (modelClass) {
-            LocalCameraViewModel::class.java -> LocalCameraViewModel(
-                dependencyRoot.localCameraRepository
+            RootViewModel::class.java -> RootViewModel(
+                dependencyRoot.setCameraDirUseCase
             )
             RemoteLibraryViewModel::class.java -> RemoteLibraryViewModel(
-                dependencyRoot.serverConfigRepository,
-                dependencyRoot.remoteLibraryRepository
+                dependencyRoot.remoteLibraryBrowserUseCase
             )
             BackupViewModel::class.java -> BackupViewModel(
                 dependencyRoot.backupUseCase

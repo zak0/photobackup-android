@@ -25,7 +25,7 @@ class ViewerFragment : Fragment(R.layout.fragment_viewer) {
         viewPager.adapter = viewerAdapter
 
         viewModel.selectedRemoteMedia.value?.let { photo ->
-            viewPager.setCurrentItem(viewModel.photos.value?.indexOf(photo) ?: 0, false)
+            viewPager.setCurrentItem(viewModel.allMedia.value?.indexOf(photo) ?: 0, false)
         }
 
         viewModel.onImageViewerOpened()

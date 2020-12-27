@@ -14,7 +14,7 @@ import androidx.navigation.ui.NavigationUI
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.extension.dependencyRoot
 import com.jamitek.photosapp.storage.StorageAccessHelper
-import com.jamitek.photosapp.ui.viewmodel.LocalCameraViewModel
+import com.jamitek.photosapp.ui.viewmodel.RootViewModel
 import com.jamitek.photosapp.ui.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
     private val viewModelFactory by lazy { ViewModelFactory(dependencyRoot) }
     private val localCameraViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(
-            LocalCameraViewModel::class.java
+            RootViewModel::class.java
         )
     }
 

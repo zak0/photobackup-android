@@ -19,10 +19,10 @@ class TimelineAdapter(private val viewModel: RemoteLibraryViewModel) : RecyclerV
         return TimelineViewHolder(view)
     }
 
-    override fun getItemCount(): Int = viewModel.photosPerDate.value?.size ?: 0
+    override fun getItemCount(): Int = viewModel.groupedMedia.value?.size ?: 0
 
     override fun onBindViewHolder(holder: TimelineViewHolder, position: Int) {
-        viewModel.photosPerDate.value?.get(position)?.also { timelineItem ->
+        viewModel.groupedMedia.value?.get(position)?.also { timelineItem ->
             holder.itemView.dateLabel.text = timelineItem.first
 
             holder.itemView.recycler.adapter = ThumbnailsAdapter(viewModel, timelineItem.second)

@@ -22,10 +22,10 @@ class ViewerAdapter(
         return ViewerViewHolder(view)
     }
 
-    override fun getItemCount(): Int = viewModel.photos.value?.size ?: 0
+    override fun getItemCount(): Int = viewModel.allMedia.value?.size ?: 0
 
     override fun onBindViewHolder(holder: ViewerViewHolder, position: Int) {
-        viewModel.photos.value?.get(position)?.also { media ->
+        viewModel.allMedia.value?.get(position)?.also { media ->
             // TODO Primarily try to use local thumbnails to prevent having to load anything over the
             //  network. User local lib repo for this. Glide supports local file URIs directly.
 

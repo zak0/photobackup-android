@@ -50,7 +50,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
         })
 
-        viewModel.photosPerDate.observe(viewLifecycleOwner, Observer {
+        viewModel.groupedMedia.observe(viewLifecycleOwner, Observer {
             adapter.notifyDataSetChanged()
         })
 

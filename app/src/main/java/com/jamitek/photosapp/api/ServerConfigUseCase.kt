@@ -10,13 +10,16 @@ class ServerConfigUseCase(
     private val repo: ServerConfigRepository
 ) {
 
+    /**
+     * Triple<Server URL, username, password>
+     */
     private val mutableNewConfig =
         MutableLiveData<Triple<String?, String?, String?>>(Triple(null, null, null))
     val newConfig: LiveData<Triple<String?, String?, String?>> = mutableNewConfig
 
     private val mutableUiEvent = MutableLiveData<Event<ServerSetupScreenEvent>>()
     val uiEvent: LiveData<Event<ServerSetupScreenEvent>> = mutableUiEvent
-    val items: LiveData<List<SettingsItem>> = MutableLiveData<List<SettingsItem>>(buildSettings())
+    val items: LiveData<List<SettingsItem>> = MutableLiveData(buildSettings())
 
     fun onItemClicked(key: ServerSetupSettingsItemKey) {
         when (key) {
