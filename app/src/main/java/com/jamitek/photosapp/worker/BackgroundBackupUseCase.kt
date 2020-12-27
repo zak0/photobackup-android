@@ -3,6 +3,7 @@ package com.jamitek.photosapp.worker
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import com.jamitek.photosapp.appsettings.AppSettingsRepository
 import com.jamitek.photosapp.locallibrary.LocalCameraLibraryStatus
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class BackgroundBackupUseCase(
-    private val cameraRepository: LocalCameraRepository
+    private val cameraRepository: LocalCameraRepository,
+    private val appSettingsRepository: AppSettingsRepository
 ) {
 
     private companion object {
@@ -62,7 +64,10 @@ class BackgroundBackupUseCase(
                 } else if (workStatus.value == WorkStatus.Scanning) {
                     // Transition to Idle means that we can now start uploading if
                     // previous state was Scanning
-                    cameraRepository.backup()
+                    cameraRepository.backup(
+                        uploadPhotos = appSettingsRepository.backupPhotos,
+                        uploadVideos = appSettingsRepository.backupVideos
+                    )
                     // No need to emit a new state, repository should do it once
                     // upload is started. (Even if there's nothing to upload, it should
                     // still start the upload process, and reflect this in its status.)

@@ -56,6 +56,11 @@ class DependencyRoot(app: Application) {
         )
     }
     val serverConfigUseCase by lazy { ServerConfigUseCase(serverConfigRepository) }
-    val backgroundBackupUseCase by lazy { BackgroundBackupUseCase(localCameraRepository) }
+    val backgroundBackupUseCase by lazy {
+        BackgroundBackupUseCase(
+            localCameraRepository,
+            appSettingsRepository
+        )
+    }
 
 }

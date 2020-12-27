@@ -9,6 +9,7 @@ import com.jamitek.photosapp.database.LocalMediaDb
 import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.api.ApiClient
+import com.jamitek.photosapp.api.model.ApiMediaType
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import kotlinx.coroutines.*
 
@@ -123,7 +124,7 @@ class LocalCameraRepository(
      *
      * Backup will not be initiated if a scan is in progress.
      */
-    fun backup() {
+    fun backup(uploadPhotos: Boolean, uploadVideos: Boolean) {
         if (scanJob?.isActive == true) {
             Log.d(TAG, "Backup cannot be started while scan is in progress...")
             return
@@ -135,11 +136,27 @@ class LocalCameraRepository(
             return
         }
 
+        // Sanity check for inputs
+        if (!uploadPhotos && !uploadVideos) {
+            Log.e(TAG, "Neither photos nor videos are to be uploaded, returning...")
+            return
+        }
+
         var consecutiveFailures = 0
         updateStatus(false, true)
         backupJob = CoroutineScope(Dispatchers.IO).launch {
-            // Get all files that don't appear to be backed up yet
-            cache.filter { !it.uploaded }.forEach { localMedia ->
+            // Get all files that don't appear to be backed up yet.
+            // Also take only photos and/or videos based on params of this method call.
+            cache.filter {
+                val onlyPhotos = uploadPhotos && !uploadVideos
+                val onlyVideos = !uploadPhotos && uploadVideos
+
+                !it.uploaded && when {
+                    onlyPhotos -> it.type == ApiMediaType.Picture.name
+                    onlyVideos -> it.type == ApiMediaType.Video.name
+                    else -> true
+                }
+            }.forEach { localMedia ->
                 // First POST meta data. If the POST succeeds, the API responds with ID of the
                 // meta data on the server
                 val metaPostResponse = api.postMetaData(localMedia)
