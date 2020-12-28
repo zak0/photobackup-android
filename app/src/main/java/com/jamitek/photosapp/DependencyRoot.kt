@@ -29,7 +29,7 @@ class DependencyRoot(app: Application) {
     private val storageAccessHelper by lazy { StorageAccessHelper(app) }
     private val serverConfigStore by lazy { ServerConfigStore(app) }
     private val keyValueStore by lazy { KeyValueStore(app) }
-    private val apiClient by lazy { ApiClient(serverConfigStore, mediaSerializer) }
+    private val apiClient by lazy { ApiClient(serverConfigStore, mediaSerializer, app) }
 
     private val serverConfigRepository by lazy { ServerConfigRepository(serverConfigStore) }
     private val remoteLibraryRepository by lazy { RemoteLibraryRepository(apiClient) }

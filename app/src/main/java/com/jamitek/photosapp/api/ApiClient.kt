@@ -1,5 +1,7 @@
 package com.jamitek.photosapp.api
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.jamitek.photosapp.api.model.ApiMedia
 import com.jamitek.photosapp.api.model.ApiMediaStatus
@@ -9,15 +11,18 @@ import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.model.RemoteLibraryScanStatus
 import com.jamitek.photosapp.model.RemoteMedia
 import okhttp3.*
+import okio.BufferedSink
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.io.InputStream
 
 class ApiClient(
     private val serverConfigStore: ServerConfigStore,
-    private val serializer: ApiSerializer
+    private val serializer: ApiSerializer,
+    private val context: Context
 ) {
 
     companion object {
@@ -121,10 +126,42 @@ class ApiClient(
 
     fun uploadMedia(
         serverId: Int,
-        localMedia: LocalMedia,
-        file: ByteArray
+        localMedia: LocalMedia
     ): ApiResponse<Boolean> {
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+
+        val requestFile = object : RequestBody() {
+            override fun contentType(): MediaType? {
+                val mimeString =
+                    if (localMedia.type == ApiMediaType.Video.name) "video/*" else "image/*"
+                return MediaType.parse(mimeString)
+            }
+
+            override fun contentLength(): Long {
+                return localMedia.fileSize
+            }
+
+            override fun writeTo(sink: BufferedSink) {
+                var stream: InputStream? = null
+                try {
+                    stream = context.contentResolver.openInputStream(Uri.parse(localMedia.uri))
+
+                    val buffer = ByteArray(32768)
+                    var bytesRead = stream!!.read(buffer) ?: -1
+
+                    while (bytesRead > 0) {
+                        sink.write(buffer, 0, bytesRead)
+                        bytesRead = stream.read(buffer)
+                    }
+
+                } catch (t: Throwable) {
+                    Log.e(TAG, "Could not read file: ", t)
+                } finally {
+                    stream?.close()
+                }
+            }
+        }
+
+
         val body = MultipartBody.Part.createFormData("newFile", localMedia.fileName, requestFile)
 
         return try {
