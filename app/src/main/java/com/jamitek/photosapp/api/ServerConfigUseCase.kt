@@ -45,8 +45,7 @@ class ServerConfigUseCase(
     fun saveServerConfig() {
         // TODO Validate before saving?
         newConfig.value?.also { config ->
-            repo.addServerAddress(config.first!!)
-            repo.selectAddress(config.first!!)
+            repo.setServerUrl(config.first!!)
             repo.setCredentials(config.second!!, config.third!!)
         }
 

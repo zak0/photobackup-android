@@ -21,18 +21,10 @@ class RemoteLibraryViewModel(
     private val mutableSelectedPhoto = MutableLiveData<RemoteMedia>().apply { value = null }
     val selectedRemoteMedia: LiveData<RemoteMedia> = mutableSelectedPhoto
 
-    /**
-     * Callback for when a thumbnail is clicked on library screen. Marks the clicked image as
-     * selected.
-     */
     fun onThumbnailClicked(remoteMedia: RemoteMedia) {
         mutableSelectedPhoto.value = remoteMedia
     }
 
-    /**
-     * Callback for when image viewer is opened.
-     * TODO Trigger necessary following actions. (GET for meta data, ...)
-     */
     fun onImageViewerOpened() {
         mutableSelectedPhoto.value = null
     }
@@ -53,9 +45,9 @@ class RemoteLibraryViewModel(
 
     private fun authorizedGlideUrl(url: String): GlideUrl = GlideUrl(
         url,
-        with(remoteLibraryUseCase.authHeader) {
+        remoteLibraryUseCase.authHeader?.let { authHeader ->
             LazyHeaders.Builder()
-                .addHeader(first, second)
+                .addHeader(authHeader.first, authHeader.second)
                 .build()
         }
     )

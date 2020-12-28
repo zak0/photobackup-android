@@ -10,7 +10,7 @@ class RemoteLibraryBrowserUseCase(
     val urlIsSet
         get() = serverConfigRepo.urlIsSet
 
-    /** Authorization header is used for fetching files with View layer libraries */
+    /** Authorization header is used for fetching files with Glide on View layer */
     val authHeader
         get() = serverConfigRepo.authHeader
 

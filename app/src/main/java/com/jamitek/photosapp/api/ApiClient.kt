@@ -16,7 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ApiClient(
-    private val serverConfigRepo: ServerConfigRepository,
+    private val serverConfigStore: ServerConfigStore,
     private val serializer: ApiSerializer
 ) {
 
@@ -26,13 +26,14 @@ class ApiClient(
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
-            val authHeader = serverConfigRepo.authHeader
-            val request = chain.request().newBuilder()
-                .addHeader(
-                    authHeader.first,
-                    authHeader.second
-                ) //"Basic amFha2tvYWRtaW46U2FsYWluZW5TYW5hMTMyNCFA"
-                .build()
+            val request = serverConfigStore.authHeader?.let { authHeader ->
+                chain.request().newBuilder()
+                    .addHeader(
+                        authHeader.first,
+                        authHeader.second
+                    )
+                    .build()
+            } ?: chain.request()
             chain.proceed(request)
         }
         .build()
@@ -43,7 +44,7 @@ class ApiClient(
         buildRetrofit()
 
         // Register to rebuild Retrofit service if/when server URL is changed
-        serverConfigRepo.subscribeToServerConfigChanges(TAG) { buildRetrofit() }
+        serverConfigStore.subscribeToServerConfigChanges(TAG) { buildRetrofit() }
     }
 
     private fun buildRetrofit() {
@@ -52,9 +53,9 @@ class ApiClient(
         //
         // If the ApiClient is attempted to be used before Retrofit initialization, crash will
         // ensue.
-        if (serverConfigRepo.urlIsSet) {
+        if (serverConfigStore.urlIsSet) {
             val retrofit = Retrofit.Builder()
-                .baseUrl(serverConfigRepo.baseUrl)
+                .baseUrl(serverConfigStore.baseUrl)
                 .client(okHttpClient)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .build()
