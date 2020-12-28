@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jamitek.photosapp.R
+import com.jamitek.photosapp.databinding.ListItemThumbnailBinding
 import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
-import kotlinx.android.synthetic.main.list_item_thumbnail.view.*
 
 class ThumbnailsAdapter(
     private val viewModel: RemoteLibraryViewModel,
@@ -29,7 +29,11 @@ class ThumbnailsAdapter(
         }
 
         return ThumbnailsViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.list_item_thumbnail, parent, false)
+            ListItemThumbnailBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         )
     }
 
@@ -42,7 +46,7 @@ class ThumbnailsAdapter(
         //  network. Check local lib repo for this. FYI: Glide supports URIs as URLs.
         val thumbnailAddress = viewModel.authorizedThumbnailGlideUrl(media.serverId)
 
-        holder.itemView.playButtonOverlay.visibility =
+        holder.binding.playButtonOverlay.visibility =
             if (media.type == "Video") View.VISIBLE else View.GONE
 
         Glide
@@ -50,12 +54,13 @@ class ThumbnailsAdapter(
             .load(thumbnailAddress)
             .centerCrop()
             .placeholder(thumbnailPlaceholder)
-            .into(holder.itemView.image)
+            .into(holder.binding.image)
 
         holder.itemView.setOnClickListener {
             viewModel.onThumbnailClicked(media)
         }
     }
 
-    class ThumbnailsViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    class ThumbnailsViewHolder(val binding: ListItemThumbnailBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

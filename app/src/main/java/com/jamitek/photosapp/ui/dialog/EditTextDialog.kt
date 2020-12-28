@@ -6,13 +6,13 @@ import android.text.InputType
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import com.jamitek.photosapp.R
-import kotlinx.android.synthetic.main.dialog_edittext.view.*
+import com.jamitek.photosapp.databinding.DialogEdittextBinding
 
 class EditTextDialog(
     context: Context,
     title: String,
 
-    /** Input type of the [EditText], use constants in [InputType]. */
+    /** Input type of the contained EditText, use constants in [InputType]. */
     inputTypeFlags: Int = InputType.TYPE_CLASS_TEXT,
 
     /** Validates the input. Return true when valid. */
@@ -28,13 +28,12 @@ class EditTextDialog(
 
     init {
 
-        val contentView =
-            LayoutInflater.from(context).inflate(R.layout.dialog_edittext, null, false).apply {
-                input.inputType = inputTypeFlags
-            }
+        val binding = DialogEdittextBinding.inflate(LayoutInflater.from(context), null, false)
+        val contentView = binding.root
 
+        binding.input.inputType = inputTypeFlags
 
-        val input = { contentView.input.text.toString() }
+        val input = { binding.input.text.toString() }
 
         dialog = AlertDialog.Builder(context)
             .setView(contentView)

@@ -12,11 +12,11 @@ import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.jamitek.photosapp.R
+import com.jamitek.photosapp.databinding.ActivityMainBinding
 import com.jamitek.photosapp.extension.dependencyRoot
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import com.jamitek.photosapp.ui.viewmodel.RootViewModel
 import com.jamitek.photosapp.ui.viewmodel.ViewModelFactory
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedListener {
 
@@ -27,14 +27,16 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
             RootViewModel::class.java
         )
     }
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         navController.addOnDestinationChangedListener(this)
-        NavigationUI.setupWithNavController(bottomNav, navController)
-        NavigationUI.setupWithNavController(toolbar, navController)
+        NavigationUI.setupWithNavController(binding.bottomNav, navController)
+        NavigationUI.setupWithNavController(binding.toolbar, navController)
     }
 
     override fun onDestinationChanged(
@@ -46,9 +48,9 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         val bottomNavlessFragments = arrayListOf(R.id.viewerFragment)
 
         // TODO Copy nice sliding hiding animation for bottom nav bar from uptimeapp
-        bottomNav.visibility =
+        binding.bottomNav.visibility =
             if (destination.id in bottomNavlessFragments) View.GONE else View.VISIBLE
-        toolbar.visibility =
+        binding.toolbar.visibility =
             if (destination.id in toolbarlessFragments) View.GONE else View.VISIBLE
     }
 

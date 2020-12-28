@@ -1,14 +1,12 @@
 package com.jamitek.photosapp.ui.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
-import com.jamitek.photosapp.R
+import com.jamitek.photosapp.databinding.ViewViewerImageBinding
 import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
-import kotlinx.android.synthetic.main.view_viewer_image.view.*
 
 class ViewerAdapter(
     private val viewModel: RemoteLibraryViewModel,
@@ -17,9 +15,13 @@ class ViewerAdapter(
     RecyclerView.Adapter<ViewerAdapter.ViewerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewerViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.view_viewer_image, parent, false)
-        return ViewerViewHolder(view)
+        return ViewerViewHolder(
+            ViewViewerImageBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun getItemCount(): Int = viewModel.allMedia.value?.size ?: 0
@@ -43,13 +45,14 @@ class ViewerAdapter(
                 .load(mediaAddress)
                 //.format(DecodeFormat.PREFER_ARGB_8888) // TODO Test if this has an effect
                 .override(Target.SIZE_ORIGINAL) // Without this, Glide downsamples the images
-                .into(holder.itemView.image)
+                .into(holder.binding.image)
 
-            holder.itemView.filenameLabel.text = media.fileName
-            holder.itemView.backButton.setOnClickListener { popBackStack() }
+            holder.binding.filenameLabel.text = media.fileName
+            holder.binding.backButton.setOnClickListener { popBackStack() }
 
         }
     }
 
-    class ViewerViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    class ViewerViewHolder(val binding: ViewViewerImageBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

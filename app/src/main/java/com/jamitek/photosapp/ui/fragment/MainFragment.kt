@@ -1,15 +1,17 @@
 package com.jamitek.photosapp.ui.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.jamitek.photosapp.R
+import com.jamitek.photosapp.databinding.FragmentMainBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.ui.adapter.TimelineAdapter
 import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
-import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment(R.layout.fragment_main) {
 
@@ -23,11 +25,28 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             RemoteLibraryViewModel::class.java
         )
     }
+    private var nullableBinding: FragmentMainBinding? = null
+    private val binding
+        get() = nullableBinding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = FragmentMainBinding.inflate(inflater, container, false).let {
+        nullableBinding = it
+        binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        nullableBinding = null
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        recycler.adapter = adapter
+        binding.recycler.adapter = adapter
         //recycler.addOnScrollListener(ThumbnailsOnScrollListener(viewModel)) // TODO Uncomment when lazy loading is really built
         observe()
         viewModel.refreshRemotePhotos()
@@ -36,10 +55,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (viewModel.urlIsSet) {
-            errorText.visibility = View.GONE
+            binding.errorText.visibility = View.GONE
         } else {
-            errorText.visibility = View.VISIBLE
-            errorText.setText(R.string.errorServerUrlNotSet)
+            binding.errorText.visibility = View.VISIBLE
+            binding.errorText.setText(R.string.errorServerUrlNotSet)
         }
     }
 
@@ -50,7 +69,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
         })
 
-        viewModel.groupedMedia.observe(viewLifecycleOwner, Observer {
+        viewModel.groupedMedia.observe(viewLifecycleOwner, {
             adapter.notifyDataSetChanged()
         })
 
