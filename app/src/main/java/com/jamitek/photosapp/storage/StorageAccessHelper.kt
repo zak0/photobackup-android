@@ -52,23 +52,13 @@ class StorageAccessHelper(private val context: Context) {
         }
     }
 
-    fun uriToDocFile(uriString: String): DocumentFile? {
-        return DocumentFile.fromSingleUri(context, Uri.parse(uriString))
-    }
-
-    fun getFileAsByteArray(uriString: String): ByteArray? {
-        var bytes: ByteArray? = null
-        var stream: InputStream? = null
-        try {
-            stream = context.contentResolver.openInputStream(Uri.parse(uriString))
-            bytes = stream?.readBytes()
-        } catch (e: Exception) {
-            Log.e(TAG, "Could not read file contents: ", e)
-        } finally {
-            stream?.close()
+    fun streamForMediaUri(uriString: String): InputStream? {
+        return try {
+            context.contentResolver.openInputStream(Uri.parse(uriString))
+        } catch (t: Throwable) {
+            Log.e(TAG, "Unable to get stream for URI: ", t)
+            null
         }
-
-        return bytes
     }
 
 }

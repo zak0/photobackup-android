@@ -1,7 +1,5 @@
 package com.jamitek.photosapp.api
 
-import android.content.Context
-import android.net.Uri
 import android.util.Log
 import com.jamitek.photosapp.api.model.ApiMedia
 import com.jamitek.photosapp.api.model.ApiMediaStatus
@@ -21,8 +19,7 @@ import java.io.InputStream
 
 class ApiClient(
     private val serverConfigStore: ServerConfigStore,
-    private val serializer: ApiSerializer,
-    private val context: Context
+    private val serializer: ApiSerializer
 ) {
 
     companion object {
@@ -126,9 +123,11 @@ class ApiClient(
 
     fun uploadMedia(
         serverId: Int,
-        localMedia: LocalMedia
+        localMedia: LocalMedia,
+        stream: InputStream
     ): ApiResponse<Boolean> {
 
+        // Custom RequestBody that "streams" the media file to the server
         val requestFile = object : RequestBody() {
             override fun contentType(): MediaType? {
                 val mimeString =
@@ -141,12 +140,9 @@ class ApiClient(
             }
 
             override fun writeTo(sink: BufferedSink) {
-                var stream: InputStream? = null
                 try {
-                    stream = context.contentResolver.openInputStream(Uri.parse(localMedia.uri))
-
                     val buffer = ByteArray(32768)
-                    var bytesRead = stream!!.read(buffer) ?: -1
+                    var bytesRead = stream.read(buffer)
 
                     while (bytesRead > 0) {
                         sink.write(buffer, 0, bytesRead)
@@ -156,11 +152,10 @@ class ApiClient(
                 } catch (t: Throwable) {
                     Log.e(TAG, "Could not read file: ", t)
                 } finally {
-                    stream?.close()
+                    stream.close()
                 }
             }
         }
-
 
         val body = MultipartBody.Part.createFormData("newFile", localMedia.fileName, requestFile)
 

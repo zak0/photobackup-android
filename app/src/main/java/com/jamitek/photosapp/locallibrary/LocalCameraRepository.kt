@@ -167,39 +167,25 @@ class LocalCameraRepository(
                     consecutiveFailures = 0
 
                     if (metaPostResponse.data?.status == RemoteMedia.Status.UPLOAD_PENDING) {
+                        storageHelper.streamForMediaUri(localMedia.uri)?.also { stream ->
 
-                        val success = api.uploadMedia(
-                            metaPostResponse.data.serverId,
-                            localMedia
-                        ).data == true
-                        Log.d(
-                            TAG,
-                            "Media upload ${if (success) "success" else "failed"} for `${localMedia.fileName}`"
-                        )
+                            val success = api.uploadMedia(
+                                metaPostResponse.data.serverId,
+                                localMedia,
+                                stream
+                            ).data == true
 
-                        // If upload was a success, let's mark the file as uploaded into the DB
-                        if (success) {
-                            localMedia.uploaded = true
-                            db.persist(localMedia)
+                            Log.d(
+                                TAG,
+                                "Media upload ${if (success) "success" else "failed"} for `${localMedia.fileName}`"
+                            )
+
+                            // If upload was a success, let's mark the file as uploaded into the DB
+                            if (success) {
+                                localMedia.uploaded = true
+                                db.persist(localMedia)
+                            }
                         }
-
-//                        storageHelper.getFileAsByteArray(localMedia.uri)?.also { bytes ->
-//                            val success = api.uploadMedia(
-//                                metaPostResponse.data.serverId,
-//                                localMedia,
-//                                bytes
-//                            ).data == true
-//                            Log.d(
-//                                TAG,
-//                                "Media upload ${if (success) "success" else "failed"} for `${localMedia.fileName}`"
-//                            )
-//
-//                            // If upload was a success, let's mark the file as uploaded into the DB
-//                            if (success) {
-//                                localMedia.uploaded = true
-//                                db.persist(localMedia)
-//                            }
-//                        }
                     } else if (metaPostResponse.data?.status == RemoteMedia.Status.READY) {
                         // Photo is already uploaded. Let's mark it as such in our DB
                         localMedia.uploaded = true
