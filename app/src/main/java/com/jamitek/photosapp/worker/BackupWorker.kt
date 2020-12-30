@@ -40,6 +40,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appCo
         private const val NOTIFICATION_ID = 715518
         private const val NOTIFICATION_CHANNEL_ID = "PhotosApp"
         private const val NOTIFICATION_CHANNEL_NAME = "Photos Worker"
+        private const val NOTIFICATION_ICON_RES = R.drawable.ic_cloud_24dp
 
         fun startNow(context: Context) {
             val request = OneTimeWorkRequestBuilder<BackupWorker>().build()
@@ -63,7 +64,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appCo
 
     private val baseNotificationBuilder: NotificationCompat.Builder by lazy {
         NotificationCompat.Builder(applicationContext, BOUND_NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(NOTIFICATION_ICON_RES)
             .setContentTitle("Backing up camera")
     }
 
@@ -145,7 +146,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appCo
 
     private fun showNotification(message: String) {
         NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(NOTIFICATION_ICON_RES)
             .setContentTitle("Backup complete")
             .setContentText(message)
             .build()
