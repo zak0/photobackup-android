@@ -11,6 +11,13 @@
         android:id="@+id/recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
+
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/fastscroll_thumb_selector"
+        app:fastScrollHorizontalTrackDrawable="@drawable/fastscroll_track_selector"
+        app:fastScrollVerticalThumbDrawable="@drawable/fastscroll_thumb_selector"
+        app:fastScrollVerticalTrackDrawable="@drawable/fastscroll_track_selector"
+
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
