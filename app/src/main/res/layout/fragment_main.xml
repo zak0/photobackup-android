@@ -23,24 +23,81 @@
             app:layout_scrollFlags="scroll|enterAlways">
 
             <TextView
+                android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Placeholder"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageButton
-                android:id="@+id/backupButton"
+            <TextView
+                android:id="@+id/subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Last backup 30/12/2020 15:49"
+                android:textSize="10sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title" />
+
+            <ImageButton
+                android:id="@+id/expandCollapseButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_expand_24"
+                app:layout_constraintBottom_toBottomOf="@id/subtitle"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageButton
+                android:id="@+id/backupButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="16dp"
                 android:background="?selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_backup_24dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/expandCollapseButton"
+                tools:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/settingsButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="16dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_settings_24"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/backupButton"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/backButtonLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Back up now"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/backupButton"
+                app:layout_constraintEnd_toStartOf="@id/backupButton"
+                app:layout_constraintTop_toTopOf="@id/backupButton"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/settingsButtonLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/settingsButton"
+                app:layout_constraintEnd_toEndOf="@id/backButtonLabel"
+                app:layout_constraintTop_toTopOf="@id/settingsButton"
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

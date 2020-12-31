@@ -1,5 +1,6 @@
 package com.jamitek.photosapp.ui.fragment
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -51,6 +52,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         observe()
         viewModel.refreshRemotePhotos()
 
+        binding.expandCollapseButton.setOnClickListener {
+            toggleActionBarHeight()
+        }
+
         binding.backupButton.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_backupFragment)
         }
@@ -85,5 +90,24 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 //                }
 //            }
 //        })
+    }
+
+    private fun toggleActionBarHeight() {
+        val newVisibility =
+            if (binding.backupButton.visibility == View.GONE) View.VISIBLE else View.GONE
+
+        val startRotation = binding.expandCollapseButton.rotation
+        val endRotation = if (startRotation == -180f) 0f else -180f
+
+        binding.expandCollapseButton.animate().apply {
+            rotation(endRotation)
+            duration = 150L
+            start()
+        }
+
+        binding.settingsButton.visibility = newVisibility
+        binding.backupButton.visibility = newVisibility
+        binding.settingsButtonLabel.visibility = newVisibility
+        binding.backButtonLabel.visibility = newVisibility
     }
 }
