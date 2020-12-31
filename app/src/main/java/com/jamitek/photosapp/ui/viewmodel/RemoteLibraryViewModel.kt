@@ -18,7 +18,7 @@ class RemoteLibraryViewModel(
     val allMedia = remoteLibraryUseCase.allMedia
     val groupedMedia = remoteLibraryUseCase.groupedMedia
 
-    private val mutableSelectedPhoto = MutableLiveData<RemoteMedia>().apply { value = null }
+    private val mutableSelectedPhoto = MutableLiveData<RemoteMedia>(null)
     val selectedRemoteMedia: LiveData<RemoteMedia> = mutableSelectedPhoto
 
     fun onThumbnailClicked(remoteMedia: RemoteMedia) {

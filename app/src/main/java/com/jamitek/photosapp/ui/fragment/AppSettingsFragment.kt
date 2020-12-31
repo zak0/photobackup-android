@@ -10,7 +10,7 @@ import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.FragmentAppSettingsBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
-import com.jamitek.photosapp.ui.BackupScreenEvent
+import com.jamitek.photosapp.ui.AppSettingsScreenEvent
 import com.jamitek.photosapp.ui.adapter.BackupAdapter
 import com.jamitek.photosapp.ui.viewmodel.AppSettingsViewModel
 import com.jamitek.photosapp.worker.BackupWorker
@@ -51,12 +51,12 @@ class AppSettingsFragment : Fragment(R.layout.fragment_app_settings) {
         viewModel.uiEvent.observe(viewLifecycleOwner) {
             val event = it.get()
             when (event) {
-                BackupScreenEvent.ShowCameraDirSelection -> StorageAccessHelper
+                AppSettingsScreenEvent.ShowCameraDirSelection -> StorageAccessHelper
                     .promptCameraDirSelection(
                         requireActivity()
                     )
-                BackupScreenEvent.ShowServerSetup -> findNavController().navigate(R.id.action_backupFragment_to_serverSetupFragment)
-                BackupScreenEvent.StartBackupWorker -> BackupWorker.startNow(requireContext())
+                AppSettingsScreenEvent.ShowServerSetup -> findNavController().navigate(R.id.action_backupFragment_to_serverSetupFragment)
+                AppSettingsScreenEvent.StartBackupWorker -> BackupWorker.startNow(requireContext())
                 else -> event?.also { error("Unhandled BackupScreenEvent: $event") }
             }
         }

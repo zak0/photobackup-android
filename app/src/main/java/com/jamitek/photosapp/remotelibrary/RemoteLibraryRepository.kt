@@ -18,7 +18,7 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
     }
 
     private val mutableAllPhotos =
-        MutableLiveData<List<RemoteMedia>>().apply { value = emptyList() }
+        MutableLiveData<List<RemoteMedia>>(emptyList())
     val allMedia: LiveData<List<RemoteMedia>> = mutableAllPhotos
 
     /**

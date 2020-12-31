@@ -1,6 +1,6 @@
 package com.jamitek.photosapp.ui
 
-enum class BackupScreenEvent {
+enum class AppSettingsScreenEvent {
     ShowCameraDirSelection,
     ShowServerSetup,
     StartBackupWorker

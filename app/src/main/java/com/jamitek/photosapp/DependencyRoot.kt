@@ -46,7 +46,7 @@ class DependencyRoot(app: Application) {
     private val appSettingsRepository by lazy { AppSettingsRepository(keyValueStore) }
 
     val setCameraDirUseCase by lazy { SetCameraDirUseCase(localCameraRepository) }
-    val backupUseCase by lazy {
+    val appSettingsUseCase by lazy {
         AppSettingsUseCase(
             serverConfigRepository,
             remoteLibraryAdminRepository,

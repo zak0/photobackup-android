@@ -16,7 +16,7 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
                 dependencyRoot.remoteLibraryBrowserUseCase
             )
             AppSettingsViewModel::class.java -> AppSettingsViewModel(
-                dependencyRoot.backupUseCase
+                dependencyRoot.appSettingsUseCase
             )
             ServerSetupViewModel::class.java -> ServerSetupViewModel(dependencyRoot.serverConfigUseCase)
             else -> throw IllegalArgumentException("Unknown ViewModel type")

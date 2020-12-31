@@ -8,7 +8,7 @@ import com.jamitek.photosapp.SettingsItem
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 import com.jamitek.photosapp.api.ServerConfigRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
-import com.jamitek.photosapp.ui.BackupScreenEvent
+import com.jamitek.photosapp.ui.AppSettingsScreenEvent
 
 class AppSettingsUseCase(
     private val serverConfigRepository: ServerConfigRepository,
@@ -17,8 +17,8 @@ class AppSettingsUseCase(
     private val cameraRepository: LocalCameraRepository
 ) {
 
-    private val mutableUiEvent = MutableLiveData<Event<BackupScreenEvent?>>()
-    val uiEvent: LiveData<Event<BackupScreenEvent?>> = mutableUiEvent
+    private val mutableUiEvent = MutableLiveData<Event<AppSettingsScreenEvent?>>()
+    val uiEvent: LiveData<Event<AppSettingsScreenEvent?>> = mutableUiEvent
 
     val settingItems: LiveData<List<SettingsItem>> = MediatorLiveData<List<SettingsItem>>().apply {
         addSource(cameraRepository.status) { value = buildSettings() }
@@ -28,10 +28,10 @@ class AppSettingsUseCase(
 
     fun onItemClicked(key: AppSettingsSettingItemKey) {
         when (key) {
-            AppSettingsSettingItemKey.ITEM_PHOTOS_STATUS -> emitUiEvent(BackupScreenEvent.StartBackupWorker)
-            AppSettingsSettingItemKey.ITEM_CAMERA_DIR -> emitUiEvent(BackupScreenEvent.ShowCameraDirSelection)
+            AppSettingsSettingItemKey.ITEM_PHOTOS_STATUS -> emitUiEvent(AppSettingsScreenEvent.StartBackupWorker)
+            AppSettingsSettingItemKey.ITEM_CAMERA_DIR -> emitUiEvent(AppSettingsScreenEvent.ShowCameraDirSelection)
 
-            AppSettingsSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(BackupScreenEvent.ShowServerSetup)
+            AppSettingsSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(AppSettingsScreenEvent.ShowServerSetup)
 
             AppSettingsSettingItemKey.ITEM_RESCAN_LIBRARY -> serverAdminRepository.initLibraryScan(
                 refreshStatusUntilDone = true
@@ -55,7 +55,7 @@ class AppSettingsUseCase(
         }
     }
 
-    private fun emitUiEvent(event: BackupScreenEvent) {
+    private fun emitUiEvent(event: AppSettingsScreenEvent) {
         mutableUiEvent.value = Event(event)
     }
 

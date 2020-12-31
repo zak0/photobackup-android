@@ -13,7 +13,7 @@ class RemoteLibraryAdminRepository(private val libraryApi: ApiClient) {
     }
 
     private val mutableLibraryScanStatus =
-        MutableLiveData<RemoteLibraryScanStatus>().apply { value = null }
+        MutableLiveData<RemoteLibraryScanStatus>(null)
     val libraryScanStatus: LiveData<RemoteLibraryScanStatus> = mutableLibraryScanStatus
 
     fun initLibraryScan(refreshStatusUntilDone: Boolean = false) {

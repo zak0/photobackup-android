@@ -12,6 +12,7 @@ import com.jamitek.photosapp.databinding.FragmentMainBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.ui.adapter.TimelineAdapter
 import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
+import com.jamitek.photosapp.worker.BackupWorker
 
 class MainFragment : Fragment(R.layout.fragment_main) {
 
@@ -53,6 +54,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         binding.expandCollapseButton.setOnClickListener {
             toggleActionBarHeight()
+        }
+
+        binding.backupButton.setOnClickListener {
+            BackupWorker.startNow(requireContext())
         }
 
         binding.settingsButton.setOnClickListener {

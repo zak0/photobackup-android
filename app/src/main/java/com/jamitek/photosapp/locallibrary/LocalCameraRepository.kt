@@ -32,7 +32,7 @@ class LocalCameraRepository(
     private val cache = HashSet<LocalMedia>()
     private val cacheByCheckSum = HashMap<String, LocalMedia>()
 
-    private val mutableStatus = MutableLiveData<LocalCameraLibraryStatus?>().apply { value = null }
+    private val mutableStatus = MutableLiveData<LocalCameraLibraryStatus?>(null)
     val status: LiveData<LocalCameraLibraryStatus?> = mutableStatus
 
     var cameraDirUriString: String?
