@@ -7,19 +7,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.jamitek.photosapp.R
-import com.jamitek.photosapp.databinding.FragmentBackupBinding
+import com.jamitek.photosapp.databinding.FragmentAppSettingsBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import com.jamitek.photosapp.ui.BackupScreenEvent
 import com.jamitek.photosapp.ui.adapter.BackupAdapter
-import com.jamitek.photosapp.ui.viewmodel.BackupViewModel
+import com.jamitek.photosapp.ui.viewmodel.AppSettingsViewModel
 import com.jamitek.photosapp.worker.BackupWorker
 
-class BackupFragment : Fragment(R.layout.fragment_backup) {
+class AppSettingsFragment : Fragment(R.layout.fragment_app_settings) {
 
-    private val viewModel by lazy { getActivityViewModel(BackupViewModel::class.java) }
+    private val viewModel by lazy { getActivityViewModel(AppSettingsViewModel::class.java) }
     private val adapter by lazy { BackupAdapter(viewModel) }
-    private var nullableBinding: FragmentBackupBinding? = null
+    private var nullableBinding: FragmentAppSettingsBinding? = null
     private val binding
         get() = nullableBinding!!
 
@@ -27,7 +27,7 @@ class BackupFragment : Fragment(R.layout.fragment_backup) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentBackupBinding.inflate(inflater, container, false).let {
+    ): View = FragmentAppSettingsBinding.inflate(inflater, container, false).let {
         nullableBinding = it
         binding.root
     }

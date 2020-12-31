@@ -15,7 +15,7 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
             RemoteLibraryViewModel::class.java -> RemoteLibraryViewModel(
                 dependencyRoot.remoteLibraryBrowserUseCase
             )
-            BackupViewModel::class.java -> BackupViewModel(
+            AppSettingsViewModel::class.java -> AppSettingsViewModel(
                 dependencyRoot.backupUseCase
             )
             ServerSetupViewModel::class.java -> ServerSetupViewModel(dependencyRoot.serverConfigUseCase)

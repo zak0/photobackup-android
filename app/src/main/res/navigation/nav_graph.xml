@@ -14,8 +14,8 @@
             android:id="@+id/action_mainFragment_to_viewerFragment"
             app:destination="@id/viewerFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_backupFragment"
-            app:destination="@id/backupFragment" />
+            android:id="@+id/action_mainFragment_to_appSettingsFragment"
+            app:destination="@id/appSettingsFragment" />
     </fragment>
 
     <fragment
@@ -24,9 +24,9 @@
         android:label="ViewerFragment" />
 
     <fragment
-        android:id="@+id/backupFragment"
-        android:name="com.jamitek.photosapp.ui.fragment.BackupFragment"
-        android:label="@string/navBackup">
+        android:id="@+id/appSettingsFragment"
+        android:name="com.jamitek.photosapp.ui.fragment.AppSettingsFragment"
+        android:label="@string/navSettings">
         <action
             android:id="@+id/action_backupFragment_to_serverSetupFragment"
             app:destination="@id/serverSetupFragment" />

@@ -1,4 +1,4 @@
-package com.jamitek.photosapp.backup
+package com.jamitek.photosapp.appsettings
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -7,11 +7,10 @@ import com.jamitek.photosapp.Event
 import com.jamitek.photosapp.SettingsItem
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 import com.jamitek.photosapp.api.ServerConfigRepository
-import com.jamitek.photosapp.appsettings.AppSettingsRepository
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
 import com.jamitek.photosapp.ui.BackupScreenEvent
 
-class BackupUseCase(
+class AppSettingsUseCase(
     private val serverConfigRepository: ServerConfigRepository,
     private val serverAdminRepository: RemoteLibraryAdminRepository,
     private val appSettingsRepository: AppSettingsRepository,
@@ -27,14 +26,14 @@ class BackupUseCase(
         value = buildSettings()
     }
 
-    fun onItemClicked(key: BackupSettingItemKey) {
+    fun onItemClicked(key: AppSettingsSettingItemKey) {
         when (key) {
-            BackupSettingItemKey.ITEM_PHOTOS_STATUS -> emitUiEvent(BackupScreenEvent.StartBackupWorker)
-            BackupSettingItemKey.ITEM_CAMERA_DIR -> emitUiEvent(BackupScreenEvent.ShowCameraDirSelection)
+            AppSettingsSettingItemKey.ITEM_PHOTOS_STATUS -> emitUiEvent(BackupScreenEvent.StartBackupWorker)
+            AppSettingsSettingItemKey.ITEM_CAMERA_DIR -> emitUiEvent(BackupScreenEvent.ShowCameraDirSelection)
 
-            BackupSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(BackupScreenEvent.ShowServerSetup)
+            AppSettingsSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(BackupScreenEvent.ShowServerSetup)
 
-            BackupSettingItemKey.ITEM_RESCAN_LIBRARY -> serverAdminRepository.initLibraryScan(
+            AppSettingsSettingItemKey.ITEM_RESCAN_LIBRARY -> serverAdminRepository.initLibraryScan(
                 refreshStatusUntilDone = true
             )
 
@@ -42,13 +41,13 @@ class BackupUseCase(
         }
     }
 
-    fun onItemToggled(key: BackupSettingItemKey, isChecked: Boolean) {
+    fun onItemToggled(key: AppSettingsSettingItemKey, isChecked: Boolean) {
         when (key) {
-            BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE -> {
+            AppSettingsSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE -> {
                 appSettingsRepository.backupPhotos = isChecked
             }
 
-            BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE -> {
+            AppSettingsSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE -> {
                 appSettingsRepository.backupVideos = isChecked
             }
 
@@ -62,11 +61,11 @@ class BackupUseCase(
 
     private fun buildSettings(): List<SettingsItem> {
         return listOf(
-            SettingsItem(BackupSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
-            SettingsItem(BackupSettingItemKey.ITEM_PHOTOS_STATUS, value = {
+            SettingsItem(AppSettingsSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
+            SettingsItem(AppSettingsSettingItemKey.ITEM_PHOTOS_STATUS, value = {
                 "${cameraRepository.status.value?.localFilesCount ?: -1} photos/videos - Tap to rescan & backup"
             }),
-            SettingsItem(BackupSettingItemKey.ITEM_BACKUP_STATUS, value = {
+            SettingsItem(AppSettingsSettingItemKey.ITEM_BACKUP_STATUS, value = {
                 cameraRepository.status.value?.let { status ->
                     when {
                         status.isScanning -> "Scanning local files..."
@@ -78,13 +77,13 @@ class BackupUseCase(
                     }
                 } ?: "Error - Unable to read status"
             }),
-            SettingsItem(BackupSettingItemKey.ITEM_CAMERA_DIR, value = {
+            SettingsItem(AppSettingsSettingItemKey.ITEM_CAMERA_DIR, value = {
                 cameraRepository.cameraDirUriString?.let {
                     "Tap to change"
                 } ?: "Tap to set"
             }),
             SettingsItem(
-                BackupSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE,
+                AppSettingsSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE,
                 value = {
                     if (appSettingsRepository.backupPhotos) "Photos will be backed up"
                     else "Photos will not be backed up"
@@ -92,20 +91,20 @@ class BackupUseCase(
                 isToggled = { appSettingsRepository.backupPhotos }
             ),
             SettingsItem(
-                BackupSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE,
+                AppSettingsSettingItemKey.ITEM_BACKUP_VIDEOS_TOGGLE,
                 value = {
                     if (appSettingsRepository.backupVideos) "Videos will be backed up"
                     else "Videos will not be backed up"
                 },
                 isToggled = { appSettingsRepository.backupVideos }
             ),
-            SettingsItem(BackupSettingItemKey.SECTION_TITLE_CONNECTION_STATUS),
-            SettingsItem(BackupSettingItemKey.ITEM_CONNECTION_STATUS),
-            SettingsItem(BackupSettingItemKey.ITEM_SERVER_DETAILS, value = {
+            SettingsItem(AppSettingsSettingItemKey.SECTION_TITLE_CONNECTION_STATUS),
+            SettingsItem(AppSettingsSettingItemKey.ITEM_CONNECTION_STATUS),
+            SettingsItem(AppSettingsSettingItemKey.ITEM_SERVER_DETAILS, value = {
                 serverConfigRepository.baseUrl.takeUnless { it.isEmpty() } ?: "Tap to set"
             }),
-            SettingsItem(BackupSettingItemKey.SECTION_TITLE_SERVER_ADMIN),
-            SettingsItem(BackupSettingItemKey.ITEM_RESCAN_LIBRARY, value = {
+            SettingsItem(AppSettingsSettingItemKey.SECTION_TITLE_SERVER_ADMIN),
+            SettingsItem(AppSettingsSettingItemKey.ITEM_RESCAN_LIBRARY, value = {
                 serverAdminRepository.libraryScanStatus.value?.let {
                     """
                         Server scan state: ${it.state}

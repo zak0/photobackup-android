@@ -2,7 +2,7 @@ package com.jamitek.photosapp
 
 import android.app.Application
 import com.jamitek.photosapp.api.*
-import com.jamitek.photosapp.backup.BackupUseCase
+import com.jamitek.photosapp.appsettings.AppSettingsUseCase
 import com.jamitek.photosapp.database.KeyValueStore
 import com.jamitek.photosapp.database.SqliteLocalMediaDb
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
@@ -47,7 +47,7 @@ class DependencyRoot(app: Application) {
 
     val setCameraDirUseCase by lazy { SetCameraDirUseCase(localCameraRepository) }
     val backupUseCase by lazy {
-        BackupUseCase(
+        AppSettingsUseCase(
             serverConfigRepository,
             remoteLibraryAdminRepository,
             appSettingsRepository,

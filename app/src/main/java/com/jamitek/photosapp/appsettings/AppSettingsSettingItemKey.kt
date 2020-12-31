@@ -1,8 +1,8 @@
-package com.jamitek.photosapp.backup
+package com.jamitek.photosapp.appsettings
 
 import com.jamitek.photosapp.SettingsItemKey
 
-enum class BackupSettingItemKey(
+enum class AppSettingsSettingItemKey(
     override val isTitle: Boolean = false,
     override val isToggleable: Boolean = false
 ) : SettingsItemKey {

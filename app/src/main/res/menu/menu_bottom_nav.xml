@@ -7,7 +7,7 @@
         android:title="@string/navLibrary" />
 
     <item
-        android:id="@+id/backupFragment"
+        android:id="@+id/appSettingsFragment"
         android:icon="@drawable/ic_backup_24dp"
         android:title="@string/navBackup" />
 
