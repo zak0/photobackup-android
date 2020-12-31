@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_mainFragment_to_viewerFragment"
             app:destination="@id/viewerFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_backupFragment"
+            app:destination="@id/backupFragment" />
     </fragment>
 
     <fragment
@@ -28,14 +31,6 @@
             android:id="@+id/action_backupFragment_to_serverSetupFragment"
             app:destination="@id/serverSetupFragment" />
     </fragment>
-
-    <action
-        android:id="@+id/action_global_mainFragment"
-        app:destination="@id/mainFragment" />
-
-    <action
-        android:id="@+id/action_global_localFoldersFragment"
-        app:destination="@id/backupFragment" />
 
     <fragment
         android:id="@+id/serverSetupFragment"

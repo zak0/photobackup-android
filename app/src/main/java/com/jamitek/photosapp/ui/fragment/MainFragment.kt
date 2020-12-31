@@ -50,6 +50,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         //recycler.addOnScrollListener(ThumbnailsOnScrollListener(viewModel)) // TODO Uncomment when lazy loading is really built
         observe()
         viewModel.refreshRemotePhotos()
+
+        binding.backupButton.setOnClickListener {
+            findNavController().navigate(R.id.action_mainFragment_to_backupFragment)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         setContentView(binding.root)
 
         navController.addOnDestinationChangedListener(this)
-        NavigationUI.setupWithNavController(binding.bottomNav, navController)
         NavigationUI.setupWithNavController(binding.toolbar, navController)
     }
 
@@ -44,12 +43,8 @@ class MainActivity : AppCompatActivity(), NavController.OnDestinationChangedList
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        val toolbarlessFragments = listOf(R.id.mainFragment, R.id.viewerFragment, R.id.backupFragment)
-        val bottomNavlessFragments = arrayListOf(R.id.viewerFragment)
+        val toolbarlessFragments = listOf(R.id.mainFragment, R.id.viewerFragment)
 
-        // TODO Copy nice sliding hiding animation for bottom nav bar from uptimeapp
-        binding.bottomNav.visibility =
-            if (destination.id in bottomNavlessFragments) View.GONE else View.VISIBLE
         binding.toolbar.visibility =
             if (destination.id in toolbarlessFragments) View.GONE else View.VISIBLE
     }
