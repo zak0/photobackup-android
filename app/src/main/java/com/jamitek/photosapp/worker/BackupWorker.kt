@@ -40,7 +40,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appCo
         private const val NOTIFICATION_ID = 715518
         private const val NOTIFICATION_CHANNEL_ID = "PhotosApp"
         private const val NOTIFICATION_CHANNEL_NAME = "Photos Worker"
-        private const val NOTIFICATION_ICON_RES = R.drawable.ic_cloud_24dp
+        private const val NOTIFICATION_ICON_RES = R.drawable.ic_backup_24dp
 
         fun startNow(context: Context) {
             val request = OneTimeWorkRequestBuilder<BackupWorker>().build()
