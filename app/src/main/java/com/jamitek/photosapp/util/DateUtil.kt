@@ -27,7 +27,7 @@ object DateUtil {
         val dateString = exifDateString.split(" ")[0]
         val date = try {
             SimpleDateFormat(EXIF_DATEFORMAT, Locale.US).parse(dateString)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             null
         }
 
@@ -41,7 +41,7 @@ object DateUtil {
         val dateString = exifDateString.split(" ")[0]
         val date = try {
             SimpleDateFormat(EXIF_DATEFORMAT, Locale.US).parse(dateString)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             null
         }
 
@@ -53,5 +53,9 @@ object DateUtil {
 
     fun dateToExifDate(date: Date): String {
         return SimpleDateFormat(NICE_DATEFORMAT, Locale.US).format(date)
+    }
+
+    fun timestampToDateString(timestamp: Long, pattern: String): String {
+        return SimpleDateFormat(pattern, Locale.US).format(Date(timestamp))
     }
 }

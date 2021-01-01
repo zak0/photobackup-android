@@ -15,6 +15,9 @@
 
     <string name="localFoldersSetRootDirButton">Grant Access</string>
 
+    <string name="timelineLastBackUpTime">Last back up %s</string>
+    <string name="timelineLastBackUpNever">Never backed up</string>
+
     <string name="backupSectionTitleConnectionStatus">Server</string>
     <string name="backupConnectionStatus">Connection status</string>
     <string name="backupServerDetails">Server address</string>

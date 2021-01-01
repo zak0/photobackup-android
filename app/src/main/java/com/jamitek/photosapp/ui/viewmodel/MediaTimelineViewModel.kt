@@ -6,17 +6,18 @@ import androidx.lifecycle.ViewModel
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.jamitek.photosapp.model.RemoteMedia
-import com.jamitek.photosapp.remotelibrary.RemoteLibraryBrowserUseCase
+import com.jamitek.photosapp.remotelibrary.MediaTimelineUseCase
 
-class RemoteLibraryViewModel(
-    private val remoteLibraryUseCase: RemoteLibraryBrowserUseCase
+class MediaTimelineViewModel(
+    private val timelineUseCase: MediaTimelineUseCase,
 ) : ViewModel() {
 
     val urlIsSet
-        get() = remoteLibraryUseCase.urlIsSet
+        get() = timelineUseCase.urlIsSet
 
-    val allMedia = remoteLibraryUseCase.allMedia
-    val groupedMedia = remoteLibraryUseCase.groupedMedia
+    val allMedia = timelineUseCase.allMedia
+    val groupedMedia = timelineUseCase.groupedMedia
+    val lastBackupTimestamp = timelineUseCase.lastBackupTimestamp
 
     private val mutableSelectedPhoto = MutableLiveData<RemoteMedia>(null)
     val selectedRemoteMedia: LiveData<RemoteMedia> = mutableSelectedPhoto
@@ -30,22 +31,22 @@ class RemoteLibraryViewModel(
     }
 
     fun refreshRemotePhotos() {
-        remoteLibraryUseCase.refreshRemotePhotos()
+        timelineUseCase.refreshRemotePhotos()
     }
 
     fun authorizedThumbnailGlideUrl(mediIdOnServer: Int): GlideUrl {
-        val thumbUrl = remoteLibraryUseCase.thumbnailUrl(mediIdOnServer)
+        val thumbUrl = timelineUseCase.thumbnailUrl(mediIdOnServer)
         return authorizedGlideUrl(thumbUrl)
     }
 
     fun authorizedImageGlideUrl(mediaIdOnServer: Int): GlideUrl {
-        val imageUrl = remoteLibraryUseCase.mediaUrl(mediaIdOnServer)
+        val imageUrl = timelineUseCase.mediaUrl(mediaIdOnServer)
         return authorizedGlideUrl(imageUrl)
     }
 
     private fun authorizedGlideUrl(url: String): GlideUrl = GlideUrl(
         url,
-        remoteLibraryUseCase.authHeader?.let { authHeader ->
+        timelineUseCase.authHeader?.let { authHeader ->
             LazyHeaders.Builder()
                 .addHeader(authHeader.first, authHeader.second)
                 .build()

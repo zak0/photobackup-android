@@ -6,10 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import com.jamitek.photosapp.databinding.ViewViewerImageBinding
-import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
 
 class ViewerAdapter(
-    private val viewModel: RemoteLibraryViewModel,
+    private val viewModel: MediaTimelineViewModel,
     private val popBackStack: () -> Unit
 ) :
     RecyclerView.Adapter<ViewerAdapter.ViewerViewHolder>() {

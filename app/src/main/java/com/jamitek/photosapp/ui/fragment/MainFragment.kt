@@ -11,7 +11,8 @@ import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.FragmentMainBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.ui.adapter.TimelineAdapter
-import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
+import com.jamitek.photosapp.util.DateUtil
 import com.jamitek.photosapp.worker.BackupWorker
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -21,9 +22,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private val adapter: TimelineAdapter by lazy { TimelineAdapter(viewModel) }
-    private val viewModel: RemoteLibraryViewModel by lazy {
+    private val viewModel: MediaTimelineViewModel by lazy {
         getActivityViewModel(
-            RemoteLibraryViewModel::class.java
+            MediaTimelineViewModel::class.java
         )
     }
     private var nullableBinding: FragmentMainBinding? = null
@@ -84,6 +85,14 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         viewModel.groupedMedia.observe(viewLifecycleOwner, {
             adapter.notifyDataSetChanged()
+        })
+
+        viewModel.lastBackupTimestamp.observe(viewLifecycleOwner, {
+            binding.subtitle.text = if (it > 0) {
+                getString(R.string.timelineLastBackUpTime, DateUtil.timestampToDateString(it, "d MMM yyyy, HH:mm"))
+            } else {
+                getString(R.string.timelineLastBackUpNever)
+            }
         })
 
         // TODO Uncomment when lazy loading is added

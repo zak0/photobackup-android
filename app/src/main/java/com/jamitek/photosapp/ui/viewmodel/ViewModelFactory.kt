@@ -12,8 +12,8 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
             RootViewModel::class.java -> RootViewModel(
                 dependencyRoot.setCameraDirUseCase
             )
-            RemoteLibraryViewModel::class.java -> RemoteLibraryViewModel(
-                dependencyRoot.remoteLibraryBrowserUseCase
+            MediaTimelineViewModel::class.java -> MediaTimelineViewModel(
+                dependencyRoot.mediaTimelineUseCase
             )
             AppSettingsViewModel::class.java -> AppSettingsViewModel(
                 dependencyRoot.appSettingsUseCase

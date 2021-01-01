@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jamitek.photosapp.databinding.ListItemTimelineBinding
-import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
 
-class TimelineAdapter(private val viewModel: RemoteLibraryViewModel) :
+class TimelineAdapter(private val viewModel: MediaTimelineViewModel) :
     RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimelineViewHolder {

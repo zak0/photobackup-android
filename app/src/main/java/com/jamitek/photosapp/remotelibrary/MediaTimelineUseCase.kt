@@ -1,10 +1,12 @@
 package com.jamitek.photosapp.remotelibrary
 
 import com.jamitek.photosapp.api.ServerConfigRepository
+import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 
-class RemoteLibraryBrowserUseCase(
+class MediaTimelineUseCase(
     private val serverConfigRepo: ServerConfigRepository,
-    private val remoteLibraryRepo: RemoteLibraryRepository
+    private val remoteLibraryRepo: RemoteLibraryRepository,
+    private val localCameraRepo: LocalCameraRepository
 ) {
 
     val urlIsSet
@@ -15,6 +17,8 @@ class RemoteLibraryBrowserUseCase(
         get() = serverConfigRepo.authHeader
 
     val allMedia = remoteLibraryRepo.allMedia
+
+    val lastBackupTimestamp = localCameraRepo.lastBackupTime
 
     /**
      * Media grouped into nicely displayable sets.

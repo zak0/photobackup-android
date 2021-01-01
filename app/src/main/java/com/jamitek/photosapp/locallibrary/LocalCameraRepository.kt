@@ -229,7 +229,7 @@ class LocalCameraRepository(
      * Dispatches status refresh to [Dispatchers.Main].
      */
     private fun updateStatus(isScanning: Boolean, isUploading: Boolean) {
-        CoroutineScope(Dispatchers.Main).launch {
+        dispatchMain {
             mutableStatus.value = buildStatus(isScanning, isUploading)
         }
     }
@@ -239,15 +239,18 @@ class LocalCameraRepository(
      * returning.
      */
     private suspend fun blockingUpdateStatus(isScanning: Boolean, isUploading: Boolean) {
-        CoroutineScope(Dispatchers.Main).launch {
+        dispatchMain {
             mutableStatus.value = buildStatus(isScanning, isUploading)
         }.join()
     }
 
     private fun persistLastBackUpTime() {
         val now = System.currentTimeMillis()
-        mutableLastBackupTime.value = now
+        dispatchMain { mutableLastBackupTime.value = now }
         keyValueStore.putLong(KEY_LAST_BACKUP_TIME, now)
     }
+
+    private fun dispatchMain(block: () -> Unit): Job =
+        CoroutineScope(Dispatchers.Main).launch { block() }
 
 }

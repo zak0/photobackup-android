@@ -10,12 +10,12 @@ import androidx.navigation.fragment.findNavController
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.FragmentViewerBinding
 import com.jamitek.photosapp.ui.adapter.ViewerAdapter
-import com.jamitek.photosapp.ui.viewmodel.RemoteLibraryViewModel
+import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
 
 class ViewerFragment : Fragment(R.layout.fragment_viewer) {
 
-    private val viewModel: RemoteLibraryViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(RemoteLibraryViewModel::class.java)
+    private val viewModel: MediaTimelineViewModel by lazy {
+        ViewModelProvider(requireActivity()).get(MediaTimelineViewModel::class.java)
     }
     private val viewerAdapter: ViewerAdapter by lazy {
         ViewerAdapter(viewModel) { findNavController().popBackStack() }
