@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jamitek.photosapp.database.KeyValueStore
-import com.jamitek.photosapp.database.KeyValueStore.Companion.KEY_CAMERA_DIR_URI
 import com.jamitek.photosapp.database.LocalMediaDb
 import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.model.RemoteMedia
@@ -21,9 +20,12 @@ class LocalCameraRepository(
     private val api: ApiClient
 ) {
 
-    companion object {
-        private const val TAG = "LocalCameraRepo"
-        private const val UPLOAD_MAX_FAILURES = 2
+    private companion object {
+        const val TAG = "LocalCameraRepo"
+        const val UPLOAD_MAX_FAILURES = 2
+
+        const val KEY_CAMERA_DIR_URI = "camera.dir.uri"
+        const val KEY_LAST_BACKUP_TIME = "backup.last.success.time"
     }
 
     private var initJob: Job? = null
@@ -31,6 +33,11 @@ class LocalCameraRepository(
 
     private val cache = HashSet<LocalMedia>()
     private val cacheByCheckSum = HashMap<String, LocalMedia>()
+
+    private val mutableLastBackupTime = MutableLiveData(
+        keyValueStore.getLong(KEY_LAST_BACKUP_TIME, defaultValue = -1)
+    )
+    val lastBackupTime: LiveData<Long> = mutableLastBackupTime
 
     private val mutableStatus = MutableLiveData<LocalCameraLibraryStatus?>(null)
     val status: LiveData<LocalCameraLibraryStatus?> = mutableStatus
@@ -201,8 +208,9 @@ class LocalCameraRepository(
             }
         }
 
-        // Status update of happy
+        // Status update of a successful backup
         blockingUpdateStatus(isScanning = false, isUploading = false)
+        persistLastBackUpTime()
     }
 
     private fun cacheLocalMedia(localMedia: LocalMedia) {
@@ -234,6 +242,12 @@ class LocalCameraRepository(
         CoroutineScope(Dispatchers.Main).launch {
             mutableStatus.value = buildStatus(isScanning, isUploading)
         }.join()
+    }
+
+    private fun persistLastBackUpTime() {
+        val now = System.currentTimeMillis()
+        mutableLastBackupTime.value = now
+        keyValueStore.putLong(KEY_LAST_BACKUP_TIME, now)
     }
 
 }

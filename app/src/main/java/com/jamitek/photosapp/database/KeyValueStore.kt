@@ -1,13 +1,12 @@
 package com.jamitek.photosapp.database
 
 import android.content.Context
+import kotlinx.coroutines.delay
 
 open class KeyValueStore(context: Context) {
 
     companion object {
         private const val PREFS_NAME = "photosapp.prefs"
-        const val KEY_CAMERA_DIR_URI = "camera.dir.uri"
-        const val KEY_LOCAL_FOLDERS_ROOT_URI = "local.folders.root.uri"
     }
 
     private val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -26,6 +25,14 @@ open class KeyValueStore(context: Context) {
 
     fun putBoolean(key: String, value: Boolean) {
         sharedPrefs.edit().putBoolean(key, value).apply()
+    }
+
+    fun getLong(key: String, defaultValue: Long): Long {
+        return sharedPrefs.getLong(key, defaultValue)
+    }
+
+    fun putLong(key: String, value: Long) {
+        sharedPrefs.edit().putLong(key, value).apply()
     }
 
     fun clear(key: String) {
