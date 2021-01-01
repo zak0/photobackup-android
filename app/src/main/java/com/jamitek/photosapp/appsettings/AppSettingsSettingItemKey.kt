@@ -10,7 +10,7 @@ enum class AppSettingsSettingItemKey(
     ITEM_CONNECTION_STATUS,
     ITEM_SERVER_DETAILS,
 
-    SECTION_TITLE_BACKUP_STATUS(isTitle = true),
+    SECTION_TITLE_BACKUP(isTitle = true),
     ITEM_PHOTOS_STATUS,
     ITEM_BACKUP_STATUS,
     ITEM_CAMERA_DIR,

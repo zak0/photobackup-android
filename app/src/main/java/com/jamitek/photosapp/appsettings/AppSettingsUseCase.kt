@@ -28,7 +28,6 @@ class AppSettingsUseCase(
 
     fun onItemClicked(key: AppSettingsSettingItemKey) {
         when (key) {
-            AppSettingsSettingItemKey.ITEM_PHOTOS_STATUS -> emitUiEvent(AppSettingsScreenEvent.StartBackupWorker)
             AppSettingsSettingItemKey.ITEM_CAMERA_DIR -> emitUiEvent(AppSettingsScreenEvent.ShowCameraDirSelection)
 
             AppSettingsSettingItemKey.ITEM_SERVER_DETAILS -> emitUiEvent(AppSettingsScreenEvent.ShowServerSetup)
@@ -61,22 +60,7 @@ class AppSettingsUseCase(
 
     private fun buildSettings(): List<SettingsItem> {
         return listOf(
-            SettingsItem(AppSettingsSettingItemKey.SECTION_TITLE_BACKUP_STATUS),
-            SettingsItem(AppSettingsSettingItemKey.ITEM_PHOTOS_STATUS, value = {
-                "${cameraRepository.status.value?.localFilesCount ?: -1} photos/videos - Tap to rescan & backup"
-            }),
-            SettingsItem(AppSettingsSettingItemKey.ITEM_BACKUP_STATUS, value = {
-                cameraRepository.status.value?.let { status ->
-                    when {
-                        status.isScanning -> "Scanning local files..."
-                        status.isUploading -> "Uploading... ${status.waitingForBackupCount} files pending"
-                        else -> {
-                            if (status.waitingForBackupCount > 0) "${status.waitingForBackupCount} files pending upload"
-                            else "All backed up"
-                        }
-                    }
-                } ?: "Error - Unable to read status"
-            }),
+            SettingsItem(AppSettingsSettingItemKey.SECTION_TITLE_BACKUP),
             SettingsItem(AppSettingsSettingItemKey.ITEM_CAMERA_DIR, value = {
                 cameraRepository.cameraDirUriString?.let {
                     "Tap to change"

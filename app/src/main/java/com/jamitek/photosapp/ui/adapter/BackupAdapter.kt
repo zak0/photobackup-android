@@ -13,7 +13,7 @@ class BackupAdapter(private val viewModel: AppSettingsViewModel) : SettingsAdapt
     override fun getItemTitle(itemKey: SettingsItemKey, context: Context): String =
         context.getString(
             when (itemKey as AppSettingsSettingItemKey) {
-                AppSettingsSettingItemKey.SECTION_TITLE_BACKUP_STATUS -> R.string.backupSectionTitleBackupStatus
+                AppSettingsSettingItemKey.SECTION_TITLE_BACKUP -> R.string.backupSectionTitleBackupStatus
                 AppSettingsSettingItemKey.ITEM_PHOTOS_STATUS -> R.string.backupPhotosStatus
                 AppSettingsSettingItemKey.ITEM_BACKUP_STATUS -> R.string.backupBackupStatus
                 AppSettingsSettingItemKey.ITEM_CAMERA_DIR -> R.string.backupCameraDir
