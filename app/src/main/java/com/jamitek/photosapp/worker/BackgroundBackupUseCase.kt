@@ -51,34 +51,43 @@ class BackgroundBackupUseCase(
      * need to enforce this here.
      */
     fun scanAndBackup() {
-        cameraRepository.scan()
+        cameraRepository.scanAndBackup(
+            uploadPhotos = appSettingsRepository.backupPhotos,
+            uploadVideos = appSettingsRepository.backupVideos
+        )
     }
 
     private fun handleWorkStatusTransition(to: WorkStatus) {
         val newStatus: WorkStatus? =
             if (to == WorkStatus.Idle) {
-                if (workStatus.value == WorkStatus.Uploading) {
-                    // Transition to Idle means that the worker is done if previous
-                    // state was Uploading
-                    WorkStatus.Done
-                } else if (workStatus.value == WorkStatus.Scanning) {
-                    // Transition to Idle means that we can now start uploading if
-                    // previous state was Scanning
-                    cameraRepository.backup(
-                        uploadPhotos = appSettingsRepository.backupPhotos,
-                        uploadVideos = appSettingsRepository.backupVideos
-                    )
-                    // No need to emit a new state, repository should do it once
-                    // upload is started. (Even if there's nothing to upload, it should
-                    // still start the upload process, and reflect this in its status.)
-                    null
-                } else if (workStatus.value == WorkStatus.Done) {
-                    // If previous status was Done, we're okay transitioning back to Idle.
-                    WorkStatus.Idle
-                } else {
-                    // This is an unknown transition, and should not happen.
-                    null
+                when (workStatus.value) {
+                    WorkStatus.Uploading -> {
+                        // Transition to Idle means that the worker is done if previous
+                        // state was Uploading
+                        WorkStatus.Done
+                    }
+
+                    WorkStatus.Scanning -> {
+                        // Transition to Idle means that we can now start uploading if
+                        // previous state was Scanning
+                        //
+                        // No need to emit a new state, repository should do it once
+                        // upload is started. (Even if there's nothing to upload, it should
+                        // still start the upload process, and reflect this in its status.)
+                        null
+                    }
+
+                    WorkStatus.Done -> {
+                        // If previous status was Done, we're okay transitioning back to Idle.
+                        WorkStatus.Idle
+                    }
+
+                    else -> {
+                        // This is an unknown transition, and should not happen.
+                        null
+                    }
                 }
+
             } else {
                 // Otherwise we're good with just the new state
                 to
