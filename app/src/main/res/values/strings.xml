@@ -17,6 +17,9 @@
 
     <string name="timelineLastBackUpTime">Last back up %s</string>
     <string name="timelineLastBackUpNever">Never backed up</string>
+    <string name="timelineContentDescriptionExpandCollapse">Expand/collapse additional options</string>
+    <string name="timelineOptionBackUpNow">Back up now</string>
+    <string name="timelineOptionSettings">Settings</string>
 
     <string name="backupSectionTitleConnectionStatus">Server</string>
     <string name="backupConnectionStatus">Connection status</string>
