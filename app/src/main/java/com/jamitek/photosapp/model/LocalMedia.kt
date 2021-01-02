@@ -9,4 +9,4 @@ data class LocalMedia(
     var fileSize: Long,
     var checksum: String,
     var uploaded: Boolean
-)
+) : DisplayableMedia

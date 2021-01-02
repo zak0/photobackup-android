@@ -25,7 +25,7 @@ data class RemoteMedia(
 
     /** Status of the media */
     var status: String?
-) {
+) : DisplayableMedia {
     object Status {
         const val READY = "ready"
         const val UNKNOWN = "unknown"

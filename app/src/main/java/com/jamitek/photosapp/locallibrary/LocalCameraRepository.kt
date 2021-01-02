@@ -34,6 +34,9 @@ class LocalCameraRepository(
     private val cache = HashSet<LocalMedia>()
     private val cacheByCheckSum = HashMap<String, LocalMedia>()
 
+    private val mutableAllUnsorted = MutableLiveData<List<LocalMedia>>(emptyList())
+    val allUnsorted: LiveData<List<LocalMedia>> = mutableAllUnsorted
+
     private val mutableLastBackupTime = MutableLiveData(
         keyValueStore.getLong(KEY_LAST_BACKUP_TIME, defaultValue = -1)
     )
@@ -54,6 +57,7 @@ class LocalCameraRepository(
 
             storageHelper.treeUriStringToDocFileUriString(cameraDirUriString)?.also {
                 cache.addAll(db.getAllInDirectory(it))
+                notifyLocalMediaChanged()
             }
 
             cacheByCheckSum.clear()
@@ -122,6 +126,7 @@ class LocalCameraRepository(
 
             // Update library status once scan is complete
             blockingUpdateStatus(isScanning = false, isUploading = false)
+            notifyLocalMediaChanged()
         }
     }
 
@@ -242,6 +247,18 @@ class LocalCameraRepository(
         dispatchMain {
             mutableStatus.value = buildStatus(isScanning, isUploading)
         }.join()
+    }
+
+    /**
+     * Notifies observers of [allUnsorted] that local media has changed.
+     * Call this conservatively, as refreshing the list will refresh the timeline!
+     *
+     * (Preferably call this only after [scan] and/or [backup]
+     */
+    private fun notifyLocalMediaChanged() {
+        dispatchMain {
+            mutableAllUnsorted.value = cache.toList()
+        }
     }
 
     private fun persistLastBackUpTime() {

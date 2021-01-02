@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
+import com.jamitek.photosapp.model.DisplayableMedia
 import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.remotelibrary.MediaTimelineUseCase
 

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import com.jamitek.photosapp.databinding.ViewViewerImageBinding
+import com.jamitek.photosapp.model.RemoteMedia
 import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
 
 class ViewerAdapter(
@@ -31,24 +32,26 @@ class ViewerAdapter(
             // TODO Primarily try to use local thumbnails to prevent having to load anything over the
             //  network. User local lib repo for this. Glide supports local file URIs directly.
 
-            val mediaAddress = if (media.type == "Picture") {
-                viewModel.authorizedImageGlideUrl(media.serverId)
-            } else if (media.type == "Video") {
-                // TODO Actually play videos. Now just displays video thumbnail
-                viewModel.authorizedThumbnailGlideUrl(media.serverId)
-            } else {
-                error("Unknown media type '${media.type}'.")
+            if (media is RemoteMedia) {
+                val mediaAddress = if (media.type == "Picture") {
+                    viewModel.authorizedImageGlideUrl(media.serverId)
+                } else if (media.type == "Video") {
+                    // TODO Actually play videos. Now just displays video thumbnail
+                    viewModel.authorizedThumbnailGlideUrl(media.serverId)
+                } else {
+                    error("Unknown media type '${media.type}'.")
+                }
+
+                Glide
+                    .with(holder.itemView.context)
+                    .load(mediaAddress)
+                    //.format(DecodeFormat.PREFER_ARGB_8888) // TODO Test if this has an effect
+                    .override(Target.SIZE_ORIGINAL) // Without this, Glide downsamples the images
+                    .into(holder.binding.image)
+
+                holder.binding.filenameLabel.text = media.fileName
+                holder.binding.backButton.setOnClickListener { popBackStack() }
             }
-
-            Glide
-                .with(holder.itemView.context)
-                .load(mediaAddress)
-                //.format(DecodeFormat.PREFER_ARGB_8888) // TODO Test if this has an effect
-                .override(Target.SIZE_ORIGINAL) // Without this, Glide downsamples the images
-                .into(holder.binding.image)
-
-            holder.binding.filenameLabel.text = media.fileName
-            holder.binding.backButton.setOnClickListener { popBackStack() }
 
         }
     }
