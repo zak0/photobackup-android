@@ -99,7 +99,7 @@ class LocalCameraRepository(
 
         cameraDirUriString?.also { uriString ->
             blockingUpdateStatus(isScanning = true, isUploading = false)
-            scanner.iterateCameraDir(uriString) { localMedia, _ ->
+            scanner.iterateCameraDir() { localMedia ->
 
                 Log.d(
                     TAG,

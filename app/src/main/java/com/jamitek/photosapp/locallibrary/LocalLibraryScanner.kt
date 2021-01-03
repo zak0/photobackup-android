@@ -1,11 +1,14 @@
 package com.jamitek.photosapp.locallibrary
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.jamitek.photosapp.model.LocalMedia
 import com.jamitek.photosapp.storage.StorageAccessHelper
+import com.jamitek.photosapp.util.DateUtil
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.*
@@ -21,102 +24,127 @@ class LocalLibraryScanner(private val context: Context) {
      * With each detected media file, calls [onMediaFile] callback. Parameters of the callback are
      * [LocalMedia] of the discovered media file, and [DocumentFile] of the containing directory.
      */
-    fun iterateCameraDir(cameraDirUri: String, onMediaFile: (LocalMedia, DocumentFile) -> Unit) {
-        DocumentFile.fromTreeUri(context, Uri.parse(cameraDirUri))?.also { docFile ->
-            if (!docFile.isDirectory) {
-                throw IllegalStateException("Selected camera directory is not a directory.")
+    fun iterateCameraDir(onMediaFile: (LocalMedia) -> Unit) {
+
+        val startTime = System.currentTimeMillis()
+
+        val projection = arrayOf(
+            MediaStore.MediaColumns._ID,
+            MediaStore.MediaColumns.DATE_TAKEN,
+            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
+            MediaStore.MediaColumns.SIZE,
+            MediaStore.MediaColumns.DISPLAY_NAME
+        )
+
+        val selection = "${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} = ?"
+        val selectionArgs = arrayOf("Camera")
+
+        val resolver = context.contentResolver
+        val cursor = resolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null
+        )
+
+        val mediaFiles = ArrayList<LocalMedia>()
+
+        var i = 0
+        cursor!!.moveToFirst()
+        while (!cursor.isAfterLast) {
+
+            i++
+            if (i % 50 == 0) {
+                Log.d(TAG, "Progress: $i")
             }
 
-            iterateDirectory(docFile, true, onMediaFile)
-        }
-    }
-
-    fun iterateLocalFolders(
-        localFoldersRootUri: String,
-        onMediaFile: (LocalMedia, DocumentFile) -> Unit
-    ) {
-        DocumentFile.fromTreeUri(context, Uri.parse(localFoldersRootUri))?.also { docFile ->
-            if (!docFile.isDirectory) {
-                throw IllegalStateException("Selected local folders root directory is not a directory.")
+            val stringCol = { colName: String ->
+                cursor.getString(cursor.getColumnIndex(colName))
             }
 
-            iterateDirectory(docFile, false, onMediaFile)
-        }
-    }
+            val longCol = { colName: String ->
+                cursor.getLong(cursor.getColumnIndex(colName))
+            }
 
-    /**
-     * Scans a directory and all subdirectories for supported media files. If a supported file is encountered, calls
-     * [onMediaFile] with it as the parameter. If a directory is encountered, calls this same
-     * method again to scan that directory.
-     *
-     * When [calculateChecksum] is set to true, calculates MD5 hash for media files and stores it in
-     * [LocalMedia.checksum], otherwise sets [LocalMedia.checksum] to an empty string ("").
-     *
-     * Ignores folders (and their subfolders) that contain a ".nomedia" file.
-     */
-    private fun iterateDirectory(
-        directory: DocumentFile,
-        calculateChecksum: Boolean,
-        onMediaFile: (LocalMedia, DocumentFile) -> Unit
-    ) {
+            val bucketName = stringCol(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME)
 
-        val dirUriString = directory.uri.toString()
-        val dirHasNoMedia = directory.findFile(".nomedia") != null
+            // Skip everything except "Camera" bucket
+            if (bucketName == "Camera") {
 
-        if (!dirHasNoMedia) {
-            directory.listFiles().forEach { childDocFile ->
-                val fileName = childDocFile.name ?: ""
+                val fileName = stringCol(MediaStore.MediaColumns.DISPLAY_NAME)
+                Log.d(TAG, "Processing '$fileName'")
 
-                // Iterate subfolders as well
-                if (childDocFile.isDirectory) {
-                    iterateDirectory(childDocFile, calculateChecksum, onMediaFile)
-                }
-
-                // Only accept media files
                 val fileExtension = fileName.split(".").last().toLowerCase(Locale.ROOT)
                 val isPicture = fileExtension in StorageAccessHelper.SUPPORTED_PICTURE_EXTENSIONS
                 val isVideo = fileExtension in StorageAccessHelper.SUPPORTED_VIDEO_EXTENSIONS
+
+                // TODO Try-catch the following at least for first tests with a large library
                 if (isPicture || isVideo) {
-                    val fileSize = childDocFile.length()
-                    val digest =
-                        if (calculateChecksum) calculateMd5ForFile(context, childDocFile) else ""
-                    val fileUriString = childDocFile.uri.toString()
-                    onMediaFile(
-                        LocalMedia(
-                            -1,
-                            if (isPicture) "Picture" else if (isVideo) "Video" else error("Media must have a type!"),
-                            fileName,
-                            dirUriString,
-                            fileUriString,
-                            fileSize,
-                            digest,
-                            false
-                        ),
-                        directory
+                    val fileUri = Uri.withAppendedPath(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        stringCol(MediaStore.MediaColumns._ID)
                     )
+
+                    // Calculates size and hash for this file. We need THE ACTUAL size of the file
+                    // on storage, and it seems that the indexed MediaColumns.SIZE is less than
+                    // the actual size on disk...
+                    val sizeAndDigest = calculateSizeAndMd5ForFile(resolver, fileUri, fileName)
+                    val fileSize = sizeAndDigest.first
+                    val digest = sizeAndDigest.second
+                    val rawDateTaken = stringCol(MediaStore.MediaColumns.DATE_TAKEN).toLong()
+                    val datetimeOriginal =
+                        DateUtil.dateToExifDateTime(Date(rawDateTaken))
+
+                    val localMedia = LocalMedia(
+                        -1,
+                        if (isPicture) "Picture" else if (isVideo) "Video" else error("Media must have a type!"),
+                        fileName,
+                        datetimeOriginal,
+                        fileUri.toString(),
+                        fileSize,
+                        digest,
+                        false
+                    )
+
+               //     onMediaFile(localMedia)
+                    mediaFiles.add(localMedia) // TODO Remove this once no longer needed for debug
                 }
+            } else {
+                Log.d(TAG, "Skipping media in bucket '$bucketName'.")
             }
-        } else {
-            Log.d(
-                TAG,
-                "Directory '${directory.name}' contains '.nomedia' file. Scanning for it and its subdirectories is skipped."
-            )
+
+            cursor.moveToNext()
         }
+
+        cursor.close()
+
+        val duration = System.currentTimeMillis() - startTime
+
+        Log.d(TAG, "Duration: $duration")
+
     }
 
-    private fun calculateMd5ForFile(context: Context, file: DocumentFile): String {
+    private fun calculateSizeAndMd5ForFile(
+        resolver: ContentResolver,
+        mediaUri: Uri,
+        fileName: String
+    ): Pair<Long, String> {
         val digest = MessageDigest.getInstance("MD5")
         val buffer = ByteArray(32768)
-
-        return context.contentResolver.openInputStream(file.uri)?.let { stream ->
+        val stream = resolver.openInputStream(mediaUri)
+        return stream?.let {
+            var fileSize = 0L
             var readBytes = stream.read(buffer)
             try {
                 while (readBytes > 0) {
+                    fileSize += readBytes
                     digest.update(buffer, 0, readBytes)
                     readBytes = stream.read(buffer)
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to calculate MD5 hash for ${file.name}.", e)
+            } catch (t: Throwable) {
+                Log.e(TAG, "Failed to calculate MD5 hash for ${fileName}.", t)
             } finally {
                 stream.close()
             }
@@ -124,9 +152,9 @@ class LocalLibraryScanner(private val context: Context) {
             val md5Sum = digest.digest()
             val bigInt = BigInteger(1, md5Sum)
             val asString = bigInt.toString(16)
-            String.format("%32s", asString).replace(" ", "0")
+            fileSize to String.format("%32s", asString).replace(" ", "0")
         } ?: run {
-            throw IllegalStateException("Failed to calculate MD5 hash for ${file.name}.")
+            throw IllegalStateException("Failed to calculate MD5 hash for ${fileName}.")
         }
     }
 

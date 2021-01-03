@@ -11,6 +11,7 @@ object DateUtil {
     private const val TAG = "DateUtil"
     const val EPOCH_EXIF = "1970:01:01 00:00:00"
     private const val EXIF_DATEFORMAT = "yyyy:MM:dd" // 2020:07:29
+    private const val EXIF_DATETIMEFORMAT = "yyyy:MM:dd HH:mm:ss" // 2020:07:29 07:59:00
     private const val NICE_DATEFORMAT = "EEE, d MMM yyyy" // Wed, 6 Dec 2020
     private const val NICE_MONTH_AND_YEAR = "MMMM yyyy" /// December 2020
 
@@ -51,8 +52,8 @@ object DateUtil {
         } ?: "Unknown"
     }
 
-    fun dateToExifDate(date: Date): String {
-        return SimpleDateFormat(NICE_DATEFORMAT, Locale.US).format(date)
+    fun dateToExifDateTime(date: Date): String {
+        return SimpleDateFormat(EXIF_DATETIMEFORMAT, Locale.US).format(date)
     }
 
     fun timestampToDateString(timestamp: Long, pattern: String): String {
