@@ -24,7 +24,7 @@ class LocalLibraryScanner(private val context: Context) {
      * With each detected media file, calls [onMediaFile] callback. Parameters of the callback are
      * [LocalMedia] of the discovered media file, and [DocumentFile] of the containing directory.
      */
-    fun iterateCameraDir(onMediaFile: (LocalMedia) -> Unit) {
+    fun iterateCameraDir(forced: Boolean = false, onMediaFile: (LocalMedia) -> Unit) {
 
         val startTime = System.currentTimeMillis()
 
@@ -49,10 +49,11 @@ class LocalLibraryScanner(private val context: Context) {
             null
         )
 
-        val mediaFiles = ArrayList<LocalMedia>()
+        val firstPassMediaFiles = ArrayList<LocalMedia>()
 
         var i = 0
         cursor!!.moveToFirst()
+
         while (!cursor.isAfterLast) {
 
             i++
@@ -87,12 +88,6 @@ class LocalLibraryScanner(private val context: Context) {
                         stringCol(MediaStore.MediaColumns._ID)
                     )
 
-                    // Calculates size and hash for this file. We need THE ACTUAL size of the file
-                    // on storage, and it seems that the indexed MediaColumns.SIZE is less than
-                    // the actual size on disk...
-                    val sizeAndDigest = calculateSizeAndMd5ForFile(resolver, fileUri, fileName)
-                    val fileSize = sizeAndDigest.first
-                    val digest = sizeAndDigest.second
                     val rawDateTaken = stringCol(MediaStore.MediaColumns.DATE_TAKEN).toLong()
                     val datetimeOriginal =
                         DateUtil.dateToExifDateTime(Date(rawDateTaken))
@@ -103,13 +98,13 @@ class LocalLibraryScanner(private val context: Context) {
                         fileName,
                         datetimeOriginal,
                         fileUri.toString(),
-                        fileSize,
-                        digest,
+                        -1,
+                        "",
                         false
                     )
 
                //     onMediaFile(localMedia)
-                    mediaFiles.add(localMedia) // TODO Remove this once no longer needed for debug
+                    firstPassMediaFiles.add(localMedia) // TODO Remove this once no longer needed for debug
                 }
             } else {
                 Log.d(TAG, "Skipping media in bucket '$bucketName'.")
@@ -119,6 +114,25 @@ class LocalLibraryScanner(private val context: Context) {
         }
 
         cursor.close()
+
+        i = 0
+        firstPassMediaFiles.forEach {
+
+            if (++i % 50 == 0) {
+                Log.d(TAG, "Checksum and size progress: ")
+            }
+
+            // Calculates size and hash for this file. We need THE ACTUAL size of the file
+            // on storage, and it seems that the indexed MediaColumns.SIZE is less than
+            // the actual size on disk...
+            val fileUri = Uri.parse(it.uri)
+            val sizeAndDigest = if (forced) calculateSizeAndMd5ForFile(resolver, fileUri, it.fileName) else 0L to ""
+            val fileSize = sizeAndDigest.first
+            val digest = sizeAndDigest.second
+
+            it.fileSize = fileSize
+            it.checksum = digest
+        }
 
         val duration = System.currentTimeMillis() - startTime
 
@@ -133,7 +147,14 @@ class LocalLibraryScanner(private val context: Context) {
     ): Pair<Long, String> {
         val digest = MessageDigest.getInstance("MD5")
         val buffer = ByteArray(32768)
-        val stream = resolver.openInputStream(mediaUri)
+        val stream = try {
+            // TODO For some reason, on a real device, next line will get stuck after a few
+            //  files. See what's up with it...
+            resolver.openInputStream(mediaUri)
+        } catch (t: Throwable) {
+            Log.e(TAG, "Exception opening inputstream for '$fileName': ", t)
+            null
+        }
         return stream?.let {
             var fileSize = 0L
             var readBytes = stream.read(buffer)

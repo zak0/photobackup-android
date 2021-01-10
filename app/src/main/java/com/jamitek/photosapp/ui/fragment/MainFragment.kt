@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.FragmentMainBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
+import com.jamitek.photosapp.locallibrary.LocalLibraryScanner
 import com.jamitek.photosapp.ui.adapter.TimelineAdapter
 import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
 import com.jamitek.photosapp.util.DateUtil
@@ -58,7 +59,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
 
         binding.backupButton.setOnClickListener {
-            BackupWorker.startNow(requireContext())
+
+            // TODO Start the worker instead. This is here just for debugging purposes!!!
+            LocalLibraryScanner(requireContext()).iterateCameraDir(true) {}
+            //BackupWorker.startNow(requireContext())
         }
 
         binding.settingsButton.setOnClickListener {
