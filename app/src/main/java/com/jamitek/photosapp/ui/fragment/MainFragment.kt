@@ -5,13 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.FragmentMainBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
+import com.jamitek.photosapp.ui.TimelineScreenEvent
 import com.jamitek.photosapp.ui.adapter.TimelineAdapter
+import com.jamitek.photosapp.ui.adapter.TimelineSettingsAdapter
 import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
+import com.jamitek.photosapp.ui.viewmodel.TimelineSettingsViewModel
 import com.jamitek.photosapp.util.DateUtil
 import com.jamitek.photosapp.worker.BackupWorker
 
@@ -25,6 +27,16 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private val viewModel: MediaTimelineViewModel by lazy {
         getActivityViewModel(
             MediaTimelineViewModel::class.java
+        )
+    }
+    private val settingsViewModel by lazy {
+        getActivityViewModel(
+            TimelineSettingsViewModel::class.java
+        )
+    }
+    private val settingsAdapter: TimelineSettingsAdapter by lazy {
+        TimelineSettingsAdapter(
+            settingsViewModel
         )
     }
     private var nullableBinding: FragmentMainBinding? = null
@@ -57,13 +69,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             toggleActionBarHeight()
         }
 
-        binding.backupButton.setOnClickListener {
-            BackupWorker.startNow(requireContext())
-        }
-
-        binding.settingsButton.setOnClickListener {
-            findNavController().navigate(R.id.action_mainFragment_to_appSettingsFragment)
-        }
+        binding.timelineSettingsRecycler.adapter = settingsAdapter
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,23 +83,35 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun observe() {
-        viewModel.selectedRemoteMedia.observe(viewLifecycleOwner, Observer {
+        viewModel.selectedRemoteMedia.observe(viewLifecycleOwner) {
             it?.let { photo ->
                 findNavController().navigate(R.id.action_mainFragment_to_viewerFragment)
             }
-        })
+        }
 
-        viewModel.groupedMedia.observe(viewLifecycleOwner, {
+        viewModel.groupedMedia.observe(viewLifecycleOwner) {
             adapter.notifyDataSetChanged()
-        })
+        }
 
-        viewModel.lastBackupTimestamp.observe(viewLifecycleOwner, {
+        viewModel.lastBackupTimestamp.observe(viewLifecycleOwner) {
             binding.subtitle.text = if (it > 0) {
-                getString(R.string.timelineLastBackUpTime, DateUtil.timestampToDateString(it, "d MMM yyyy, HH:mm"))
+                getString(
+                    R.string.timelineLastBackUpTime,
+                    DateUtil.timestampToDateString(it, "d MMM yyyy, HH:mm")
+                )
             } else {
                 getString(R.string.timelineLastBackUpNever)
             }
-        })
+        }
+
+        settingsViewModel.event.observe(viewLifecycleOwner) {
+            it.get()?.also { event ->
+                when (event) {
+                    TimelineScreenEvent.StartBackupWorker -> BackupWorker.startNow(requireContext())
+                    TimelineScreenEvent.ShowAppSettings -> findNavController().navigate(R.id.action_mainFragment_to_appSettingsFragment)
+                }
+            }
+        }
 
         // TODO Uncomment when lazy loading is added
 //        viewModel.nextGetOffset.observe(viewLifecycleOwner, Observer {
@@ -107,7 +125,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private fun toggleActionBarHeight() {
         val newVisibility =
-            if (binding.backupButton.visibility == View.GONE) View.VISIBLE else View.GONE
+            if (binding.timelineSettingsRecycler.visibility == View.GONE) View.VISIBLE else View.GONE
 
         val startRotation = binding.expandCollapseButton.rotation
         val endRotation = if (startRotation == -180f) 0f else -180f
@@ -118,9 +136,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             start()
         }
 
-        binding.settingsButton.visibility = newVisibility
-        binding.backupButton.visibility = newVisibility
-        binding.settingsButtonLabel.visibility = newVisibility
-        binding.backButtonLabel.visibility = newVisibility
+        binding.timelineSettingsRecycler.visibility = newVisibility
     }
 }

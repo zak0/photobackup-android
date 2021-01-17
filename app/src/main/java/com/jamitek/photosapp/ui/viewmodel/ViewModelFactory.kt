@@ -19,6 +19,9 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
                 dependencyRoot.appSettingsUseCase
             )
             ServerSetupViewModel::class.java -> ServerSetupViewModel(dependencyRoot.serverConfigUseCase)
+
+            TimelineSettingsViewModel::class.java -> TimelineSettingsViewModel()
+
             else -> throw IllegalArgumentException("Unknown ViewModel type")
         } as T
     }
