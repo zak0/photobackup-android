@@ -94,25 +94,31 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : Worker(appCo
 
             // Observing a LiveData has to happen in the main thread...
             withContext(Dispatchers.Main) {
-                useCase.scanAndBackup()
-                useCase.workStatus.observeForever {
-                    when (it) {
-                        WorkStatus.Scanning -> updateBoundNotificationText("Scanning camera directory...")
-                        WorkStatus.Uploading -> updateBoundNotificationText("Uploading new files...")
-                        WorkStatus.Done -> {
-                            showNotification(useCase.completionNotificationMessage)
-                            backupDone.set(true)
+                // Only observe work status if backup is started.
+                if (useCase.scanAndBackup()) {
+                    useCase.workStatus.observeForever {
+                        when (it) {
+                            WorkStatus.Scanning -> updateBoundNotificationText("Scanning camera directory...")
+                            WorkStatus.Uploading -> updateBoundNotificationText("Uploading new files...")
+                            WorkStatus.Done -> {
+                                showNotification(useCase.completionNotificationMessage)
+                                backupDone.set(true)
+                            }
+                            WorkStatus.Unknown,
+                            WorkStatus.Idle,
+                            null -> Unit
                         }
-                        WorkStatus.Unknown,
-                        WorkStatus.Idle,
-                        null -> Unit
                     }
+                } else {
+                    // Just immediately complete the work and mark the work done.
+                    backupDone.set(true)
                 }
             }
         }
 
+        // TODO Replace the brute force'y sleep()ing with something else
         while(!backupDone.get()) {
-            Thread.sleep(1)
+            Thread.sleep(10)
         }
 
         return Result.success()

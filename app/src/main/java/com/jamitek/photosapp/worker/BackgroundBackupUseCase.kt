@@ -50,12 +50,10 @@ class BackgroundBackupUseCase(
      * starting a new scan/upload if there is one already running. I.e. no
      * need to enforce this here.
      */
-    fun scanAndBackup() {
-        cameraRepository.scanAndBackup(
-            uploadPhotos = appSettingsRepository.backupPhotos,
-            uploadVideos = appSettingsRepository.backupVideos
-        )
-    }
+    fun scanAndBackup(): Boolean = cameraRepository.scanAndBackup(
+        uploadPhotos = appSettingsRepository.backupPhotos,
+        uploadVideos = appSettingsRepository.backupVideos
+    )
 
     private fun handleWorkStatusTransition(to: WorkStatus) {
         val newStatus: WorkStatus? =

@@ -80,17 +80,15 @@ class LocalCameraRepository(
             return false
         }
 
-        scanAndBackupJob = CoroutineScope(Dispatchers.IO).launch {
-            initJob!!.join() // Initialization has to have been at least started by now...
-
-            // Only proceed if camera (backup source) dir is set...
-            cameraDirUriString?.also {
+        // Only proceed if camera (backup source) dir is set...
+        return cameraDirUriString?.let {
+            scanAndBackupJob = CoroutineScope(Dispatchers.IO).launch {
+                initJob!!.join() // Initialization has to have been at least started by now...
                 scan()
                 backup(uploadPhotos, uploadVideos)
             }
-        }
-
-        return true
+            true
+        } ?: false
     }
 
     /**
@@ -225,12 +223,13 @@ class LocalCameraRepository(
         cacheByCheckSum[localMedia.checksum] = localMedia
     }
 
-    private fun buildStatus(isScanning: Boolean, isUploading: Boolean) = LocalCameraLibraryStatus(
-        isUploading,
-        isScanning,
-        cache.size,
-        cache.count { !it.uploaded }
-    )
+    private fun buildStatus(isScanning: Boolean, isUploading: Boolean) =
+        LocalCameraLibraryStatus(
+            isUploading,
+            isScanning,
+            cache.size,
+            cache.count { !it.uploaded }
+        )
 
     /**
      * Dispatches status refresh to [Dispatchers.Main].
