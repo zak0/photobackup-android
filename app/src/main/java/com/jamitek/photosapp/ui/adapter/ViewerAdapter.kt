@@ -2,10 +2,13 @@ package com.jamitek.photosapp.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
+import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.ViewViewerImageBinding
+import com.jamitek.photosapp.extension.context
 import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
 
 class ViewerAdapter(
@@ -34,6 +37,12 @@ class ViewerAdapter(
             val mediaAddress = if (media.type == "Picture") {
                 viewModel.authorizedImageGlideUrl(media.serverId)
             } else if (media.type == "Video") {
+                Toast.makeText(
+                    holder.context,
+                    R.string.viewerVideoPlaybackNotSupported,
+                    Toast.LENGTH_LONG
+                ).show()
+
                 // TODO Actually play videos. Now just displays video thumbnail
                 viewModel.authorizedThumbnailGlideUrl(media.serverId)
             } else {
@@ -41,7 +50,7 @@ class ViewerAdapter(
             }
 
             Glide
-                .with(holder.itemView.context)
+                .with(holder.context)
                 .load(mediaAddress)
                 //.format(DecodeFormat.PREFER_ARGB_8888) // TODO Test if this has an effect
                 .override(Target.SIZE_ORIGINAL) // Without this, Glide downsamples the images
