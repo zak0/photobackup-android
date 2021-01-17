@@ -63,8 +63,8 @@ class AppSettingsUseCase(
             SettingsItem(AppSettingsSettingItemKey.SECTION_TITLE_BACKUP),
             SettingsItem(AppSettingsSettingItemKey.ITEM_CAMERA_DIR, value = {
                 cameraRepository.cameraDirUriString?.let {
-                    "Tap to change"
-                } ?: "Tap to set"
+                    "Tap to change backup source"
+                } ?: "Backup source not set"
             }),
             SettingsItem(
                 AppSettingsSettingItemKey.ITEM_BACKUP_PHOTOS_TOGGLE,

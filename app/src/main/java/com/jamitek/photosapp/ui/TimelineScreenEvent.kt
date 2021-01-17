@@ -2,5 +2,6 @@ package com.jamitek.photosapp.ui
 
 enum class TimelineScreenEvent {
     ShowAppSettings,
-    StartBackupWorker
+    StartBackupWorker,
+    NoBackupSourceToast
 }

@@ -10,10 +10,10 @@ import com.bumptech.glide.Glide
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.ListItemThumbnailBinding
 import com.jamitek.photosapp.model.RemoteMedia
-import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
+import com.jamitek.photosapp.ui.viewmodel.TimelineViewModel
 
 class ThumbnailsAdapter(
-    private val viewModel: MediaTimelineViewModel,
+    private val viewModel: TimelineViewModel,
     private val dataSet: ArrayList<RemoteMedia>
 ) :
     RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailsViewHolder>() {

@@ -48,6 +48,9 @@ class LocalCameraRepository(
             keyValueStore.putString(KEY_CAMERA_DIR_URI, value)
         }
 
+    val cameraDirIsSet
+        get() = cameraDirUriString?.isNotBlank() == true
+
     init {
         initJob = GlobalScope.launch {
             cache.clear()
@@ -78,9 +81,13 @@ class LocalCameraRepository(
         }
 
         scanAndBackupJob = CoroutineScope(Dispatchers.IO).launch {
-            initJob!!.join()
-            scan()
-            backup(uploadPhotos, uploadVideos)
+            initJob!!.join() // Initialization has to have been at least started by now...
+
+            // Only proceed if camera (backup source) dir is set...
+            cameraDirUriString?.also {
+                scan()
+                backup(uploadPhotos, uploadVideos)
+            }
         }
 
         return true

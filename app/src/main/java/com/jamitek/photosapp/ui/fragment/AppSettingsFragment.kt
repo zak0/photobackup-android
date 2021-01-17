@@ -11,14 +11,14 @@ import com.jamitek.photosapp.databinding.FragmentAppSettingsBinding
 import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import com.jamitek.photosapp.ui.AppSettingsScreenEvent
-import com.jamitek.photosapp.ui.adapter.BackupAdapter
+import com.jamitek.photosapp.ui.adapter.AppSettingsAdapter
 import com.jamitek.photosapp.ui.viewmodel.AppSettingsViewModel
 import com.jamitek.photosapp.worker.BackupWorker
 
 class AppSettingsFragment : Fragment(R.layout.fragment_app_settings) {
 
     private val viewModel by lazy { getActivityViewModel(AppSettingsViewModel::class.java) }
-    private val adapter by lazy { BackupAdapter(viewModel) }
+    private val adapter by lazy { AppSettingsAdapter(viewModel) }
     private var nullableBinding: FragmentAppSettingsBinding? = null
     private val binding
         get() = nullableBinding!!

@@ -5,9 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jamitek.photosapp.Event
 import com.jamitek.photosapp.R
+import com.jamitek.photosapp.remotelibrary.TimelineUseCase
 import com.jamitek.photosapp.ui.TimelineScreenEvent
 
-class TimelineSettingsViewModel : ViewModel() {
+class TimelineSettingsViewModel(private val useCase: TimelineUseCase) : ViewModel() {
 
     /**
      * [Pair]<Title Resource ID, Icon Resource ID>
@@ -17,15 +18,25 @@ class TimelineSettingsViewModel : ViewModel() {
         R.string.timelineOptionSettings to R.drawable.ic_settings_24
     )
 
-    val mutableEvent = MutableLiveData<Event<TimelineScreenEvent>>()
+    private val mutableEvent = MutableLiveData<Event<TimelineScreenEvent>>()
     val event: LiveData<Event<TimelineScreenEvent>> = mutableEvent
 
     fun onBackUpNowPressed() {
-        mutableEvent.value = Event(TimelineScreenEvent.StartBackupWorker)
+        emitEvent(
+            if (useCase.cameraDirIsSet) {
+                TimelineScreenEvent.StartBackupWorker
+            } else {
+                TimelineScreenEvent.NoBackupSourceToast
+            }
+        )
     }
 
     fun onSettingsPressed() {
         mutableEvent.value = Event(TimelineScreenEvent.ShowAppSettings)
+    }
+
+    private fun emitEvent(event: TimelineScreenEvent) {
+        mutableEvent.value = Event(event)
     }
 
 }

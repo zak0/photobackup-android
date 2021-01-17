@@ -10,7 +10,7 @@ import com.jamitek.photosapp.locallibrary.LocalLibraryScanner
 import com.jamitek.photosapp.appsettings.AppSettingsRepository
 import com.jamitek.photosapp.locallibrary.SetCameraDirUseCase
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryAdminRepository
-import com.jamitek.photosapp.remotelibrary.MediaTimelineUseCase
+import com.jamitek.photosapp.remotelibrary.TimelineUseCase
 import com.jamitek.photosapp.remotelibrary.RemoteLibraryRepository
 import com.jamitek.photosapp.storage.StorageAccessHelper
 import com.jamitek.photosapp.worker.BackgroundBackupUseCase
@@ -61,8 +61,8 @@ class DependencyRoot(app: Application) {
             appSettingsRepository
         )
     }
-    val mediaTimelineUseCase by lazy {
-        MediaTimelineUseCase(
+    val timelineUseCase by lazy {
+        TimelineUseCase(
             serverConfigRepository,
             remoteLibraryRepository,
             localCameraRepository

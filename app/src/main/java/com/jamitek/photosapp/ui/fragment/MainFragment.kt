@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.jamitek.photosapp.R
@@ -12,7 +13,7 @@ import com.jamitek.photosapp.extension.getActivityViewModel
 import com.jamitek.photosapp.ui.TimelineScreenEvent
 import com.jamitek.photosapp.ui.adapter.TimelineAdapter
 import com.jamitek.photosapp.ui.adapter.TimelineSettingsAdapter
-import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
+import com.jamitek.photosapp.ui.viewmodel.TimelineViewModel
 import com.jamitek.photosapp.ui.viewmodel.TimelineSettingsViewModel
 import com.jamitek.photosapp.util.DateUtil
 import com.jamitek.photosapp.worker.BackupWorker
@@ -24,9 +25,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private val adapter: TimelineAdapter by lazy { TimelineAdapter(viewModel) }
-    private val viewModel: MediaTimelineViewModel by lazy {
+    private val viewModel: TimelineViewModel by lazy {
         getActivityViewModel(
-            MediaTimelineViewModel::class.java
+            TimelineViewModel::class.java
         )
     }
     private val settingsViewModel by lazy {
@@ -109,6 +110,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 when (event) {
                     TimelineScreenEvent.StartBackupWorker -> BackupWorker.startNow(requireContext())
                     TimelineScreenEvent.ShowAppSettings -> findNavController().navigate(R.id.action_mainFragment_to_appSettingsFragment)
+                    TimelineScreenEvent.NoBackupSourceToast -> Toast.makeText(
+                        requireContext(),
+                        R.string.errorCameraDirNotSet,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }

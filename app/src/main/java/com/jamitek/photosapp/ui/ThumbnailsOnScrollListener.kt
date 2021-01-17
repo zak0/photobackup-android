@@ -3,9 +3,9 @@ package com.jamitek.photosapp.ui
 import android.util.Log
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
+import com.jamitek.photosapp.ui.viewmodel.TimelineViewModel
 
-class ThumbnailsOnScrollListener(private val viewModel: MediaTimelineViewModel) : RecyclerView.OnScrollListener() {
+class ThumbnailsOnScrollListener(private val viewModel: TimelineViewModel) : RecyclerView.OnScrollListener() {
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
 

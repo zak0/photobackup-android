@@ -3,7 +3,7 @@ package com.jamitek.photosapp.remotelibrary
 import com.jamitek.photosapp.api.ServerConfigRepository
 import com.jamitek.photosapp.locallibrary.LocalCameraRepository
 
-class MediaTimelineUseCase(
+class TimelineUseCase(
     private val serverConfigRepo: ServerConfigRepository,
     private val remoteLibraryRepo: RemoteLibraryRepository,
     private val localCameraRepo: LocalCameraRepository
@@ -11,6 +11,9 @@ class MediaTimelineUseCase(
 
     val urlIsSet
         get() = serverConfigRepo.urlIsSet
+
+    val cameraDirIsSet
+        get() = localCameraRepo.cameraDirIsSet
 
     /** Authorization header is used for fetching files with Glide on View layer */
     val authHeader

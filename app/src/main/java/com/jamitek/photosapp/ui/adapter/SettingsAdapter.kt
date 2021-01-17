@@ -11,6 +11,9 @@ import com.jamitek.photosapp.SettingsItemKey
 import com.jamitek.photosapp.databinding.ListItemSettingsBinding
 import com.jamitek.photosapp.databinding.ListItemSettingsSectionTitleBinding
 
+/**
+ * A base [RecyclerView.Adapter] for settings-like screens that share the same layouts.
+ */
 abstract class SettingsAdapter :
     RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder<ViewBinding>>() {
 

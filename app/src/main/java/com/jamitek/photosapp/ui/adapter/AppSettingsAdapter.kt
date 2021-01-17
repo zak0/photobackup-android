@@ -6,7 +6,7 @@ import com.jamitek.photosapp.SettingsItemKey
 import com.jamitek.photosapp.appsettings.AppSettingsSettingItemKey
 import com.jamitek.photosapp.ui.viewmodel.AppSettingsViewModel
 
-class BackupAdapter(private val viewModel: AppSettingsViewModel) : SettingsAdapter() {
+class AppSettingsAdapter(private val viewModel: AppSettingsViewModel) : SettingsAdapter() {
 
     override val items = viewModel.items.value ?: emptyList()
 

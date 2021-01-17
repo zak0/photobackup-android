@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.jamitek.photosapp.model.RemoteMedia
-import com.jamitek.photosapp.remotelibrary.MediaTimelineUseCase
+import com.jamitek.photosapp.remotelibrary.TimelineUseCase
 
-class MediaTimelineViewModel(
-    private val timelineUseCase: MediaTimelineUseCase,
+class TimelineViewModel(
+    private val timelineUseCase: TimelineUseCase,
 ) : ViewModel() {
 
     val urlIsSet

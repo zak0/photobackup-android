@@ -12,15 +12,15 @@ class ViewModelFactory(private val dependencyRoot: DependencyRoot) : ViewModelPr
             RootViewModel::class.java -> RootViewModel(
                 dependencyRoot.setCameraDirUseCase
             )
-            MediaTimelineViewModel::class.java -> MediaTimelineViewModel(
-                dependencyRoot.mediaTimelineUseCase
+            TimelineViewModel::class.java -> TimelineViewModel(
+                dependencyRoot.timelineUseCase
             )
             AppSettingsViewModel::class.java -> AppSettingsViewModel(
                 dependencyRoot.appSettingsUseCase
             )
             ServerSetupViewModel::class.java -> ServerSetupViewModel(dependencyRoot.serverConfigUseCase)
 
-            TimelineSettingsViewModel::class.java -> TimelineSettingsViewModel()
+            TimelineSettingsViewModel::class.java -> TimelineSettingsViewModel(dependencyRoot.timelineUseCase)
 
             else -> throw IllegalArgumentException("Unknown ViewModel type")
         } as T

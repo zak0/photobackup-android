@@ -9,10 +9,10 @@ import com.bumptech.glide.request.target.Target
 import com.jamitek.photosapp.R
 import com.jamitek.photosapp.databinding.ViewViewerImageBinding
 import com.jamitek.photosapp.extension.context
-import com.jamitek.photosapp.ui.viewmodel.MediaTimelineViewModel
+import com.jamitek.photosapp.ui.viewmodel.TimelineViewModel
 
 class ViewerAdapter(
-    private val viewModel: MediaTimelineViewModel,
+    private val viewModel: TimelineViewModel,
     private val popBackStack: () -> Unit
 ) :
     RecyclerView.Adapter<ViewerAdapter.ViewerViewHolder>() {

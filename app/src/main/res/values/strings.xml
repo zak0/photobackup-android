@@ -10,8 +10,9 @@
     <string name="navBackup">Back up</string>
     <string name="navSettings">Settings</string>
 
-    <string name="errorServerUrlNotSet">No servers added.</string>
+    <string name="errorServerUrlNotSet">Server not configured.</string>
     <string name="errorLocalFoldersRootNotSet">Please grant access to storage.</string>
+    <string name="errorCameraDirNotSet">Cannot back up. Camera directory is not set.</string>
 
     <string name="localFoldersSetRootDirButton">Grant Access</string>
 
