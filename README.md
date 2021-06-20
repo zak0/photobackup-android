@@ -14,3 +14,7 @@ Both this project and the corresponding server project are part of my personal c
 - Backs up photos and videos.
 - Notifies when automatic backups are done. For that peace of mind.
 - **(WIP)** Server administration from the client app
+
+# License
+
+This project is licensed under the terms of **GNU AGPLv3** license. See file **LICENSE** for more details. 
