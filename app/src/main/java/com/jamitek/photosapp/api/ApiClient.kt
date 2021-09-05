@@ -66,22 +66,31 @@ class ApiClient(
         }
     }
 
-    fun getAllMedia(callback: (Boolean, List<RemoteMedia>) -> Unit) = getAllMedia(0, callback)
+    fun getAllMedia(callback: (Result<List<RemoteMedia>>) -> Unit) = getAllMedia(0, callback)
 
-    fun getAllMedia(offset: Int, callback: (Boolean, List<RemoteMedia>) -> Unit) {
+    fun getAllMedia(offset: Int, callback: (Result<List<RemoteMedia>>) -> Unit) {
         val retroFitCallback = object : Callback<ResponseBody> {
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() == 200) {
-                    val photos =
-                        response.body().parseOrNull {
-                            serializer.deserialize<List<ApiMedia>>(it)
-                                .map { body -> body.asRemoteMedia() }
-                        } ?: emptyList()
-                    callback(true, photos)
-                    Log.d(TAG, "getAllPhotos() - response: 200")
-                } else {
-                    callback(false, emptyList())
+                val result = when (response.code()) {
+                    200 -> {
+                        Log.d(TAG, "getAllPhotos() - response: 200")
+                        val photos =
+                            response.body().parseOrNull {
+                                serializer.deserialize<List<ApiMedia>>(it)
+                                    .map { body -> body.asRemoteMedia() }
+                            } ?: emptyList()
+                        Result.success(photos)
+                    }
+
+                    401 -> Result.failure(ApiException.AuthError())
+                    500 -> Result.failure(ApiException.ServerError())
+                    else -> Result.failure(
+                        ApiException.UnknownError(
+                            response.code(),
+                            response.body()?.string()
+                        )
+                    )
                 }
             }
 

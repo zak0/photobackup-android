@@ -24,12 +24,9 @@ class TimelineUseCase(
     val lastBackupTimestamp = localCameraRepo.lastBackupTime
 
     /**
-     * Media grouped into nicely displayable sets.
-     *
-     * TODO Instead of hardcoding, use [RemoteLibraryRepository.mediaPerMonth] or
-     *  [RemoteLibraryRepository.mediaPerDate] per user's settings.
+     * Media grouped into nicely displayable buckets.
      */
-    val groupedMedia = remoteLibraryRepo.mediaPerMonth
+    val groupedMedia = remoteLibraryRepo.bucketedMedia
 
     fun refreshRemotePhotos() {
         if (urlIsSet) {

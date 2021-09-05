@@ -17,19 +17,17 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
         private const val TAG = "RemoteLibraryRepository"
     }
 
-    private val mutableAllPhotos =
+    private val mutableAllMedia =
         MutableLiveData<List<RemoteMedia>>(emptyList())
-    val allMedia: LiveData<List<RemoteMedia>> = mutableAllPhotos
+    val allMedia: LiveData<List<RemoteMedia>> = mutableAllMedia
 
     /**
-     * Media for "timeline" neatly organized into per-date buckets.
+     * Media for "timeline" organized into per-date buckets.
      */
     private val mutableMediaPerDate =
         MutableLiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>>().apply {
             value = ArrayList()
         }
-    val mediaPerDate: LiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>> =
-        mutableMediaPerDate
 
     /**
      * Media in monthly buckets
@@ -38,14 +36,21 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
         MutableLiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>>().apply {
             value = ArrayList()
         }
-    val mediaPerMonth: LiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>> =
+
+    /**
+     * TODO Instead of hardcoding, use [mutableMediaPerMonth] or [mutableMediaPerDate] per user's
+     *  settings.
+     */
+    val bucketedMedia: LiveData<ArrayList<Pair<String, ArrayList<RemoteMedia>>>> =
         mutableMediaPerMonth
 
     fun fetchRemotePhotos() {
         libraryApi.getAllMedia { success, photos ->
-            GlobalScope.launch {
-                arrangeIntoDateBuckets(photos)
-                arrangeIntoMonthBuckets(photos)
+            if (success) {
+                GlobalScope.launch {
+                    arrangeIntoDateBuckets(photos)
+                    arrangeIntoMonthBuckets(photos)
+                }
             }
         }
     }
@@ -110,7 +115,7 @@ class RemoteLibraryRepository(private val libraryApi: ApiClient) {
         Log.d(TAG, "Arrange by date - Done. Notifying observers...")
         withContext(Dispatchers.Main) {
             mutableMediaPerDate.value = newPhotosPerDate
-            mutableAllPhotos.value = newAllPhotos
+            mutableAllMedia.value = newAllPhotos
         }
     }
 
